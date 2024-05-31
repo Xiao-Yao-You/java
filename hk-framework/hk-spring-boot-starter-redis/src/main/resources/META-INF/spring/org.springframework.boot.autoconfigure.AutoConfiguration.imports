@@ -1,0 +1,2 @@
+com.hk.jigai.framework.redis.config.HkRedisAutoConfiguration
+com.hk.jigai.framework.redis.config.HkCacheAutoConfiguration

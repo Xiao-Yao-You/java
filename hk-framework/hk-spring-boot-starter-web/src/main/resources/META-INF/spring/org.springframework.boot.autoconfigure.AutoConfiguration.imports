@@ -1,0 +1,6 @@
+com.hk.jigai.framework.apilog.config.HkApiLogAutoConfiguration
+com.hk.jigai.framework.jackson.config.HkJacksonAutoConfiguration
+com.hk.jigai.framework.swagger.config.HkSwaggerAutoConfiguration
+com.hk.jigai.framework.web.config.HkWebAutoConfiguration
+com.hk.jigai.framework.xss.config.HkXssAutoConfiguration
+com.hk.jigai.framework.banner.config.HkBannerAutoConfiguration

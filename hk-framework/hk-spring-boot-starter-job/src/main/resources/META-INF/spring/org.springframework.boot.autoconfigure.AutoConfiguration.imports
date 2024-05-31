@@ -1,0 +1,2 @@
+com.hk.jigai.framework.quartz.config.HkQuartzAutoConfiguration
+com.hk.jigai.framework.quartz.config.HkAsyncAutoConfiguration

@@ -1,0 +1,2 @@
+com.hk.jigai.framework.tracer.config.HkTracerAutoConfiguration
+com.hk.jigai.framework.tracer.config.HkMetricsAutoConfiguration

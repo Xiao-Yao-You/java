@@ -1,0 +1,3 @@
+com.hk.jigai.framework.idempotent.config.HkIdempotentConfiguration
+com.hk.jigai.framework.lock4j.config.HkLock4jConfiguration
+com.hk.jigai.framework.ratelimiter.config.HkRateLimiterConfiguration
