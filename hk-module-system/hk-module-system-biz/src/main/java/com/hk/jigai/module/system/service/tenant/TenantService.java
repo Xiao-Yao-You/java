@@ -1,15 +1,19 @@
 package com.hk.jigai.module.system.service.tenant;
 
 import com.hk.jigai.framework.common.pojo.PageResult;
+import com.hk.jigai.framework.common.util.collection.CollectionUtils;
 import com.hk.jigai.framework.tenant.core.context.TenantContextHolder;
 import com.hk.jigai.module.system.controller.admin.tenant.vo.tenant.TenantPageReqVO;
 import com.hk.jigai.module.system.controller.admin.tenant.vo.tenant.TenantSaveReqVO;
+import com.hk.jigai.module.system.dal.dataobject.dept.DeptDO;
 import com.hk.jigai.module.system.dal.dataobject.tenant.TenantDO;
 import com.hk.jigai.module.system.service.tenant.handler.TenantInfoHandler;
 import com.hk.jigai.module.system.service.tenant.handler.TenantMenuHandler;
 
 import javax.validation.Valid;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -127,4 +131,32 @@ public interface TenantService {
      */
     void validTenant(Long id);
 
+    /**
+     * 校验租户们是否有效。如下情况，视为无效：
+     * 1. 租户编号不存在
+     * 2. 租户被禁用
+     *
+     * @param ids 租户编号数组
+     */
+    void validateTenantList(Collection<Long> ids);
+
+    /**
+     * 获得指定编号的租户 Map
+     *
+     * @param ids 租户编号数组
+     * @return 租户 Map
+     */
+    default Map<Long, TenantDO> getTenantMap(Collection<Long> ids) {
+        List<TenantDO> list = getTenantList(ids);
+        return CollectionUtils.convertMap(list, TenantDO::getId);
+    }
+
+
+    /**
+     * 获得租户信息数组
+     *
+     * @param ids 租户编号数组
+     * @return 租户信息数组
+     */
+    List<TenantDO> getTenantList(Collection<Long> ids);
 }

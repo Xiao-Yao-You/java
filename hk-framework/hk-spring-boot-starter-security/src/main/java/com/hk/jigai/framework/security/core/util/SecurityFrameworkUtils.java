@@ -106,11 +106,11 @@ public class SecurityFrameworkUtils {
      *
      * @return 部门编号
      */
-    @Nullable
-    public static Long getLoginUserDeptId() {
-        LoginUser loginUser = getLoginUser();
-        return loginUser != null ? MapUtil.getLong(loginUser.getInfo(), LoginUser.INFO_KEY_DEPT_ID) : null;
-    }
+//    @Nullable
+//    public static Long getLoginUserDeptId() {
+//        LoginUser loginUser = getLoginUser();
+//        return loginUser != null ? MapUtil.getLong(loginUser.getInfo(), LoginUser.INFO_KEY_DEPT_ID) : null;
+//    }
 
     /**
      * 设置当前用户

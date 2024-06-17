@@ -6,6 +6,7 @@ import com.hk.jigai.framework.common.enums.UserTypeEnum;
 import com.hk.jigai.framework.common.util.monitor.TracerUtils;
 import com.hk.jigai.framework.common.util.servlet.ServletUtils;
 import com.hk.jigai.framework.common.util.validation.ValidationUtils;
+import com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils;
 import com.hk.jigai.module.system.api.logger.dto.LoginLogCreateReqDTO;
 import com.hk.jigai.module.system.api.sms.SmsCodeApi;
 import com.hk.jigai.module.system.api.social.dto.SocialUserBindReqDTO;

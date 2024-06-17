@@ -8,6 +8,7 @@ import com.hk.jigai.framework.common.enums.CommonStatusEnum;
 import com.hk.jigai.framework.common.util.collection.CollectionUtils;
 import com.hk.jigai.framework.datapermission.core.annotation.DataPermission;
 import com.hk.jigai.module.system.api.permission.dto.DeptDataPermissionRespDTO;
+import com.hk.jigai.module.system.controller.admin.user.vo.user.UserDeptRespVO;
 import com.hk.jigai.module.system.dal.dataobject.permission.MenuDO;
 import com.hk.jigai.module.system.dal.dataobject.permission.RoleDO;
 import com.hk.jigai.module.system.dal.dataobject.permission.RoleMenuDO;
@@ -32,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static com.hk.jigai.framework.common.util.collection.CollectionUtils.convertSet;
 import static com.hk.jigai.framework.common.util.json.JsonUtils.toJsonString;
@@ -282,7 +284,11 @@ public class PermissionServiceImpl implements PermissionService {
         }
 
         // 获得用户的部门编号的缓存，通过 Guava 的 Suppliers 惰性求值，即有且仅有第一次发起 DB 的查询
-        Supplier<Long> userDeptId = Suppliers.memoize(() -> userService.getUser(userId).getDeptId());
+        List<Long> userDeptList = userService.getUser(userId).getDeptList().stream().map(UserDeptRespVO :: getId).collect(Collectors.toList());
+        Supplier<List<Long>> userDeptId = Suppliers.memoize(() -> new ArrayList<>());
+        if(!CollectionUtils.isAnyEmpty(userDeptList)){
+            userDeptId = Suppliers.memoize(() -> userDeptList);
+        }
         // 遍历每个角色，计算
         for (RoleDO role : roles) {
             // 为空时，跳过
@@ -304,12 +310,12 @@ public class PermissionServiceImpl implements PermissionService {
             }
             // 情况三，DEPT_ONLY
             if (Objects.equals(role.getDataScope(), DataScopeEnum.DEPT_ONLY.getScope())) {
-                CollectionUtils.addIfNotNull(result.getDeptIds(), userDeptId.get());
+                CollUtil.addAll(result.getDeptIds(), userDeptId.get());
                 continue;
             }
             // 情况四，DEPT_DEPT_AND_CHILD
             if (Objects.equals(role.getDataScope(), DataScopeEnum.DEPT_AND_CHILD.getScope())) {
-                CollUtil.addAll(result.getDeptIds(), deptService.getChildDeptIdListFromCache(userDeptId.get()));
+                userDeptList.forEach(id ->{CollUtil.addAll(result.getDeptIds(), deptService.getChildDeptIdListFromCache(id));});
                 // 添加本身部门编号
                 CollUtil.addAll(result.getDeptIds(), userDeptId.get());
                 continue;

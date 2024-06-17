@@ -3,16 +3,23 @@ package com.hk.jigai.module.system.controller.admin.user;
 import cn.hutool.core.collection.CollUtil;
 import com.hk.jigai.framework.apilog.core.annotation.ApiAccessLog;
 import com.hk.jigai.framework.common.enums.CommonStatusEnum;
+import com.hk.jigai.framework.common.exception.enums.GlobalErrorCodeConstants;
 import com.hk.jigai.framework.common.pojo.CommonResult;
 import com.hk.jigai.framework.common.pojo.PageParam;
 import com.hk.jigai.framework.common.pojo.PageResult;
+import com.hk.jigai.framework.common.util.collection.CollectionUtils;
+import com.hk.jigai.framework.common.util.collection.MapUtils;
+import com.hk.jigai.framework.common.util.object.BeanUtils;
 import com.hk.jigai.framework.excel.core.util.ExcelUtils;
+import com.hk.jigai.framework.security.core.LoginUser;
+import com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils;
 import com.hk.jigai.module.system.controller.admin.user.vo.user.*;
 import com.hk.jigai.module.system.convert.user.UserConvert;
 import com.hk.jigai.module.system.dal.dataobject.dept.DeptDO;
 import com.hk.jigai.module.system.dal.dataobject.user.AdminUserDO;
 import com.hk.jigai.module.system.enums.common.SexEnum;
 import com.hk.jigai.module.system.service.dept.DeptService;
+import com.hk.jigai.module.system.service.permission.PermissionService;
 import com.hk.jigai.module.system.service.user.AdminUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -30,10 +37,14 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.hk.jigai.framework.apilog.core.enums.OperateTypeEnum.EXPORT;
+import static com.hk.jigai.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static com.hk.jigai.framework.common.pojo.CommonResult.success;
 import static com.hk.jigai.framework.common.util.collection.CollectionUtils.convertList;
+import static com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+import static com.hk.jigai.module.system.enums.ErrorCodeConstants.TENANT_DUPLICATE;
 
 @Tag(name = "管理后台 - 用户")
 @RestController
@@ -43,8 +54,9 @@ public class UserController {
 
     @Resource
     private AdminUserService userService;
+
     @Resource
-    private DeptService deptService;
+    private PermissionService permissionService;
 
     @PostMapping("/create")
     @Operation(summary = "新增用户")
@@ -96,21 +108,22 @@ public class UserController {
         if (CollUtil.isEmpty(pageResult.getList())) {
             return success(new PageResult<>(pageResult.getTotal()));
         }
-        // 拼接数据
-        Map<Long, DeptDO> deptMap = deptService.getDeptMap(
-                convertList(pageResult.getList(), AdminUserDO::getDeptId));
-        return success(new PageResult<>(UserConvert.INSTANCE.convertList(pageResult.getList(), deptMap),
-                pageResult.getTotal()));
+        List<UserRespVO> returnList = CollectionUtils.convertList(pageResult.getList(), user -> {
+            UserRespVO userVO = BeanUtils.toBean(user, UserRespVO.class);
+            return userVO;
+        });
+        return success(new PageResult<>(returnList, pageResult.getTotal()));
     }
 
     @GetMapping({"/list-all-simple", "/simple-list"})
     @Operation(summary = "获取用户精简信息列表", description = "只包含被开启的用户，主要用于前端的下拉选项")
     public CommonResult<List<UserSimpleRespVO>> getSimpleUserList() {
         List<AdminUserDO> list = userService.getUserListByStatus(CommonStatusEnum.ENABLE.getStatus());
-        // 拼接数据
-        Map<Long, DeptDO> deptMap = deptService.getDeptMap(
-                convertList(list, AdminUserDO::getDeptId));
-        return success(UserConvert.INSTANCE.convertSimpleList(list, deptMap));
+        List<UserSimpleRespVO> returnList = CollectionUtils.convertList(list, user -> {
+            UserSimpleRespVO userVO = BeanUtils.toBean(user, UserSimpleRespVO.class);
+            return userVO;
+        });
+        return success(returnList);
     }
 
     @GetMapping("/get")
@@ -119,9 +132,7 @@ public class UserController {
     @PreAuthorize("@ss.hasPermission('system:user:query')")
     public CommonResult<UserRespVO> getUser(@RequestParam("id") Long id) {
         AdminUserDO user = userService.getUser(id);
-        // 拼接数据
-        DeptDO dept = deptService.getDept(user.getDeptId());
-        return success(UserConvert.INSTANCE.convert(user, dept));
+        return success(BeanUtils.toBean(user, UserRespVO.class));
     }
 
     @GetMapping("/export")
@@ -132,11 +143,12 @@ public class UserController {
                                HttpServletResponse response) throws IOException {
         exportReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<AdminUserDO> list = userService.getUserPage(exportReqVO).getList();
+        List<UserRespVO> returnList = CollectionUtils.convertList(list, user -> {
+            UserRespVO userVO = BeanUtils.toBean(user, UserRespVO.class);
+            return userVO;
+        });
         // 输出 Excel
-        Map<Long, DeptDO> deptMap = deptService.getDeptMap(
-                convertList(list, AdminUserDO::getDeptId));
-        ExcelUtils.write(response, "用户数据.xls", "数据", UserRespVO.class,
-                UserConvert.INSTANCE.convertList(list, deptMap));
+        ExcelUtils.write(response, "用户数据.xls", "数据", UserRespVO.class, returnList);
     }
 
     @GetMapping("/get-import-template")
@@ -144,9 +156,9 @@ public class UserController {
     public void importTemplate(HttpServletResponse response) throws IOException {
         // 手动创建导出 demo
         List<UserImportExcelVO> list = Arrays.asList(
-                UserImportExcelVO.builder().username("yunai").deptId(1L).email("yunai@iocoder.cn").mobile("15601691300")
+                UserImportExcelVO.builder().username("yunai").deptIds("1,2").email("yunai@iocoder.cn").mobile("15601691300")
                         .nickname("恒科").status(CommonStatusEnum.ENABLE.getStatus()).sex(SexEnum.MALE.getSex()).build(),
-                UserImportExcelVO.builder().username("yuanma").deptId(2L).email("yuanma@iocoder.cn").mobile("15601701300")
+                UserImportExcelVO.builder().username("yuanma").deptIds("1").email("yuanma@iocoder.cn").mobile("15601701300")
                         .nickname("源码").status(CommonStatusEnum.DISABLE.getStatus()).sex(SexEnum.FEMALE.getSex()).build()
         );
         // 输出
@@ -166,4 +178,37 @@ public class UserController {
         return success(userService.importUserList(list, updateSupport));
     }
 
+    @GetMapping("/ignoreTenant/page")
+    @Operation(summary = "获得用户分页列表忽略租户过滤")
+    @PreAuthorize("@ss.hasPermission('system:user:list')")
+    public CommonResult<PageResult<UserRespVO>> ignoreTenantGetUserPage(@Valid UserPageReqVO pageReqVO) {
+        //权限校验,只有超级管理员才有该权限，加菜单也能控制，可以删除该判断
+        Set<Long> roleIds = permissionService.getUserRoleIdListByUserId(getLoginUserId());
+        if(CollectionUtils.isAnyEmpty() || !roleIds.contains(1)){
+            throw exception(GlobalErrorCodeConstants.FORBIDDEN);
+        }
+        // 获得用户分页列表
+        PageResult<AdminUserDO> pageResult = userService.getUserPage(pageReqVO);
+        if (CollUtil.isEmpty(pageResult.getList())) {
+            return success(new PageResult<>(pageResult.getTotal()));
+        }
+        List<UserRespVO> returnList = CollectionUtils.convertList(pageResult.getList(), user -> {
+            UserRespVO userVO = BeanUtils.toBean(user, UserRespVO.class);
+            return userVO;
+        });
+        return success(new PageResult<>(returnList, pageResult.getTotal()));
+    }
+
+    @PutMapping("/ignoreTenant/updateUserTenant")
+    @Operation(summary = "修改用户租户信息")
+    @PreAuthorize("@ss.hasPermission('system:user:update')")
+    public CommonResult<Boolean> updateUserTenant(@Valid @RequestBody UserTenantReqVO reqVO) {
+        //权限校验,只有超级管理员才有该权限，加菜单也能控制，可以删除该判断
+        Set<Long> roleIds = permissionService.getUserRoleIdListByUserId(getLoginUserId());
+        if(CollectionUtils.isAnyEmpty() || !roleIds.contains(1)){
+            throw exception(GlobalErrorCodeConstants.FORBIDDEN);
+        }
+        userService.updateUserTenant(reqVO);
+        return success(true);
+    }
 }

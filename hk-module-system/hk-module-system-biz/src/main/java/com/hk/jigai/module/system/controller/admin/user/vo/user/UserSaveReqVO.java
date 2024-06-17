@@ -12,6 +12,7 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.*;
+import java.util.List;
 import java.util.Set;
 
 @Schema(description = "管理后台 - 用户创建/修改 Request VO")
@@ -37,9 +38,12 @@ public class UserSaveReqVO {
     @DiffLogField(name = "备注")
     private String remark;
 
-    @Schema(description = "部门编号", example = "我是一个用户")
-    @DiffLogField(name = "部门", function = DeptParseFunction.NAME)
-    private Long deptId;
+//    @Schema(description = "部门编号", example = "我是一个用户")
+//    @DiffLogField(name = "部门", function = DeptParseFunction.NAME)
+//    private Long deptId;
+    @Schema(description = "部门列表信息")
+    @DiffLogField(name = "部门列表信息")
+    private List<UserDeptRespVO> deptList;
 
     @Schema(description = "岗位编号数组", example = "1")
     @DiffLogField(name = "岗位", function = PostParseFunction.NAME)

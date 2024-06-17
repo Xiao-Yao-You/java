@@ -23,13 +23,13 @@ public interface AdminUserApi {
      */
     AdminUserRespDTO getUser(Long id);
 
-    /**
-     * 通过用户 ID 查询用户下属
-     *
-     * @param id 用户编号
-     * @return 用户下属用户列表
-     */
-    List<AdminUserRespDTO> getUserListBySubordinate(Long id);
+//    /**
+//     * 通过用户 ID 查询用户下属
+//     *
+//     * @param id 用户编号
+//     * @return 用户下属用户列表
+//     */
+//    List<AdminUserRespDTO> getUserListBySubordinate(Long id);
 
     /**
      * 通过用户 ID 查询用户们

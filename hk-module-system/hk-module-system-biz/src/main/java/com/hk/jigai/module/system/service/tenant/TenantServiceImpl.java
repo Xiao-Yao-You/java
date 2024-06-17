@@ -16,6 +16,7 @@ import com.hk.jigai.module.system.controller.admin.permission.vo.role.RoleSaveRe
 import com.hk.jigai.module.system.controller.admin.tenant.vo.tenant.TenantPageReqVO;
 import com.hk.jigai.module.system.controller.admin.tenant.vo.tenant.TenantSaveReqVO;
 import com.hk.jigai.module.system.convert.tenant.TenantConvert;
+import com.hk.jigai.module.system.dal.dataobject.dept.DeptDO;
 import com.hk.jigai.module.system.dal.dataobject.permission.MenuDO;
 import com.hk.jigai.module.system.dal.dataobject.permission.RoleDO;
 import com.hk.jigai.module.system.dal.dataobject.tenant.TenantDO;
@@ -37,9 +38,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import static com.hk.jigai.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static com.hk.jigai.module.system.enums.ErrorCodeConstants.*;
@@ -93,6 +92,39 @@ public class TenantServiceImpl implements TenantService {
             throw exception(TENANT_EXPIRE, tenant.getName());
         }
     }
+
+    @Override
+    public void validateTenantList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+        // 获得科室信息
+        Map<Long, TenantDO> tenantMap = getTenantMap(ids);
+        // 校验
+        ids.forEach(id -> {
+            TenantDO tenant = tenantMap.get(id);
+            if (tenant == null) {
+                throw exception(TENANT_NOT_EXISTS);
+            }
+            if (tenant.getStatus().equals(CommonStatusEnum.DISABLE.getStatus())) {
+                throw exception(TENANT_DISABLE, tenant.getName());
+            }
+            if (DateUtils.isExpired(tenant.getExpireTime())) {
+                throw exception(TENANT_EXPIRE, tenant.getName());
+            }
+
+        });
+
+    }
+
+    @Override
+    public List<TenantDO> getTenantList(Collection<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return tenantMapper.selectBatchIds(ids);
+    }
+
 
     @Override
     @DSTransactional // 多数据源，使用 @DSTransactional 保证本地事务，以及数据源的切换

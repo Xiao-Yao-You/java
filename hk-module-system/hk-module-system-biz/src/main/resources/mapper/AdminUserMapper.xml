@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hk.jigai.module.system.dal.mysql.user.AdminUserMapper">
+
+    <select id="selectById" resultMap="userMap">
+        SELECT  su.id,
+                su.username,
+                su.password,
+                su.nickname,
+                su.remark,
+                su.post_ids,
+                su.email,
+                su.mobile,
+                su.sex,
+                su.avatar,
+                su.status,
+                su.login_ip,
+                su.login_date,
+                sd.id as deptId,
+                sd.name as deptName,
+                sd.parent_id as parentId
+        FROM system_users su
+   LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
+   LEFT JOIN system_dept sd ON sud.dept_id=sd.id
+            WHERE su.id = #{id}
+        ORDER BY su.id DESC
+    </select>
+
+    <select id="selectByUsername" resultMap="userMap">
+        SELECT  su.id,
+                su.username,
+                su.password,
+                su.nickname,
+                su.remark,
+                su.post_ids,
+                su.email,
+                su.mobile,
+                su.sex,
+                su.avatar,
+                su.status,
+                su.login_ip,
+                su.login_date,
+                sd.id as deptId,
+                sd.name as deptName,
+                sd.parent_id as parentId
+        FROM system_users su
+                 LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
+                 LEFT JOIN system_dept sd ON sud.dept_id=sd.id
+        WHERE su.username = #{username}
+        ORDER BY su.id DESC
+    </select>
+
+    <select id="selectByEmail" resultMap="userMap">
+        SELECT  su.id,
+                su.username,
+                su.password,
+                su.nickname,
+                su.remark,
+                su.post_ids,
+                su.email,
+                su.mobile,
+                su.sex,
+                su.avatar,
+                su.status,
+                su.login_ip,
+                su.login_date,
+                sd.id as deptId,
+                sd.name as deptName,
+                sd.parent_id as parentId
+        FROM system_users su
+                 LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
+                 LEFT JOIN system_dept sd ON sud.dept_id=sd.id
+        WHERE su.email = #{email}
+        ORDER BY su.id DESC
+    </select>
+
+    <select id="selectByMobile" resultMap="userMap">
+        SELECT  su.id,
+                su.username,
+                su.password,
+                su.nickname,
+                su.remark,
+                su.post_ids,
+                su.email,
+                su.mobile,
+                su.sex,
+                su.avatar,
+                su.status,
+                su.login_ip,
+                su.login_date,
+                sd.id as deptId,
+                sd.name as deptName,
+                sd.parent_id as parentId
+        FROM system_users su
+                 LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
+                 LEFT JOIN system_dept sd ON sud.dept_id=sd.id
+        WHERE su.mobile = #{mobile}
+        ORDER BY su.id DESC
+    </select>
+
+    <select id="selectListByNickname" resultMap="userMap">
+        SELECT  su.id,
+                su.username,
+                su.password,
+                su.nickname,
+                su.remark,
+                su.post_ids,
+                su.email,
+                su.mobile,
+                su.sex,
+                su.avatar,
+                su.status,
+                su.login_ip,
+                su.login_date,
+                sd.id as deptId,
+                sd.name as deptName,
+                sd.parent_id as parentId
+        FROM system_users su
+                 LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
+                 LEFT JOIN system_dept sd ON sud.dept_id=sd.id
+        WHERE su.nickname like CONCAT('%' , #{nickname} , '%')
+        ORDER BY su.id DESC
+    </select>
+
+    <select id="selectPage" parameterType="map" resultMap="userMap">
+        SELECT  su.id,su.username,su.password,su.nickname,su.remark,su.post_ids,su.email,su.mobile,su.sex,su.avatar,su.status,su.login_ip,su.login_date,su.create_time,sd.id as deptId,sd.name as deptName
+          FROM system_users su
+     LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
+     LEFT JOIN system_dept sd ON sud.dept_id=sd.id
+         WHERE 1=1
+        <if test="username != null and username != ''">
+            and su.username like CONCAT('%' , #{username} , '%')
+        </if>
+        <if test="mobile != null and mobile != ''">
+            and su.mobile  like CONCAT('%' , #{mobile} , '%')
+        </if>
+        <if test="status != null">
+            and su.status = #{status}
+        </if>
+        <if test="createTimeArray != null and createTimeArray.length >1">
+            and su.create_time between #{createTimeArray[${0}]} and #{createTimeArray[${1}]}
+        </if>
+        <if test="deptList != null and deptList.size() > 0">
+            and sd.id IN
+            <foreach item="item" index="index" collection="deptList" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        ORDER BY su.id DESC
+        LIMIT #{offset},#{pageSize}
+    </select>
+
+
+    <select id="selectCount" parameterType="map" resultType="Integer">
+        SELECT  count(1)
+        FROM system_users su
+        LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
+        LEFT JOIN system_dept sd ON sud.dept_id=sd.id
+        WHERE 1=1
+            <if test="username != null  and username != ''">
+                and su.username like CONCAT('%' , #{username} , '%')
+            </if>
+            <if test="mobile != null  and mobile != ''">
+                and su.mobile  like CONCAT('%' , #{mobile} , '%')
+            </if>
+            <if test="status != null">
+                and su.status = #{status}
+            </if>
+            <if test="createTimeArray != null and createTimeArray.length >1">
+                and su.create_time between #{createTimeArray[${0}]} and #{createTimeArray[${1}]}
+            </if>
+            <if test="deptList != null and deptList.size() > 0">
+                and sd.id IN
+                <foreach item="item" index="index" collection="deptList" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+    </select>
+
+    <select id="selectListByStatus" resultMap="userMap">
+        SELECT  su.id,
+        su.username,
+        su.password,
+        su.nickname,
+        su.remark,
+        su.post_ids,
+        su.email,
+        su.mobile,
+        su.sex,
+        su.avatar,
+        su.status,
+        su.login_ip,
+        su.login_date,
+        sd.id as deptId,
+        sd.name as deptName
+        FROM system_users su
+   LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
+   LEFT JOIN system_dept sd ON sud.dept_id=sd.id
+       WHERE su.status = #{status}
+    ORDER BY su.id DESC
+    </select>
+
+    <select id="selectListByDeptIds" resultMap="userMap">
+        SELECT  su.id,
+        su.username,
+        su.password,
+        su.nickname,
+        su.remark,
+        su.post_ids,
+        su.email,
+        su.mobile,
+        su.sex,
+        su.avatar,
+        su.status,
+        su.login_ip,
+        su.login_date,
+        sd.id as deptId,
+        sd.name as deptName
+        FROM system_users su
+        LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
+        LEFT JOIN system_dept sd ON sud.dept_id=sd.id
+        WHERE sd.id IN
+            <foreach item="item" index="index" collection="deptIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        ORDER BY su.id DESC
+    </select>
+
+
+
+    <resultMap id="userMap" type="com.hk.jigai.module.system.dal.dataobject.user.AdminUserDO">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="nickname" column="nickname"/>
+        <result property="remark" column="remark"/>
+        <result property="postIds" column="post_ids" typeHandler="com.hk.jigai.framework.mybatis.core.type.JsonLongSetTypeHandler"/>
+        <result property="email" column="email"/>
+        <result property="mobile" column="mobile"/>
+        <result property="sex" column="sex"/>
+        <result property="avatar" column="avatar"/>
+        <result property="status" column="status"/>
+        <result property="loginIp" column="login_ip"/>
+        <result property="loginDate" column="login_date"/>
+        <result property="createTime" column="create_time"/>
+        <collection property="deptList" ofType="com.hk.jigai.module.system.controller.admin.user.vo.user.UserDeptRespVO">
+            <id property="id" column="deptId"/>
+            <result property="name" column="deptName"/>
+            <result property="parentId" column="parentId"/>
+        </collection>
+    </resultMap>
+</mapper>

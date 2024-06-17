@@ -109,6 +109,8 @@ public interface ErrorCodeConstants {
     ErrorCode TENANT_CAN_NOT_UPDATE_SYSTEM = new ErrorCode(1_002_015_003, "系统租户不能进行修改、删除等操作！");
     ErrorCode TENANT_NAME_DUPLICATE = new ErrorCode(1_002_015_004, "名字为【{}】的租户已存在");
     ErrorCode TENANT_WEBSITE_DUPLICATE = new ErrorCode(1_002_015_005, "域名为【{}】的租户已存在");
+    ErrorCode TENANT_DUPLICATE = new ErrorCode(1_002_015_006, "当前用户的租户为【{}】，无需切换");
+
 
     // ========== 租户套餐 1-002-016-000 ==========
     ErrorCode TENANT_PACKAGE_NOT_EXISTS = new ErrorCode(1_002_016_000, "租户套餐不存在");
@@ -163,4 +165,11 @@ public interface ErrorCodeConstants {
     // ========== 站内信发送 1-002-028-000 ==========
     ErrorCode NOTIFY_SEND_TEMPLATE_PARAM_MISS = new ErrorCode(1_002_028_000, "模板参数({})缺失");
 
+    // ========== 厂区地图定位配置 1-002-029-000 ==========
+    ErrorCode MAP_COORDINATE_INFO_NOT_EXISTS = new ErrorCode(1_002_029_000, "厂区地图定位详细信息不存在");
+
+    // ========== 单据编码类型配置 1-002-030-000 ==========
+    ErrorCode SCENE_CODE_NOT_EXISTS = new ErrorCode(1_002_030_000, "单据编码类型配置不存在");
+    ErrorCode SCENE_CODE_IS_IN_USE = new ErrorCode(1_002_030_001, "该单据编码已经被使用，无法修改或删除");
+    ErrorCode SCENE_CODE_NOT_AVAILABLE = new ErrorCode(1_002_030_002, "单据编码类型目前不存在或者不可用，请核实");
 }

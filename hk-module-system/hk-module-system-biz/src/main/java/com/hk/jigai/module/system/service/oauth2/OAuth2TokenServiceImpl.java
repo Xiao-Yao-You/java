@@ -8,10 +8,13 @@ import cn.hutool.core.util.StrUtil;
 import com.hk.jigai.framework.common.enums.UserTypeEnum;
 import com.hk.jigai.framework.common.exception.enums.GlobalErrorCodeConstants;
 import com.hk.jigai.framework.common.pojo.PageResult;
+import com.hk.jigai.framework.common.util.collection.CollectionUtils;
 import com.hk.jigai.framework.common.util.date.DateUtils;
 import com.hk.jigai.framework.security.core.LoginUser;
+import com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils;
 import com.hk.jigai.framework.tenant.core.context.TenantContextHolder;
 import com.hk.jigai.module.system.controller.admin.oauth2.vo.token.OAuth2AccessTokenPageReqVO;
+import com.hk.jigai.module.system.controller.admin.user.vo.user.UserDeptRespVO;
 import com.hk.jigai.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
 import com.hk.jigai.module.system.dal.dataobject.oauth2.OAuth2ClientDO;
 import com.hk.jigai.module.system.dal.dataobject.oauth2.OAuth2RefreshTokenDO;
@@ -29,6 +32,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.hk.jigai.framework.common.exception.util.ServiceExceptionUtil.exception0;
 import static com.hk.jigai.framework.common.util.collection.CollectionUtils.convertSet;
@@ -177,8 +181,14 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
     private Map<String, String> buildUserInfo(Long userId, Integer userType) {
         if (userType.equals(UserTypeEnum.ADMIN.getValue())) {
             AdminUserDO user = adminUserService.getUser(userId);
+            StringBuffer deptIds = new StringBuffer("");
+            if(!CollectionUtils.isAnyEmpty()){
+                for(UserDeptRespVO vo : user.getDeptList()){
+                    deptIds.append(vo.getId()).append(",");
+                }
+            }
             return MapUtil.builder(LoginUser.INFO_KEY_NICKNAME, user.getNickname())
-                    .put(LoginUser.INFO_KEY_DEPT_ID, StrUtil.toStringOrNull(user.getDeptId())).build();
+                    .put(LoginUser.INFO_KEY_DEPT_ID, deptIds.toString()).build();
         } else if (userType.equals(UserTypeEnum.MEMBER.getValue())) {
             // 注意：目前 Member 暂时不读取，可以按需实现
             return Collections.emptyMap();

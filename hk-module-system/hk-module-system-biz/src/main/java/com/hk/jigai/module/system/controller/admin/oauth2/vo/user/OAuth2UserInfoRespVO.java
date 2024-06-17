@@ -34,9 +34,9 @@ public class OAuth2UserInfoRespVO {
     private String avatar;
 
     /**
-     * 所在部门
+     * 所在部门组
      */
-    private Dept dept;
+    private List<Dept> depts;
 
     /**
      * 所属岗位数组

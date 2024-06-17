@@ -15,6 +15,7 @@
         <!-- 各种 module 拓展 -->
         <module>hk-module-system</module>
         <module>hk-module-infra</module>
+        <module>hk-module-bpm</module>
     </modules>
 
     <name>${project.artifactId}</name>

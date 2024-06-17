@@ -16,11 +16,14 @@ import com.hk.jigai.module.system.service.dict.DictDataService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jodd.util.StringUtil;
+import org.springframework.data.redis.support.atomic.RedisAtomicLong;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
@@ -101,4 +104,17 @@ public class DictDataController {
                 BeanUtils.toBean(list, DictDataRespVO.class));
     }
 
+    @GetMapping("/pageIgnoreLogin")
+    @Operation(summary = "/获得字典类型的分页列表忽略登录")
+    @PermitAll
+    public CommonResult<PageResult<DictDataRespVO>> getDictTypePageIgnoreLogin(@Valid DictDataPageReqVO pageReqVO) {
+        if(pageReqVO == null){
+            pageReqVO = new DictDataPageReqVO();
+            pageReqVO.setDictType("hk_map_coordinate_info_type");
+        }else if(StringUtil.isEmpty(pageReqVO.getDictType())){
+            pageReqVO.setDictType("hk_map_coordinate_info_type");
+        }
+        PageResult<DictDataDO> pageResult = dictDataService.getDictDataPage(pageReqVO);
+        return success(BeanUtils.toBean(pageResult, DictDataRespVO.class));
+    }
 }

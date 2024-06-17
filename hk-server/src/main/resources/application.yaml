@@ -63,6 +63,7 @@ flowable:
 
 # MyBatis Plus 的配置项
 mybatis-plus:
+  mapper-locations: classpath:/mapper/**/*.xml
   configuration:
     map-underscore-to-camel-case: true # 虽然默认为 true ，但是还是显示去指定下。
   global-config:
@@ -154,6 +155,8 @@ hk:
   security:
     permit-all_urls:
       - /admin-api/mp/open/** # 微信公众号开放平台，微信回调接口，不需要登录
+      - /admin-api/map-coordinate-info/queryAll #查询厂区具体经纬度，不需要登录
+      - /admin-api/system/dict-data/pageIgnoreLogin #查询字段，不需要登录
   websocket:
     enable: true # websocket的开关
     path: /infra/ws # 路径
@@ -182,7 +185,7 @@ hk:
     db-schemas: ${spring.datasource.dynamic.datasource.master.name}
     front-type: 10 # 前端模版的类型，参见 CodegenFrontTypeEnum 枚举类
   tenant: # 多租户相关配置项
-    enable: false
+    enable: true
     ignore-urls:
       - /admin-api/system/tenant/get-id-by-name # 基于名字获取租户，不许带租户编号
       - /admin-api/system/tenant/get-by-website # 基于域名获取租户，不许带租户编号
@@ -193,6 +196,9 @@ hk:
       - /admin-api/pay/notify/** # 支付回调通知，不携带租户编号
       - /jmreport/* # 积木报表，无法携带租户编号
       - /admin-api/mp/open/** # 微信公众号开放平台，微信回调接口，无法携带租户编号
+      - /admin-api/system/auth/ignoreTenant/** # 针对超级管理员账号，需要管理所有租户的用户，并需要配置用户的租户信息
+      - /admin-api/map-coordinate-info/queryAll #针对地图管理，目前没有租户概念
+      - /admin-api/system/dict-data/pageIgnoreLogin #针对字典查询接口
     ignore-tables:
       - system_tenant
       - system_tenant_package
@@ -209,6 +215,7 @@ hk:
       - system_mail_template
       - system_mail_log
       - system_notify_template
+      - system_scene_code
       - infra_codegen_column
       - infra_codegen_table
       - infra_config

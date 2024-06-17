@@ -3,6 +3,7 @@ package com.hk.jigai.module.system.dal.dataobject.user;
 import com.hk.jigai.framework.common.enums.CommonStatusEnum;
 import com.hk.jigai.framework.mybatis.core.type.JsonLongSetTypeHandler;
 import com.hk.jigai.framework.tenant.core.db.TenantBaseDO;
+import com.hk.jigai.module.system.controller.admin.user.vo.user.UserDeptRespVO;
 import com.hk.jigai.module.system.enums.common.SexEnum;
 import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -12,6 +13,7 @@ import lombok.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -51,10 +53,17 @@ public class AdminUserDO extends TenantBaseDO {
      * 备注
      */
     private String remark;
+//    /**
+//     * 部门 ID
+//     */
+//    private Long deptId;
+
     /**
-     * 部门 ID
+     * 部门列表
      */
-    private Long deptId;
+    @TableField(exist = false)
+    private List<UserDeptRespVO> deptList;
+
     /**
      * 岗位编号数组
      */

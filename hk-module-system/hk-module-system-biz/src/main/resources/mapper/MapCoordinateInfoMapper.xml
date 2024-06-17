@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hk.jigai.module.system.dal.mysql.mapcoordinateinfo.MapCoordinateInfoMapper">
+
+    <select id="getMapCoordinateInfoAll" resultMap="mapCoordinateInfoMap">
+        select id,zone_type as zoneType,type,description,description,longitude,latitude,create_time as createTime
+        from hk_map_coordinate_info
+        where zone_type = '00' and deleted = 0
+    </select>
+
+    <resultMap id="mapCoordinateInfoMap" type="com.hk.jigai.module.system.controller.admin.mapcoordinateinfo.vo.MapCoordinateInfoAllVO">
+        <result property="type" column="type"/>
+        <collection property="mapCoordinateInfoList" ofType="com.hk.jigai.module.system.controller.admin.mapcoordinateinfo.vo.MapCoordinateInfoRespVO">
+            <id property="id" column="id"/>
+            <result property="zoneType" column="zoneType"/>
+            <result property="type" column="type"/>
+            <result property="description" column="description"/>
+            <result property="description" column="image"/>
+            <result property="longitude" column="longitude"/>
+            <result property="latitude" column="latitude"/>
+            <result property="createTime" column="createTime"/>
+        </collection>
+    </resultMap>
+
+</mapper>

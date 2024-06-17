@@ -48,9 +48,9 @@ public class UserProfileRespVO {
      */
     private List<RoleSimpleRespVO> roles;
     /**
-     * 所在部门
+     * 所在部门集合
      */
-    private DeptSimpleRespVO dept;
+    private List<DeptSimpleRespVO> depts;
     /**
      * 所属岗位数组
      */

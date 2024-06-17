@@ -1,50 +1,39 @@
 package com.hk.jigai.module.system.dal.mysql.user;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.mybatis.core.mapper.BaseMapperX;
 import com.hk.jigai.framework.mybatis.core.query.LambdaQueryWrapperX;
 import com.hk.jigai.module.system.controller.admin.user.vo.user.UserPageReqVO;
 import com.hk.jigai.module.system.dal.dataobject.user.AdminUserDO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface AdminUserMapper extends BaseMapperX<AdminUserDO> {
 
-    default AdminUserDO selectByUsername(String username) {
-        return selectOne(AdminUserDO::getUsername, username);
-    }
+    AdminUserDO selectById(Long id);
 
-    default AdminUserDO selectByEmail(String email) {
-        return selectOne(AdminUserDO::getEmail, email);
-    }
+    AdminUserDO selectByUsername(String username);
 
-    default AdminUserDO selectByMobile(String mobile) {
-        return selectOne(AdminUserDO::getMobile, mobile);
-    }
+    AdminUserDO selectByEmail(String email);
 
-    default PageResult<AdminUserDO> selectPage(UserPageReqVO reqVO, Collection<Long> deptIds) {
-        return selectPage(reqVO, new LambdaQueryWrapperX<AdminUserDO>()
-                .likeIfPresent(AdminUserDO::getUsername, reqVO.getUsername())
-                .likeIfPresent(AdminUserDO::getMobile, reqVO.getMobile())
-                .eqIfPresent(AdminUserDO::getStatus, reqVO.getStatus())
-                .betweenIfPresent(AdminUserDO::getCreateTime, reqVO.getCreateTime())
-                .inIfPresent(AdminUserDO::getDeptId, deptIds)
-                .orderByDesc(AdminUserDO::getId));
-    }
+    AdminUserDO selectByMobile(String mobile);
 
-    default List<AdminUserDO> selectListByNickname(String nickname) {
-        return selectList(new LambdaQueryWrapperX<AdminUserDO>().like(AdminUserDO::getNickname, nickname));
-    }
+    List<AdminUserDO> selectPage(Map<String, Object> requestMap);
 
-    default List<AdminUserDO> selectListByStatus(Integer status) {
-        return selectList(AdminUserDO::getStatus, status);
-    }
+    List<AdminUserDO> selectListByNickname(String nickname);
 
-    default List<AdminUserDO> selectListByDeptIds(Collection<Long> deptIds) {
-        return selectList(AdminUserDO::getDeptId, deptIds);
-    }
+    List<AdminUserDO> selectListByStatus(Integer status);
+
+    List<AdminUserDO> selectListByDeptIds(Collection<Long> deptIds);
+
+    Integer selectCount(Map<String, Object> requestMap);
+
 
 }

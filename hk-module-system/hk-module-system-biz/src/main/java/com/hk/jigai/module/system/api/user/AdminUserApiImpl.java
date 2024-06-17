@@ -37,33 +37,33 @@ public class AdminUserApiImpl implements AdminUserApi {
         return BeanUtils.toBean(user, AdminUserRespDTO.class);
     }
 
-    @Override
-    public List<AdminUserRespDTO> getUserListBySubordinate(Long id) {
-        // 1.1 获取用户负责的部门
-        AdminUserDO user = userService.getUser(id);
-        if (user == null) {
-            return Collections.emptyList();
-        }
-        ArrayList<Long> deptIds = new ArrayList<>();
-        DeptDO dept = deptService.getDept(user.getDeptId());
-        if (dept == null) {
-            return Collections.emptyList();
-        }
-        if (ObjUtil.notEqual(dept.getLeaderUserId(), id)) { // 校验为负责人
-            return Collections.emptyList();
-        }
-        deptIds.add(dept.getId());
-        // 1.2 获取所有子部门
-        List<DeptDO> childDeptList = deptService.getChildDeptList(dept.getId());
-        if (CollUtil.isNotEmpty(childDeptList)) {
-            deptIds.addAll(convertSet(childDeptList, DeptDO::getId));
-        }
-
-        // 2. 获取部门对应的用户信息
-        List<AdminUserDO> users = userService.getUserListByDeptIds(deptIds);
-        users.removeIf(item -> ObjUtil.equal(item.getId(), id)); // 排除自己
-        return BeanUtils.toBean(users, AdminUserRespDTO.class);
-    }
+//    @Override
+//    public List<AdminUserRespDTO> getUserListBySubordinate(Long id) {
+//        // 1.1 获取用户负责的部门
+//        AdminUserDO user = userService.getUser(id);
+//        if (user == null) {
+//            return Collections.emptyList();
+//        }
+//        ArrayList<Long> deptIds = new ArrayList<>();
+//        DeptDO dept = deptService.getDept(user.getDeptId());
+//        if (dept == null) {
+//            return Collections.emptyList();
+//        }
+//        if (ObjUtil.notEqual(dept.getLeaderUserId(), id)) { // 校验为负责人
+//            return Collections.emptyList();
+//        }
+//        deptIds.add(dept.getId());
+//        // 1.2 获取所有子部门
+//        List<DeptDO> childDeptList = deptService.getChildDeptList(dept.getId());
+//        if (CollUtil.isNotEmpty(childDeptList)) {
+//            deptIds.addAll(convertSet(childDeptList, DeptDO::getId));
+//        }
+//
+//        // 2. 获取部门对应的用户信息
+//        List<AdminUserDO> users = userService.getUserListByDeptIds(deptIds);
+//        users.removeIf(item -> ObjUtil.equal(item.getId(), id)); // 排除自己
+//        return BeanUtils.toBean(users, AdminUserRespDTO.class);
+//    }
 
     @Override
     public List<AdminUserRespDTO> getUserList(Collection<Long> ids) {

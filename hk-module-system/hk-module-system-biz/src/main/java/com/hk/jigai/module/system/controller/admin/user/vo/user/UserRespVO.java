@@ -1,6 +1,7 @@
 package com.hk.jigai.module.system.controller.admin.user.vo.user;
 
 import com.hk.jigai.framework.excel.core.annotations.DictFormat;
+import com.hk.jigai.framework.excel.core.convert.DeptConverter;
 import com.hk.jigai.framework.excel.core.convert.DictConvert;
 import com.hk.jigai.module.system.enums.DictTypeConstants;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Schema(description = "管理后台 - 用户信息 Response VO")
@@ -31,15 +33,19 @@ public class UserRespVO{
     @Schema(description = "备注", example = "我是一个用户")
     private String remark;
 
-    @Schema(description = "部门ID", example = "我是一个用户")
-    private Long deptId;
-    @Schema(description = "部门名称", example = "IT 部")
-    @ExcelProperty("部门名称")
-    private String deptName;
+//    @Schema(description = "部门ID", example = "我是一个用户")
+//    private Long deptId;
+//    @Schema(description = "部门名称", example = "IT 部")
+//    @ExcelProperty("部门名称")
+//    private String deptName;
+
+    @Schema(description = "部门列表信息")
+    @ExcelProperty(value = "部门名称", converter = DeptConverter.class)
+    private List<UserDeptRespVO> deptList;
+
 
     @Schema(description = "岗位编号数组", example = "1")
     private Set<Long> postIds;
-
     @Schema(description = "用户邮箱", example = "hk@iocoder.cn")
     @ExcelProperty("用户邮箱")
     private String email;

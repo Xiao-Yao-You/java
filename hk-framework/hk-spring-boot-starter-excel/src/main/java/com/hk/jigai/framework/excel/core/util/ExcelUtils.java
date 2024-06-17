@@ -1,5 +1,6 @@
 package com.hk.jigai.framework.excel.core.util;
 
+import com.hk.jigai.framework.excel.core.convert.DeptConverter;
 import com.hk.jigai.framework.excel.core.handler.SelectSheetWriteHandler;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.converters.longconverter.LongStringConverter;
@@ -38,6 +39,7 @@ public class ExcelUtils {
                 .registerWriteHandler(new LongestMatchColumnWidthStyleStrategy()) // 基于 column 长度，自动适配。最大 255 宽度
                 .registerWriteHandler(new SelectSheetWriteHandler(head)) // 基于固定 sheet 实现下拉框
                 .registerConverter(new LongStringConverter()) // 避免 Long 类型丢失精度
+                .registerConverter(new DeptConverter()) // 部门对象转换
                 .sheet(sheetName).doWrite(data);
         // 设置 header 和 contentType。写在最后的原因是，避免报错时，响应 contentType 已经被修改了
         response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename, StandardCharsets.UTF_8.name()));

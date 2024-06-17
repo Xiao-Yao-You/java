@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hk.jigai.module.system.dal.mysql.tenant.UserTenantMapper">
+
+    <select id="selectListByUserId" resultMap="tenantMap">
+        SELECT  sut.id,
+                sut.user_id as userId,
+                st.name as tenantName,
+                st.id as tenantId
+        FROM system_user_tenant sut
+                 LEFT JOIN system_tenant st ON sut.tenant_id=st.id and st.deleted = 0
+        WHERE sut.user_id = #{id} and sut.deleted = 0
+     ORDER BY sut.id
+    </select>
+
+
+    <resultMap id="tenantMap" type="com.hk.jigai.module.system.dal.dataobject.tenant.UserTenantDO">
+        <id property="id" column="id"/>
+        <result property="userId" column="userId"/>
+        <result property="tenantId" column="tenantId"/>
+        <result property="tenantName" column="tenantName"/>
+    </resultMap>
+</mapper>

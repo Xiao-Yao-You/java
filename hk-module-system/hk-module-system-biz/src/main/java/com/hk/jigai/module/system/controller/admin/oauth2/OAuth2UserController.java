@@ -2,10 +2,12 @@ package com.hk.jigai.module.system.controller.admin.oauth2;
 
 import cn.hutool.core.collection.CollUtil;
 import com.hk.jigai.framework.common.pojo.CommonResult;
+import com.hk.jigai.framework.common.util.collection.CollectionUtils;
 import com.hk.jigai.framework.common.util.object.BeanUtils;
 import com.hk.jigai.module.system.controller.admin.oauth2.vo.user.OAuth2UserInfoRespVO;
 import com.hk.jigai.module.system.controller.admin.oauth2.vo.user.OAuth2UserUpdateReqVO;
 import com.hk.jigai.module.system.controller.admin.user.vo.profile.UserProfileUpdateReqVO;
+import com.hk.jigai.module.system.controller.admin.user.vo.user.UserSimpleRespVO;
 import com.hk.jigai.module.system.dal.dataobject.dept.DeptDO;
 import com.hk.jigai.module.system.dal.dataobject.dept.PostDO;
 import com.hk.jigai.module.system.dal.dataobject.user.AdminUserDO;
@@ -56,9 +58,12 @@ public class OAuth2UserController {
         AdminUserDO user = userService.getUser(getLoginUserId());
         OAuth2UserInfoRespVO resp = BeanUtils.toBean(user, OAuth2UserInfoRespVO.class);
         // 获得部门信息
-        if (user.getDeptId() != null) {
-            DeptDO dept = deptService.getDept(user.getDeptId());
-            resp.setDept(BeanUtils.toBean(dept, OAuth2UserInfoRespVO.Dept.class));
+        if (!CollectionUtils.isAnyEmpty(user.getDeptList())) {
+            List<OAuth2UserInfoRespVO.Dept> returnList = CollectionUtils.convertList(user.getDeptList(), dept -> {
+                OAuth2UserInfoRespVO.Dept deptDto = BeanUtils.toBean(dept, OAuth2UserInfoRespVO.Dept.class);
+                return deptDto;
+            });
+            resp.setDepts(returnList);
         }
         // 获得岗位信息
         if (CollUtil.isNotEmpty(user.getPostIds())) {

@@ -2,6 +2,7 @@ package com.hk.jigai.module.system.service.user;
 
 import cn.hutool.core.collection.CollUtil;
 import com.hk.jigai.framework.common.util.collection.CollectionUtils;
+import com.hk.jigai.module.system.controller.admin.user.vo.profile.UserProfileTenantRespVO;
 import com.hk.jigai.module.system.controller.admin.user.vo.profile.UserProfileUpdatePasswordReqVO;
 import com.hk.jigai.module.system.controller.admin.user.vo.profile.UserProfileUpdateReqVO;
 import com.hk.jigai.module.system.controller.admin.user.vo.user.*;
@@ -11,6 +12,8 @@ import com.hk.jigai.module.system.dal.dataobject.user.AdminUserDO;
 import javax.validation.Valid;
 import java.io.InputStream;
 import java.util.*;
+
+import static com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 
 /**
  * 后台用户 Service 接口
@@ -200,5 +203,18 @@ public interface AdminUserService {
      * @return 是否匹配
      */
     boolean isPasswordMatch(String rawPassword, String encodedPassword);
+
+    /**
+     * 更新用户的租户信息
+     * @param reqVO
+     */
+    void updateUserTenant(UserTenantReqVO reqVO);
+
+    /**
+     * 查询用户的租户信息
+     * @param userId 用户id
+     * @return
+     */
+    UserProfileTenantRespVO queryUserTenant(Long userId);
 
 }
