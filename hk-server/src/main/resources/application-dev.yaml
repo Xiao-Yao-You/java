@@ -174,7 +174,69 @@ hk:
     refund-notify-url: http://yunai.natapp1.cc/admin-api/pay/notify/refund # 支付渠道的【退款】回调地址
   demo: true # 开启演示模式
   tencent-lbs-key: TVDBZ-TDILD-4ON4B-PFDZA-RNLKH-VVF6E # QQ 地图的密钥 https://lbs.qq.com/service/staticV2/staticGuide/staticDoc
-
+  security:
+    permit-all_urls:
+      - /admin-api/mp/open/** # 微信公众号开放平台，微信回调接口，不需要登录
+      - /admin-api/map-coordinate-info/queryAll #查询厂区具体经纬度，不需要登录
+      - /admin-api/system/dict-data/pageIgnoreLogin #查询字段，不需要登录
+  tenant: # 多租户相关配置项
+    enable: true
+    ignore-urls:
+      - /admin-api/system/tenant/get-id-by-name # 基于名字获取租户，不许带租户编号
+      - /admin-api/system/tenant/get-by-website # 基于域名获取租户，不许带租户编号
+      - /admin-api/system/captcha/get # 获取图片验证码，和租户无关
+      - /admin-api/system/captcha/check # 校验图片验证码，和租户无关
+      - /admin-api/infra/file/*/get/** # 获取图片，和租户无关
+      - /admin-api/system/sms/callback/* # 短信回调接口，无法带上租户编号
+      - /admin-api/pay/notify/** # 支付回调通知，不携带租户编号
+      - /jmreport/* # 积木报表，无法携带租户编号
+      - /admin-api/mp/open/** # 微信公众号开放平台，微信回调接口，无法携带租户编号
+      - /admin-api/system/auth/ignoreTenant/** # 针对超级管理员账号，需要管理所有租户的用户，并需要配置用户的租户信息
+      - /admin-api/map-coordinate-info/queryAll #针对地图管理，目前没有租户概念
+      - /admin-api/system/dict-data/pageIgnoreLogin #针对字典查询接口
+    ignore-tables:
+      - system_tenant
+      - system_tenant_package
+      - system_dict_data
+      - system_dict_type
+      - system_error_code
+      - system_menu
+      - system_sms_channel
+      - system_sms_template
+      - system_sms_log
+      - system_sensitive_word
+      - system_oauth2_client
+      - system_mail_account
+      - system_mail_template
+      - system_mail_log
+      - system_notify_template
+      - system_scene_code
+      - infra_codegen_column
+      - infra_codegen_table
+      - infra_config
+      - infra_file_config
+      - infra_file
+      - infra_file_content
+      - infra_job
+      - infra_job_log
+      - infra_job_log
+      - infra_data_source_config
+      - jimu_dict
+      - jimu_dict_item
+      - jimu_report
+      - jimu_report_data_source
+      - jimu_report_db
+      - jimu_report_db_field
+      - jimu_report_db_param
+      - jimu_report_link
+      - jimu_report_map
+      - jimu_report_share
+      - rep_demo_dxtj
+      - rep_demo_employee
+      - rep_demo_gongsi
+      - rep_demo_jianpiao
+      - tmp_report_data_1
+      - tmp_report_data_income
 justauth:
   enabled: true
   type:
