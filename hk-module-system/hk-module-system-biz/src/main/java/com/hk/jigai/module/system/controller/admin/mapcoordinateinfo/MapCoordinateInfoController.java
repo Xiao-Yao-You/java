@@ -104,18 +104,22 @@ public class MapCoordinateInfoController {
     public CommonResult<MapCoordinateInfoAllRespVO> getMapCoordinateInfoAll() {
         MapCoordinateInfoAllRespVO result = new MapCoordinateInfoAllRespVO();
         result.setList(mapCoordinateInfoService.getMapCoordinateInfoAll());
-//        SceneCodeDO dto = new SceneCodeDO();
+//        try{
+//                    SceneCodeDO dto = new SceneCodeDO();
 //        dto.setSuffix("000000");
 //        dto.setInfix("yyyMMdd");
 //        dto.setStart(100);
 //        dto.setDescription("测试");
 //        dto.setStatus("00");
-//        dto.setKey("Income");
+//        dto.setKey("pay");
 //        dto.setId(11);
 //        dto.setStep(10);
-//        dto.setType("01");
+//        dto.setType("02");
 //        dto.setPrefix("wft");
 //        sceneCodeService.increment(dto);
+//        } catch (Exception e){
+//
+//        }
         return success(result);
     }
 }

@@ -96,15 +96,15 @@ public class SceneCodeServiceImpl implements SceneCodeService {
         }
         //准备Lua脚本和参数
         String luaScript = "local key = KEYS[1] " +
-                "local dateKey = 'reset:date:' .. key " +
-                "local initial = tonumber(ARGV[1]) " +
-                "local step = tonumber(ARGV[2]) " +
-                "local resetDate = tonumber(ARGV[3]) " +
-                "local currentDate = tonumber(redis.call('GET', dateKey) or '0') " +
-//                "if currentDate ~= resetDate " +
-//                "then   redis.call('SET', dateKey, currentDate)   redis.call('SET', key, initial) end " +
-                "redis.call('INCRBY', key, step) " +
-                "return redis.call('GET', key)";
+                " local dateKey = 'reset:date:' .. key " +
+                " local initial = tonumber(ARGV[1]) " +
+                " local step = tonumber(ARGV[2]) " +
+                " local resetDate = tonumber(ARGV[3]) " +
+                " local currentDate = tonumber(redis.call('GET', dateKey) or '0') " +
+                " if currentDate ~= resetDate " +
+                " then   redis.call('SET', dateKey, ARGV[3])   redis.call('SET', key, initial) " +
+                " else redis.call('INCRBY', key, step) end " +
+                " return redis.call('GET', key)";
         List<String> keys = new ArrayList<>();
         keys.add(scenceDto.getKey());
         List<String> argsLua = new ArrayList<>();
@@ -135,32 +135,11 @@ public class SceneCodeServiceImpl implements SceneCodeService {
         DefaultRedisScript<Integer> redisScript = new DefaultRedisScript<>();
         redisScript.setScriptText(luaScript);
         redisScript.setResultType(Integer.class);
-        //Integer o = redisTemplate.execute(redisScript, keys, String.valueOf(scenceDto.getStart()),String.valueOf(scenceDto.getStep()),resetDate);
-        long result = 1;
+        Integer result = redisTemplate.execute(redisScript, keys, Long.valueOf(scenceDto.getStart()),Long.valueOf(scenceDto.getStep()),resetDate);
+        //拼接单号并返回
         StringBuffer sb = new StringBuffer(scenceDto.getPrefix());
         sb.append(formatDate(today,scenceDto.getInfix()));
         sb.append(String.format("%0"+scenceDto.getSuffix().length()+"d", result));
-
-
-
-
-        String script = "local val = redis.call('GET', KEYS[1])" +
-                "  print(val)"+
-                " if val then" +
-                "  print('bb')"+
-                "   return redis.call('INCRBY', KEYS[1], ARGV[1])" +
-                "  else" +
-                "  print('cc')"+
-                "   return redis.call('SET', KEYS[1], ARGV[1])" +
-                " end";
-
-        DefaultRedisScript<Integer> redisScript2 = new DefaultRedisScript<>();
-        redisScript2.setScriptText(script);
-        redisScript2.setResultType(Integer.class);
-
-        Integer result2 = redisTemplate.execute(redisScript2, Collections.singletonList("Income"), "8");
-
-
         return sb.toString();
     }
 
