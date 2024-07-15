@@ -54,9 +54,9 @@ public interface SceneCodeService {
 
     /**
      * 获取各种收据号
-      * @param scenceDto
+      * @param keyCode
      * @return
      */
-    String increment(SceneCodeDO scenceDto);
+    String increment(String keyCode);
 
 }

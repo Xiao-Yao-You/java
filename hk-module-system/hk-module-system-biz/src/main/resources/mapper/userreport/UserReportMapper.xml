@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hk.jigai.module.system.dal.mysql.userreport.UserReportMapper">
+    <select id="selectPage" >
+        SELECT
+        u.id AS user_id,
+        u.name AS user_name,
+        o.id AS order_id,
+        o.amount AS order_amount
+        FROM
+        user u
+        LEFT JOIN order o ON u.id = o.user_id
+        <if test="ew != null">
+
+        </if>
+        LIMIT #{page.offset}, #{page.size}
+
+    </select>
+
+    <select id="selectCount" >
+
+
+    </select>
+</mapper>

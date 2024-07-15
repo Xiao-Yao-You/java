@@ -30,7 +30,7 @@ public class SceneCodeDO extends BaseDO {
     /**
      * 编码key
      */
-    private String key;
+    private String keyCode;
     /**
      * 描述
      */
@@ -62,6 +62,11 @@ public class SceneCodeDO extends BaseDO {
     /**
      * 状态
      */
-    private String status;
+    private Integer status;
+
+    /**
+     * 状态
+     */
+    private Integer useStatus;
 
 }

@@ -6,8 +6,6 @@ import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -16,12 +14,8 @@ import java.util.*;
 import com.hk.jigai.module.system.controller.admin.scenecode.vo.*;
 import com.hk.jigai.module.system.dal.dataobject.scenecode.SceneCodeDO;
 import com.hk.jigai.framework.common.pojo.PageResult;
-import com.hk.jigai.framework.common.pojo.PageParam;
 import com.hk.jigai.framework.common.util.object.BeanUtils;
-
 import com.hk.jigai.module.system.dal.mysql.scenecode.SceneCodeMapper;
-import redis.clients.jedis.Jedis;
-
 import static com.hk.jigai.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static com.hk.jigai.module.system.enums.ErrorCodeConstants.*;
 
@@ -37,9 +31,6 @@ public class SceneCodeServiceImpl implements SceneCodeService {
     @Resource
     private SceneCodeMapper sceneCodeMapper;
 
-//    @Autowired
-//    private Jedis jedis;
-
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
@@ -47,6 +38,10 @@ public class SceneCodeServiceImpl implements SceneCodeService {
     public Integer createSceneCode(SceneCodeSaveReqVO createReqVO) {
         // 插入
         SceneCodeDO sceneCode = BeanUtils.toBean(createReqVO, SceneCodeDO.class);
+        SceneCodeDO dto = sceneCodeMapper.selectOneByKeyCode(createReqVO.getKeyCode());
+        if(dto!=null){
+            throw exception(SCENE_CODE_ALREADY_EXIST);
+        }
         sceneCodeMapper.insert(sceneCode);
         // 返回
         return sceneCode.getId();
@@ -73,7 +68,7 @@ public class SceneCodeServiceImpl implements SceneCodeService {
         SceneCodeDO dto = sceneCodeMapper.selectById(id);
         if (dto == null) {
             throw exception(SCENE_CODE_NOT_EXISTS);
-        }else if("02".equals(dto.getStatus())){
+        }else if("1".equals(dto.getUseStatus())){
             throw exception(SCENE_CODE_IS_IN_USE);
         }
     }
@@ -89,9 +84,11 @@ public class SceneCodeServiceImpl implements SceneCodeService {
     }
 
     @Override
-    public String increment(SceneCodeDO scenceDto) {
+    public String increment(String keyCode) {
+        SceneCodeDO scenceDto = sceneCodeMapper.selectOneByKeyCode(keyCode);
         //校验
-        if(scenceDto == null || "01".equals(scenceDto.getStatus())){
+        Integer availableStatus = new Integer(0);
+        if(scenceDto == null || !availableStatus.equals(scenceDto.getStatus())){
             throw exception(SCENE_CODE_NOT_AVAILABLE);
         }
         //准备Lua脚本和参数
@@ -106,7 +103,7 @@ public class SceneCodeServiceImpl implements SceneCodeService {
                 " else redis.call('INCRBY', key, step) end " +
                 " return redis.call('GET', key)";
         List<String> keys = new ArrayList<>();
-        keys.add(scenceDto.getKey());
+        keys.add(scenceDto.getKeyCode());
         List<String> argsLua = new ArrayList<>();
         argsLua.add(String.valueOf(scenceDto.getStart()));
         argsLua.add(String.valueOf(scenceDto.getStep()));
@@ -138,8 +135,14 @@ public class SceneCodeServiceImpl implements SceneCodeService {
         Integer result = redisTemplate.execute(redisScript, keys, Long.valueOf(scenceDto.getStart()),Long.valueOf(scenceDto.getStep()),resetDate);
         //拼接单号并返回
         StringBuffer sb = new StringBuffer(scenceDto.getPrefix());
-        sb.append(formatDate(today,scenceDto.getInfix()));
+        if(!"none".equals(scenceDto.getInfix())){
+            sb.append(formatDate(today,scenceDto.getInfix()));
+        }
         sb.append(String.format("%0"+scenceDto.getSuffix().length()+"d", result));
+
+        //更新编码使用状态
+        scenceDto.setUseStatus(new Integer(1));
+        sceneCodeMapper.updateById(scenceDto);
         return sb.toString();
     }
 

@@ -16,13 +16,14 @@
                 su.status,
                 su.login_ip,
                 su.login_date,
+                su.create_time,
                 sd.id as deptId,
                 sd.name as deptName,
                 sd.parent_id as parentId
         FROM system_users su
    LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
-   LEFT JOIN system_dept sd ON sud.dept_id=sd.id
-            WHERE su.id = #{id}
+   LEFT JOIN system_dept sd ON sud.dept_id=sd.id and sd.deleted = 0
+            WHERE su.id = #{id} and su.deleted = 0
         ORDER BY su.id DESC
     </select>
 
@@ -45,8 +46,8 @@
                 sd.parent_id as parentId
         FROM system_users su
                  LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
-                 LEFT JOIN system_dept sd ON sud.dept_id=sd.id
-        WHERE su.username = #{username}
+                 LEFT JOIN system_dept sd ON sud.dept_id=sd.id and sd.deleted = 0
+        WHERE su.username = #{username} and su.deleted = 0
         ORDER BY su.id DESC
     </select>
 
@@ -69,8 +70,8 @@
                 sd.parent_id as parentId
         FROM system_users su
                  LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
-                 LEFT JOIN system_dept sd ON sud.dept_id=sd.id
-        WHERE su.email = #{email}
+                 LEFT JOIN system_dept sd ON sud.dept_id=sd.id and sd.deleted = 0
+        WHERE su.email = #{email} and su.deleted = 0
         ORDER BY su.id DESC
     </select>
 
@@ -93,8 +94,8 @@
                 sd.parent_id as parentId
         FROM system_users su
                  LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
-                 LEFT JOIN system_dept sd ON sud.dept_id=sd.id
-        WHERE su.mobile = #{mobile}
+                 LEFT JOIN system_dept sd ON sud.dept_id=sd.id and sd.deleted = 0
+        WHERE su.mobile = #{mobile} and su.deleted = 0
         ORDER BY su.id DESC
     </select>
 
@@ -117,8 +118,8 @@
                 sd.parent_id as parentId
         FROM system_users su
                  LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
-                 LEFT JOIN system_dept sd ON sud.dept_id=sd.id
-        WHERE su.nickname like CONCAT('%' , #{nickname} , '%')
+                 LEFT JOIN system_dept sd ON sud.dept_id=sd.id and sd.deleted = 0
+        WHERE su.nickname like CONCAT('%' , #{nickname} , '%') and su.deleted = 0
         ORDER BY su.id DESC
     </select>
 
@@ -126,8 +127,8 @@
         SELECT  su.id,su.username,su.password,su.nickname,su.remark,su.post_ids,su.email,su.mobile,su.sex,su.avatar,su.status,su.login_ip,su.login_date,su.create_time,sd.id as deptId,sd.name as deptName
           FROM system_users su
      LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
-     LEFT JOIN system_dept sd ON sud.dept_id=sd.id
-         WHERE 1=1
+     LEFT JOIN system_dept sd ON sud.dept_id=sd.id and su.deleted = 0
+         WHERE 1=1 and su.deleted = 0
         <if test="username != null and username != ''">
             and su.username like CONCAT('%' , #{username} , '%')
         </if>
@@ -151,12 +152,12 @@
     </select>
 
 
-    <select id="selectCount" parameterType="map" resultType="Integer">
+    <select id="selectCount1" parameterType="map" resultType="Integer">
         SELECT  count(1)
         FROM system_users su
         LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
-        LEFT JOIN system_dept sd ON sud.dept_id=sd.id
-        WHERE 1=1
+        LEFT JOIN system_dept sd ON sud.dept_id=sd.id and su.deleted = 0
+        WHERE 1=1 and su.deleted = 0
             <if test="username != null  and username != ''">
                 and su.username like CONCAT('%' , #{username} , '%')
             </if>
@@ -195,8 +196,8 @@
         sd.name as deptName
         FROM system_users su
    LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
-   LEFT JOIN system_dept sd ON sud.dept_id=sd.id
-       WHERE su.status = #{status}
+   LEFT JOIN system_dept sd ON sud.dept_id=sd.id and su.deleted = 0
+       WHERE su.status = #{status} and su.deleted = 0
     ORDER BY su.id DESC
     </select>
 
@@ -218,14 +219,19 @@
         sd.name as deptName
         FROM system_users su
         LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
-        LEFT JOIN system_dept sd ON sud.dept_id=sd.id
+        LEFT JOIN system_dept sd ON sud.dept_id=sd.id and sd.deleted = 0
         WHERE sd.id IN
             <foreach item="item" index="index" collection="deptIds" open="(" separator="," close=")">
                 #{item}
             </foreach>
+        and su.deleted = 0
         ORDER BY su.id DESC
     </select>
 
+    <select id="selectCount2" resultType="Integer">
+        SELECT  count(1)
+        FROM system_users
+    </select>
 
 
     <resultMap id="userMap" type="com.hk.jigai.module.system.dal.dataobject.user.AdminUserDO">
@@ -249,4 +255,6 @@
             <result property="parentId" column="parentId"/>
         </collection>
     </resultMap>
+
+
 </mapper>

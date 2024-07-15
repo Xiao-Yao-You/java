@@ -114,6 +114,7 @@ public class DictDataController {
         }else if(StringUtil.isEmpty(pageReqVO.getDictType())){
             pageReqVO.setDictType("hk_map_coordinate_info_type");
         }
+        pageReqVO.setPageSize(new Integer(1000));
         PageResult<DictDataDO> pageResult = dictDataService.getDictDataPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, DictDataRespVO.class));
     }

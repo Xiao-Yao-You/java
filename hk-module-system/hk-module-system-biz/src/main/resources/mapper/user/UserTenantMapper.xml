@@ -8,8 +8,8 @@
                 st.name as tenantName,
                 st.id as tenantId
         FROM system_user_tenant sut
-                 LEFT JOIN system_tenant st ON sut.tenant_id=st.id and st.deleted = 0
-        WHERE sut.user_id = #{id} and sut.deleted = 0
+                 LEFT JOIN system_tenant st ON sut.tenant_id=st.id and st.deleted = 0 and st.status = 0
+        WHERE sut.user_id = #{id} and sut.deleted = 0 and st.expire_time > NOW()
      ORDER BY sut.id
     </select>
 
@@ -20,4 +20,19 @@
         <result property="tenantId" column="tenantId"/>
         <result property="tenantName" column="tenantName"/>
     </resultMap>
+
+
+    <select id="selectListByUserName" resultMap="tenantMap">
+        <![CDATA[
+        SELECT  sut.id,
+                sut.user_id as userId,
+                st.name as tenantName,
+                st.id as tenantId
+        FROM system_user_tenant sut
+                 LEFT JOIN system_tenant st ON sut.tenant_id=st.id and st.deleted = 0 and st.status = 0
+                 LEFT JOIN system_users su on sut.user_id = su.id
+        WHERE su.username = #{name} and sut.deleted = 0 and st.expire_time > NOW()
+        ORDER BY sut.id
+        ]]>
+    </select>
 </mapper>

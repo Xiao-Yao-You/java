@@ -96,9 +96,9 @@ public class AdminUserServiceImpl implements AdminUserService {
     @LogRecord(type = SYSTEM_USER_TYPE, subType = SYSTEM_USER_CREATE_SUB_TYPE, bizNo = "{{#user.id}}",
             success = SYSTEM_USER_CREATE_SUCCESS)
     public Long createUser(UserSaveReqVO createReqVO) {
-        // 1.1 校验账户配合
+        // 1.1 校验账户配额
         tenantService.handleTenantInfo(tenant -> {
-            long count = userMapper.selectCount();
+            Integer count = userMapper.selectCount2();
             if (count >= tenant.getAccountCount()) {
                 throw exception(USER_COUNT_MAX, tenant.getAccountCount());
             }
@@ -114,21 +114,21 @@ public class AdminUserServiceImpl implements AdminUserService {
         AdminUserDO user = BeanUtils.toBean(createReqVO, AdminUserDO.class);
         user.setStatus(CommonStatusEnum.ENABLE.getStatus()); // 默认开启
         user.setPassword(encodePassword(createReqVO.getPassword())); // 加密密码
-        userMapper.insert(user);
+        int id = userMapper.insert(user);
         // 2.2 插入关联岗位
         if (CollectionUtil.isNotEmpty(user.getPostIds())) {
             userPostMapper.insertBatch(convertList(user.getPostIds(),
-                    postId -> new UserPostDO().setUserId(user.getId()).setPostId(postId)));
+                    postId -> new UserPostDO().setUserId(new Long(id)).setPostId(postId)));
         }
         // 2.3 插入关联部门
         if (CollectionUtil.isNotEmpty(createReqVO.getDeptList())) {
             userDeptMapper.insertBatch(convertList(createReqVO.getDeptList(),
-                    userDeptRespVO -> new UserDeptDO().setUserId(user.getId()).setDeptId(userDeptRespVO.getId())));
+                    userDeptRespVO -> new UserDeptDO().setUserId(new Long(id)).setDeptId(userDeptRespVO.getId())));
         }
 
         // 3. 记录操作日志上下文
         LogRecordContext.putVariable("user", user);
-        return user.getId();
+        return new Long(id);
     }
 
     @Override
@@ -162,13 +162,13 @@ public class AdminUserServiceImpl implements AdminUserService {
         Set<Long> postIds = CollUtil.emptyIfNull(updateObj.getPostIds());
         Collection<Long> createPostIds = CollUtil.subtract(postIds, dbPostIds);
         Collection<Long> deletePostIds = CollUtil.subtract(dbPostIds, postIds);
+        if (!CollectionUtil.isEmpty(deletePostIds)) {
+            userPostMapper.deleteByUserIdAndPostId(userId);
+        }
         // 执行新增和删除。对于已经授权的岗位，不用做任何处理
         if (!CollectionUtil.isEmpty(createPostIds)) {
             userPostMapper.insertBatch(convertList(createPostIds,
                     postId -> new UserPostDO().setUserId(userId).setPostId(postId)));
-        }
-        if (!CollectionUtil.isEmpty(deletePostIds)) {
-            userPostMapper.deleteByUserIdAndPostId(userId, deletePostIds);
         }
     }
 
@@ -262,7 +262,8 @@ public class AdminUserServiceImpl implements AdminUserService {
         permissionService.processUserDeleted(id);
         // 2.2 删除用户岗位
         userPostMapper.deleteByUserId(id);
-
+        //2.3删除用户部门
+        userDeptMapper.deleteByUserId(id);
         // 3. 记录操作日志上下文
         LogRecordContext.putVariable("user", user);
     }
@@ -287,10 +288,11 @@ public class AdminUserServiceImpl implements AdminUserService {
         requestMap.put("deptList",getDeptCondition(reqVO.getDeptId()));
         requestMap.put("offset", (reqVO.getPageNo()-1) * reqVO.getPageSize());
         requestMap.put("pageSize", reqVO.getPageSize());
-        Integer count = userMapper.selectCount(requestMap);
+        Integer count = userMapper.selectCount1(requestMap);
         Integer total = count%reqVO.getPageSize() == 0 ? count/reqVO.getPageSize() :(count/reqVO.getPageSize()+1);
         PageResult<AdminUserDO> result = new PageResult<>();
-        result.setTotal(Long.valueOf(total));
+        //result.setTotal(Long.valueOf(total));
+        result.setTotal(Long.valueOf(count));
         result.setList(userMapper.selectPage(requestMap));
         return result;
     }
@@ -532,13 +534,10 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Override
     public void updateUserTenant(UserTenantReqVO userTenantReqVO) {
         // 1. 校验正确性
-
         AdminUserDO oldUser = validateUserForCreateOrUpdate(userTenantReqVO.getUserId(), null,
                 null, null, null, null, userTenantReqVO.getTenantIdList());
-
         // 2 更新租户
         updateUsertenant(userTenantReqVO);
-
         // 3. 记录操作日志上下文
         LogRecordContext.putVariable(DiffParseFunction.OLD_OBJECT, BeanUtils.toBean(oldUser, UserSaveReqVO.class));
         LogRecordContext.putVariable("user", oldUser);
@@ -558,6 +557,13 @@ public class AdminUserServiceImpl implements AdminUserService {
             userTenantMapper.insertBatch(convertList(userTenantReqVO.getTenantIdList(),
                     id -> new UserTenantDO().setUserId(userId).setTenantId(id)));
         }
+    }
+
+    @Override
+    public UserProfileTenantRespVO queryUserTenantByName(String userName) {
+        UserProfileTenantRespVO result = new UserProfileTenantRespVO();
+        result.setTenantDOList(userTenantMapper.selectListByUserName(userName));
+        return result;
     }
 
     /**

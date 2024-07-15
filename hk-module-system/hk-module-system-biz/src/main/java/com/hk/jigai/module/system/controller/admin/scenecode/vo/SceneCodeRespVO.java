@@ -19,7 +19,7 @@ public class SceneCodeRespVO {
 
     @Schema(description = "编码key", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("编码key")
-    private String key;
+    private String keyCode;
 
     @Schema(description = "描述", example = "随便")
     @ExcelProperty("描述")
@@ -49,9 +49,13 @@ public class SceneCodeRespVO {
     @ExcelProperty("步长")
     private Integer step;
 
-    @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @Schema(description = "状态，0:启用,1:禁用", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("状态")
-    private String status;
+    private Integer status;
+
+    @Schema(description = "使用状态,0:未使用,1:已使用")
+    @ExcelProperty("状态")
+    private Integer useStatus;
 
     @Schema(description = "创建时间")
     @ExcelProperty("创建时间")

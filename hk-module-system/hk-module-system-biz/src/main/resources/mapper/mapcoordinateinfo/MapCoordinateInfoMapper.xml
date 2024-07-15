@@ -2,10 +2,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.hk.jigai.module.system.dal.mysql.mapcoordinateinfo.MapCoordinateInfoMapper">
 
-    <select id="getMapCoordinateInfoAll" resultMap="mapCoordinateInfoMap">
-        select id,zone_type as zoneType,type,description,description,longitude,latitude,create_time as createTime
+    <select id="getMapCoordinateInfoAll" resultMap="mapCoordinateInfoMap" parameterType="String">
+        select id,zone_type as zoneType,type,name,alias,mark_name,longitude,latitude,create_time as createTime,factory_code as factoryCode
         from hk_map_coordinate_info
-        where zone_type = '00' and deleted = 0
+        where zone_type = '00' and deleted = 0 and factory_code = #{factoryCode}
+        order by type,sort
     </select>
 
     <resultMap id="mapCoordinateInfoMap" type="com.hk.jigai.module.system.controller.admin.mapcoordinateinfo.vo.MapCoordinateInfoAllVO">
@@ -14,11 +15,14 @@
             <id property="id" column="id"/>
             <result property="zoneType" column="zoneType"/>
             <result property="type" column="type"/>
-            <result property="description" column="description"/>
-            <result property="description" column="image"/>
+            <result property="alias" column="alias"/>
+            <result property="markName" column="mark_name"/>
+            <result property="name" column="name"/>
+            <result property="image" column="image"/>
             <result property="longitude" column="longitude"/>
             <result property="latitude" column="latitude"/>
             <result property="createTime" column="createTime"/>
+            <result property="factoryCode" column="factoryCode"/>
         </collection>
     </resultMap>
 

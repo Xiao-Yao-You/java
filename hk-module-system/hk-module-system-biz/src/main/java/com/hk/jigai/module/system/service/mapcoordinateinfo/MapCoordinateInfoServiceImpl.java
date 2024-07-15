@@ -1,5 +1,6 @@
 package com.hk.jigai.module.system.service.mapcoordinateinfo;
 
+import com.hk.jigai.module.system.service.scenecode.SceneCodeService;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -26,11 +27,13 @@ public class MapCoordinateInfoServiceImpl implements MapCoordinateInfoService {
 
     @Resource
     private MapCoordinateInfoMapper mapCoordinateInfoMapper;
-
+    @Resource
+    private SceneCodeService sceneCodeService;
     @Override
     public Integer createMapCoordinateInfo(MapCoordinateInfoSaveReqVO createReqVO) {
-        // 插入
+        // 插入4
         MapCoordinateInfoDO mapCoordinateInfo = BeanUtils.toBean(createReqVO, MapCoordinateInfoDO.class);
+        mapCoordinateInfo.setCode(sceneCodeService.increment("QYHK"));
         mapCoordinateInfoMapper.insert(mapCoordinateInfo);
         // 返回
         return mapCoordinateInfo.getId();
@@ -70,8 +73,8 @@ public class MapCoordinateInfoServiceImpl implements MapCoordinateInfoService {
     }
 
     @Override
-    public List<MapCoordinateInfoAllVO> getMapCoordinateInfoAll() {
-        return mapCoordinateInfoMapper.getMapCoordinateInfoAll();
+    public List<MapCoordinateInfoAllVO> getMapCoordinateInfoAll(String factoryCode) {
+        return mapCoordinateInfoMapper.getMapCoordinateInfoAll(factoryCode);
     }
 
 }

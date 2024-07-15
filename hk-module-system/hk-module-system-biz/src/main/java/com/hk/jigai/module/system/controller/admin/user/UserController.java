@@ -13,11 +13,15 @@ import com.hk.jigai.framework.common.util.object.BeanUtils;
 import com.hk.jigai.framework.excel.core.util.ExcelUtils;
 import com.hk.jigai.framework.security.core.LoginUser;
 import com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils;
+import com.hk.jigai.module.system.controller.admin.user.vo.profile.UserProfileTenantRespVO;
 import com.hk.jigai.module.system.controller.admin.user.vo.user.*;
 import com.hk.jigai.module.system.convert.user.UserConvert;
 import com.hk.jigai.module.system.dal.dataobject.dept.DeptDO;
+import com.hk.jigai.module.system.dal.dataobject.tenant.UserTenantDO;
 import com.hk.jigai.module.system.dal.dataobject.user.AdminUserDO;
+import com.hk.jigai.module.system.enums.ErrorCodeConstants;
 import com.hk.jigai.module.system.enums.common.SexEnum;
+import com.hk.jigai.module.system.enums.logger.LoginResultEnum;
 import com.hk.jigai.module.system.service.dept.DeptService;
 import com.hk.jigai.module.system.service.permission.PermissionService;
 import com.hk.jigai.module.system.service.user.AdminUserService;
@@ -31,6 +35,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
@@ -44,6 +49,7 @@ import static com.hk.jigai.framework.common.exception.util.ServiceExceptionUtil.
 import static com.hk.jigai.framework.common.pojo.CommonResult.success;
 import static com.hk.jigai.framework.common.util.collection.CollectionUtils.convertList;
 import static com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+import static com.hk.jigai.module.system.enums.ErrorCodeConstants.AUTH_LOGIN_BAD_CREDENTIALS;
 import static com.hk.jigai.module.system.enums.ErrorCodeConstants.TENANT_DUPLICATE;
 
 @Tag(name = "管理后台 - 用户")
@@ -205,10 +211,26 @@ public class UserController {
     public CommonResult<Boolean> updateUserTenant(@Valid @RequestBody UserTenantReqVO reqVO) {
         //权限校验,只有超级管理员才有该权限，加菜单也能控制，可以删除该判断
         Set<Long> roleIds = permissionService.getUserRoleIdListByUserId(getLoginUserId());
-        if(CollectionUtils.isAnyEmpty() || !roleIds.contains(1)){
+        if(CollectionUtils.isAnyEmpty(roleIds) || !roleIds.contains(new Long(1))){
             throw exception(GlobalErrorCodeConstants.FORBIDDEN);
         }
         userService.updateUserTenant(reqVO);
         return success(true);
+    }
+
+
+
+    @GetMapping("/queryUserTenantByName")
+    @PermitAll
+    @Operation(summary = "根据用户账号查询个人租户信息")
+    public CommonResult<UserProfileTenantRespVO> queryUserTenant(@RequestParam("userName") String userName) {
+        //先校验userName是否存在
+        AdminUserDO user = userService.getUserByUsername(userName);
+        if (user == null) {
+            throw exception(ErrorCodeConstants.USER_NOT_EXISTS);
+        }
+        //查询
+        UserProfileTenantRespVO result = userService.queryUserTenantByName(userName);
+        return success(result);
     }
 }

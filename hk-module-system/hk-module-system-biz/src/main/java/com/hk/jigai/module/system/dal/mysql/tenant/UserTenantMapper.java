@@ -13,6 +13,9 @@ import java.util.List;
 public interface UserTenantMapper extends BaseMapperX<UserTenantDO> {
     List<UserTenantDO> selectListByUserId(Long userId);
 
+
+    List<UserTenantDO> selectListByUserName(String userName);
+
     default void deleteByUserId(Long userId) {
         delete(new LambdaQueryWrapperX<UserTenantDO>().eq(UserTenantDO::getUserId, userId));
     }

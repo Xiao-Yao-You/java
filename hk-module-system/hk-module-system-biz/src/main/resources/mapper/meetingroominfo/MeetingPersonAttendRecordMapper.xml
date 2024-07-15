@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hk.jigai.module.system.dal.mysql.meetingroominfo.MeetingPersonAttendRecordMapper">
+
+    <select id="selectByMeetingId" resultType="String" parameterType="Long">
+        select distinct user_id from hk_meeting_person_attend_record where meeting_book_id=#{meetingBookId} and deleted = 0
+    </select>
+
+</mapper>

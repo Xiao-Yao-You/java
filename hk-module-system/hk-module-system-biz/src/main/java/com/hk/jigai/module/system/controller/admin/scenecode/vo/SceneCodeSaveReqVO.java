@@ -1,5 +1,6 @@
 package com.hk.jigai.module.system.controller.admin.scenecode.vo;
 
+import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
@@ -14,7 +15,7 @@ public class SceneCodeSaveReqVO {
 
     @Schema(description = "编码key", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "编码key不能为空")
-    private String key;
+    private String keyCode;
 
     @Schema(description = "描述", example = "随便")
     private String description;
@@ -43,8 +44,11 @@ public class SceneCodeSaveReqVO {
     @NotNull(message = "步长不能为空")
     private Integer step;
 
-    @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @NotEmpty(message = "状态不能为空")
-    private String status;
+    @Schema(description = "状态", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "状态不能为空")
+    private Integer status;
+
+    @Schema(description = "使用状态,0:未使用,1:已使用")
+    private Integer useStatus;
 
 }

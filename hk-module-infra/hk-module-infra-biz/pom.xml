@@ -35,6 +35,12 @@
             <groupId>com.hk.boot</groupId>
             <artifactId>hk-spring-boot-starter-biz-tenant</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.hk.boot</groupId>
+            <artifactId>hk-module-system-biz</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
 
         <!-- Web 相关 -->
         <dependency>

@@ -22,14 +22,18 @@ public interface MapCoordinateInfoMapper extends BaseMapperX<MapCoordinateInfoDO
         return selectPage(reqVO, new LambdaQueryWrapperX<MapCoordinateInfoDO>()
                 .eqIfPresent(MapCoordinateInfoDO::getZoneType, MapCoordinateInfoConstant.DEFAULT_ZONE_TYPE)
                 .eqIfPresent(MapCoordinateInfoDO::getType, reqVO.getType())
-                .eqIfPresent(MapCoordinateInfoDO::getDescription, reqVO.getDescription())
+                .likeIfPresent(MapCoordinateInfoDO::getName, reqVO.getName())
+                .likeIfPresent(MapCoordinateInfoDO::getAlias, reqVO.getAlias())
+                .likeIfPresent(MapCoordinateInfoDO::getMarkName, reqVO.getMarkName())
                 .eqIfPresent(MapCoordinateInfoDO::getImage, reqVO.getImage())
+                .eqIfPresent(MapCoordinateInfoDO::getStatus, reqVO.getStatus())
+                .eqIfPresent(MapCoordinateInfoDO::getFactoryCode, reqVO.getFactoryCode())
                 .eqIfPresent(MapCoordinateInfoDO::getLongitude, reqVO.getLongitude())
                 .eqIfPresent(MapCoordinateInfoDO::getLatitude, reqVO.getLatitude())
                 .betweenIfPresent(MapCoordinateInfoDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(MapCoordinateInfoDO::getId));
     }
 
-    List<MapCoordinateInfoAllVO> getMapCoordinateInfoAll();
+    List<MapCoordinateInfoAllVO> getMapCoordinateInfoAll(String factoryCode);
 
 }

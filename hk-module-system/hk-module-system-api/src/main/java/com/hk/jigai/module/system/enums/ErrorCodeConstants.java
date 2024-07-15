@@ -8,7 +8,6 @@ import com.hk.jigai.framework.common.exception.ErrorCode;
  * system 系统，使用 1-002-000-000 段
  */
 public interface ErrorCodeConstants {
-
     // ========== AUTH 模块 1-002-000-000 ==========
     ErrorCode AUTH_LOGIN_BAD_CREDENTIALS = new ErrorCode(1_002_000_000, "登录失败，账号密码不正确");
     ErrorCode AUTH_LOGIN_USER_DISABLED = new ErrorCode(1_002_000_001, "登录失败，账号被禁用");
@@ -167,9 +166,20 @@ public interface ErrorCodeConstants {
 
     // ========== 厂区地图定位配置 1-002-029-000 ==========
     ErrorCode MAP_COORDINATE_INFO_NOT_EXISTS = new ErrorCode(1_002_029_000, "厂区地图定位详细信息不存在");
-
+    ErrorCode MAP_FEEDBACK_NOT_EXISTS = new ErrorCode(1_002_029_001, "厂区地图反馈不存在");
     // ========== 单据编码类型配置 1-002-030-000 ==========
     ErrorCode SCENE_CODE_NOT_EXISTS = new ErrorCode(1_002_030_000, "单据编码类型配置不存在");
     ErrorCode SCENE_CODE_IS_IN_USE = new ErrorCode(1_002_030_001, "该单据编码已经被使用，无法修改或删除");
-    ErrorCode SCENE_CODE_NOT_AVAILABLE = new ErrorCode(1_002_030_002, "单据编码类型目前不存在或者不可用，请核实");
+    ErrorCode SCENE_CODE_NOT_AVAILABLE = new ErrorCode(1_002_030_002, "单据编码目前不存在或者不可用，请核实");
+    ErrorCode SCENE_CODE_ALREADY_EXIST = new ErrorCode(1_002_030_003, "该编码已存在，请核实");
+
+    // ========== 单据编码类型配置 1-002-031-000 ==========
+    ErrorCode MEETING_ROOM_INFO_NOT_EXISTS = new ErrorCode(1_002_031_000, "会议室基本信息不存在");
+    ErrorCode USER_BOOK_MEETING_NOT_EXISTS = new ErrorCode(1_002_031_001, "会议预定信息不存在");
+    ErrorCode USER_BOOK_MEETING_ALREADY_BOOKED = new ErrorCode(1_002_031_002, "该会议室该时间段有其他会议已预定，麻烦检查！");
+
+    // ========== 单据编码类型配置 1-002-032-000 ==========
+    ErrorCode USER_REPORT_NOT_EXISTS = new ErrorCode(1_002_032_000, "汇报信息不存在");
+    ErrorCode USER_REPORT_ALREADY_COMMIT = new ErrorCode(1_002_032_001, "用户的汇报信息重复了！");
+
 }

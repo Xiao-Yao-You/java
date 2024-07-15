@@ -119,16 +119,16 @@ public class UserProfileController {
 
     @GetMapping("/queryUserTenant")
     @Operation(summary = "查询个人租户信息")
-    public CommonResult<UserProfileTenantRespVO> queryUserTenant() {
-        UserProfileTenantRespVO result = userService.queryUserTenant(getLoginUserId());
+    public CommonResult<UserProfileTenantRespVO> queryUserTenant(@RequestParam("userId") Long userId) {
+        UserProfileTenantRespVO result = userService.queryUserTenant(userId);
         return success(result);
     }
 
     @GetMapping("/modifyTenant")
     @Operation(summary = "用户切换租户")
-    public AuthLoginRespVO modifyTenant(@RequestParam("id") Long id) {
+    public CommonResult<AuthLoginRespVO> modifyTenant(@RequestParam("tenantId") Long tenantId) {
         //1.校验租户id 是否正确，以及当前用户是否为该租户
-        TenantDO tenant = tenantService.getTenant(id);
+        TenantDO tenant = tenantService.getTenant(tenantId);
         if (tenant == null) {
             throw exception(TENANT_NOT_EXISTS);
         }
@@ -139,19 +139,20 @@ public class UserProfileController {
             throw exception(TENANT_EXPIRE, tenant.getName());
         }
         LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
-        if(loginUser.getTenantId().equals(id)){
+        if(loginUser.getTenantId().equals(tenantId)){
             throw exception(TENANT_DUPLICATE, tenant.getName());
         }
 
         // 2. 重新生成token
+        TenantContextHolder.setTenantId(tenantId);
         OAuth2AccessTokenDO accessTokenDO = oAuth2TokenService.createAccessToken(loginUser.getId(), getUserType().getValue(),
                 OAuth2ClientConstants.CLIENT_ID_DEFAULT, null);
         //3.转换并返回
-        return AuthConvert.INSTANCE.convert(accessTokenDO);
+        return success(AuthConvert.INSTANCE.convert(accessTokenDO));
     }
 
     private UserTypeEnum getUserType() {
-        return UserTypeEnum.MEMBER;
+        return UserTypeEnum.ADMIN;
     }
 
 

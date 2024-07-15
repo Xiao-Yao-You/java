@@ -188,7 +188,7 @@ public class OAuth2TokenServiceImpl implements OAuth2TokenService {
                 }
             }
             return MapUtil.builder(LoginUser.INFO_KEY_NICKNAME, user.getNickname())
-                    .put(LoginUser.INFO_KEY_DEPT_ID, deptIds.toString()).build();
+                    .put(LoginUser.INFO_KEY_DEPT_ID, deptIds.toString()).put(LoginUser.INFO_KEY_MOBILE, user.getMobile()).build();
         } else if (userType.equals(UserTypeEnum.MEMBER.getValue())) {
             // 注意：目前 Member 暂时不读取，可以按需实现
             return Collections.emptyMap();

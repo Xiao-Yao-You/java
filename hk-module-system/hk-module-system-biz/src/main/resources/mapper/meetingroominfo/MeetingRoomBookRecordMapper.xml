@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hk.jigai.module.system.dal.mysql.meetingroominfo.MeetingRoomBookRecordMapper">
+
+    <select id="queryMeetingBookList" resultMap="mapCoordinateInfoMap" parameterType="com.hk.jigai.module.system.controller.admin.meetingroominfo.vo.MeetingRoomBookRecordReqVO">
+        select a.id,b.name,b.position,b.capacity,b.id as meetingRoomId,a.meeting_book_id,a.date_meeting,a.time_key,a.subject,a.user_phone
+        from hk_meeting_room_info b
+            left join (select * from hk_meeting_room_book_record where deleted = 0 and date_meeting = #{date}
+        <if test="meetingIdList != null and meetingIdList.size() > 0">
+            <foreach item="item" index="index" collection="meetingIdList" open="AND (" separator="OR" close=")">
+                meeting_room_id = #{item}
+            </foreach>
+        </if>
+        <if test="startTime != null and endTime != null">
+              and   (time_key between #{startTime} and  #{endTime})
+        </if>
+                )  a on a.meeting_room_id=b.id
+         where b.deleted=0 and b.status = 0
+            order by b.id,a.time_key
+    </select>
+
+    <resultMap id="mapCoordinateInfoMap" type="com.hk.jigai.module.system.controller.admin.meetingroominfo.vo.MeetingRoomBookRecordRespVO">
+        <result property="meetingRoomId" column="meetingRoomId"/>
+        <result property="name" column="name"/>
+        <result property="position" column="position"/>
+        <result property="capacity" column="capacity"/>
+        <collection property="list" ofType="com.hk.jigai.module.system.dal.dataobject.meetingroominfo.MeetingRoomBookRecordDO">
+            <id property="id" column="id"/>
+            <result property="meetingBookId" column="meeting_book_id"/>
+            <result property="dateMeeting" column="date_meeting"/>
+            <result property="timeKey" column="time_key"/>
+            <result property="subject" column="subject"/>
+            <result property="userPhone" column="user_phone"/>
+        </collection>
+    </resultMap>
+
+</mapper>

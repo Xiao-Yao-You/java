@@ -1,5 +1,7 @@
 package com.hk.jigai.module.system.dal.dataobject.mapcoordinateinfo;
 
+import com.alibaba.excel.annotation.ExcelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
 import java.math.BigDecimal;
@@ -34,13 +36,31 @@ public class MapCoordinateInfoDO extends BaseDO {
      */
     private String zoneType;
     /**
+     * 厂区 00 恒科 01 轩达
+     */
+    private String factoryCode;
+    /**
+     * 编码
+     */
+    private String code;
+
+    /**
      * 类型：00:仓库,01:车间,02:办公楼,03:餐厅,04:大门
      */
     private String type;
     /**
-     * 描述
+     * 名称
      */
-    private String description;
+    private String name;
+    /**
+     * 别名
+     */
+    private String alias;
+
+    /**
+     * 建筑物上名字
+     */
+    private String markName;
     /**
      * 图片
      */
@@ -53,5 +73,15 @@ public class MapCoordinateInfoDO extends BaseDO {
      * GPS纬度
      */
     private BigDecimal latitude;
+
+    /**
+     * 序号
+     */
+    private int sort;
+
+    /**
+     * 状态 0,1
+     */
+    private Integer status;
 
 }

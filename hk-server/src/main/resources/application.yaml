@@ -155,8 +155,6 @@ hk:
   security:
     permit-all-urls:
       - /admin-api/mp/open/** # 微信公众号开放平台，微信回调接口，不需要登录
-      - /admin-api/map-coordinate-info/queryAll #查询厂区具体经纬度，不需要登录
-      - /admin-api/system/dict-data/pageIgnoreLogin #查询字段，不需要登录
   websocket:
     enable: true # websocket的开关
     path: /infra/ws # 路径
@@ -197,9 +195,12 @@ hk:
       - /jmreport/* # 积木报表，无法携带租户编号
       - /admin-api/mp/open/** # 微信公众号开放平台，微信回调接口，无法携带租户编号
       - /admin-api/system/auth/ignoreTenant/** # 针对超级管理员账号，需要管理所有租户的用户，并需要配置用户的租户信息
-      - /admin-api/map-coordinate-info/queryAll #针对地图管理，目前没有租户概念
+      - /admin-api/map/queryAll #针对地图管理，目前没有租户概念
+      - /admin-api/map/feedback #地图反馈
       - /admin-api/system/dict-data/pageIgnoreLogin #针对字典查询接口
+      - /admin-api/system/user/queryUserTenantByName #针对首页，用户名查询租户信息
     ignore-tables:
+      - system_users
       - system_tenant
       - system_tenant_package
       - system_dict_data
@@ -216,6 +217,9 @@ hk:
       - system_mail_log
       - system_notify_template
       - system_scene_code
+      - system_user_tenant
+      - hk_map_feedback
+      - hk_map_coordinate_info
       - infra_codegen_column
       - infra_codegen_table
       - infra_config

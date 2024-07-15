@@ -217,4 +217,12 @@ public interface AdminUserService {
      */
     UserProfileTenantRespVO queryUserTenant(Long userId);
 
+    /**
+     * 根据用户登录账号查询租户信息
+     * @param userName
+     * @return
+     */
+    UserProfileTenantRespVO queryUserTenantByName(String userName);
+
+
 }

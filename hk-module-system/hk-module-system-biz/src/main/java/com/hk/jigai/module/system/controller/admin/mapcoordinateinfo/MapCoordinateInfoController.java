@@ -1,6 +1,7 @@
 package com.hk.jigai.module.system.controller.admin.mapcoordinateinfo;
 
 import com.hk.jigai.module.system.dal.dataobject.scenecode.SceneCodeDO;
+import com.hk.jigai.module.system.service.mapcoordinateinfo.MapFeedbackService;
 import com.hk.jigai.module.system.service.scenecode.SceneCodeService;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
@@ -34,7 +35,7 @@ import com.hk.jigai.module.system.service.mapcoordinateinfo.MapCoordinateInfoSer
 
 @Tag(name = "管理后台 - 厂区地图定位详细信息")
 @RestController
-@RequestMapping("/map-coordinate-info")
+@RequestMapping("/map")
 @Validated
 public class MapCoordinateInfoController {
 
@@ -42,7 +43,7 @@ public class MapCoordinateInfoController {
     private MapCoordinateInfoService mapCoordinateInfoService;
 
     @Resource
-    private SceneCodeService sceneCodeService;
+    private MapFeedbackService mapFeedbackService;
 
     @PostMapping("/create")
     @Operation(summary = "创建厂区地图定位详细信息")
@@ -101,25 +102,16 @@ public class MapCoordinateInfoController {
     @GetMapping("/queryAll")
     @PermitAll
     @Operation(summary = "获得厂区地图定位详细信息分页")
-    public CommonResult<MapCoordinateInfoAllRespVO> getMapCoordinateInfoAll() {
+    public CommonResult<MapCoordinateInfoAllRespVO> getMapCoordinateInfoAll(@RequestParam("factoryCode") String factoryCode) {
         MapCoordinateInfoAllRespVO result = new MapCoordinateInfoAllRespVO();
-        result.setList(mapCoordinateInfoService.getMapCoordinateInfoAll());
-//        try{
-//                    SceneCodeDO dto = new SceneCodeDO();
-//        dto.setSuffix("000000");
-//        dto.setInfix("yyyMMdd");
-//        dto.setStart(100);
-//        dto.setDescription("测试");
-//        dto.setStatus("00");
-//        dto.setKey("pay");
-//        dto.setId(11);
-//        dto.setStep(10);
-//        dto.setType("02");
-//        dto.setPrefix("wft");
-//        sceneCodeService.increment(dto);
-//        } catch (Exception e){
-//
-//        }
+        result.setList(mapCoordinateInfoService.getMapCoordinateInfoAll(factoryCode));
         return success(result);
+    }
+
+    @PostMapping("/feedback")
+    @PermitAll
+    @Operation(summary = "反馈")
+    public CommonResult feedback(@Valid @RequestBody MapFeedbackSaveReqVO createReqVO) {
+        return success(mapFeedbackService.createMapFeedback(createReqVO));
     }
 }

@@ -56,6 +56,6 @@ public interface MapCoordinateInfoService {
      * 查询所有的厂区定位
      * @return
      */
-    List<MapCoordinateInfoAllVO> getMapCoordinateInfoAll();
+    List<MapCoordinateInfoAllVO> getMapCoordinateInfoAll(String factoryCode);
 
 }

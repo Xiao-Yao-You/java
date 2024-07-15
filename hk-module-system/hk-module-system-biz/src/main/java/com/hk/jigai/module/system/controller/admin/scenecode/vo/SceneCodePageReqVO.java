@@ -16,7 +16,7 @@ import static com.hk.jigai.framework.common.util.date.DateUtils.FORMAT_YEAR_MONT
 public class SceneCodePageReqVO extends PageParam {
 
     @Schema(description = "编码key")
-    private String key;
+    private String keyCode;
 
     @Schema(description = "描述", example = "随便")
     private String description;
@@ -39,11 +39,9 @@ public class SceneCodePageReqVO extends PageParam {
     @Schema(description = "步长")
     private Integer step;
 
-    @Schema(description = "状态", example = "2")
-    private String status;
+    @Schema(description = "状态，0:启用,1:禁用")
+    private Integer status;
 
-    @Schema(description = "创建时间")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private LocalDateTime[] createTime;
-
+    @Schema(description = "使用状态,0:未使用,1:已使用")
+    private Integer useStatus;
 }

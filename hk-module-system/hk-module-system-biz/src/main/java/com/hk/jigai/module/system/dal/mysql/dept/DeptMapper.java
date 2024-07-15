@@ -4,6 +4,7 @@ import com.hk.jigai.framework.mybatis.core.mapper.BaseMapperX;
 import com.hk.jigai.framework.mybatis.core.query.LambdaQueryWrapperX;
 import com.hk.jigai.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
 import com.hk.jigai.module.system.dal.dataobject.dept.DeptDO;
+import com.hk.jigai.module.system.dal.dataobject.user.AdminUserDO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Collection;
@@ -29,5 +30,8 @@ public interface DeptMapper extends BaseMapperX<DeptDO> {
     default List<DeptDO> selectListByParentId(Collection<Long> parentIds) {
         return selectList(DeptDO::getParentId, parentIds);
     }
+
+    void delete();
+
 
 }
