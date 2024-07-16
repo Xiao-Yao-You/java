@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.*;
 import com.hk.jigai.framework.mybatis.core.dataobject.BaseDO;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * 用户预定会议记录 DO
@@ -70,8 +71,22 @@ public class UserBookMeetingDO extends BaseDO {
     /**
      * 设备数组
      */
-    @TableField(typeHandler = JsonLongSetTypeHandler.class)
     private Set<Long> equipment;
+
+    public void setEquipment(String equipment) {
+        if(StringUtils.isNotBlank(equipment)){
+            String equipment2 = equipment.replace("[","").replace("]","");
+            String[] array = equipment2.split(",");
+            if(array!=null && array.length>0){
+                Set<Long> result = new HashSet<>();
+                for(String str:array){
+                    result.add(new Long(str));
+                }
+                this.equipment = result;
+            }
+        }
+    }
+
     /**
      * 总人数
      */
