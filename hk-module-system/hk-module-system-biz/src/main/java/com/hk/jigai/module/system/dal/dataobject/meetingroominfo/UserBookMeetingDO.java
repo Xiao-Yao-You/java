@@ -19,7 +19,6 @@ import com.hk.jigai.framework.mybatis.core.dataobject.BaseDO;
 @KeySequence("hk_user_book_meeting_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -34,6 +33,11 @@ public class UserBookMeetingDO extends BaseDO {
      * 用户ID
      */
     private Long userId;
+
+    /**
+     * 用户name
+     */
+    private Long userNickName;
     /**
      * 用户联系电话
      */
@@ -42,6 +46,11 @@ public class UserBookMeetingDO extends BaseDO {
      * 会议室ID
      */
     private Long meetingRoomId;
+    /**
+     * 会议室name
+     */
+    private Long meetingRoomName;
+
     /**
      * 名称
      */
@@ -71,5 +80,10 @@ public class UserBookMeetingDO extends BaseDO {
      * 备注
      */
     private String remark;
+
+    /**
+     * 状态, 1 已撤销，0 正常
+     */
+    private Integer status;
 
 }

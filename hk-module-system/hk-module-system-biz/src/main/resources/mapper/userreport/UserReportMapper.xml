@@ -17,8 +17,7 @@
 
     </select>
 
-    <select id="selectCount" >
-
-
+    <select id="selectCount" parameterType="map" resultType="Long">
+        select count(1) from hk_user_report where user_id = #{userId} and dept_id = #{deptId} and date_report=#{dateReport}  and deleted = 0
     </select>
 </mapper>

@@ -11,6 +11,7 @@ import com.hk.jigai.framework.common.pojo.PageParam;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 
+import static com.hk.jigai.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY;
 import static com.hk.jigai.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
 @Schema(description = "管理后台 - 用户预定会议记录分页 Request VO")
@@ -32,15 +33,8 @@ public class UserBookMeetingPageReqVO extends PageParam {
     private String subject;
 
     @Schema(description = "会议日期")
-    private LocalDate dateMeeting;
-
-    @Schema(description = "会议开始")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Integer[] startTime;
-
-    @Schema(description = "会议结束")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private Integer[] endTime;
+    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY)
+    private LocalDate[] date;
 
     @Schema(description = "设备")
     private Set<Long> equipment;

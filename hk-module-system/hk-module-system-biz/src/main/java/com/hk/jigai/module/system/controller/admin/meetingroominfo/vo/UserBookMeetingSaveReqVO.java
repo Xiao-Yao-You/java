@@ -10,12 +10,14 @@ import javax.validation.constraints.*;
 @Schema(description = "管理后台 - 用户预定会议记录新增/修改 Request VO")
 @Data
 public class UserBookMeetingSaveReqVO {
-    @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "28028")
+    @Schema(description = "主键", example = "28028")
     private Long id;
 
     @Schema(description = "用户ID", example = "15793")
-    @NotNull(message = "用户ID不能为空")
     private Long userId;
+
+    @Schema(description = "用户昵称", example = "15793")
+    private Long userNickName;
 
     @Schema(description = "用户联系电话")
     @NotEmpty(message = "用户联系电话不能为空")
@@ -24,6 +26,9 @@ public class UserBookMeetingSaveReqVO {
     @Schema(description = "会议室ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "21506")
     @NotNull(message = "会议室ID不能为空")
     private Long meetingRoomId;
+
+    @Schema(description = "会议室名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "21506")
+    private Long meetingRoomName;
 
     @Schema(description = "名称", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "名称不能为空")
@@ -42,6 +47,7 @@ public class UserBookMeetingSaveReqVO {
     private Integer endTime;
 
     @Schema(description = "设备")
+
     private Set<Long> equipment;
 
     @Schema(description = "总人数", requiredMode = Schema.RequiredMode.REQUIRED)

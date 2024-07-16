@@ -5,7 +5,7 @@
     <select id="queryMeetingBookList" resultMap="mapCoordinateInfoMap" parameterType="com.hk.jigai.module.system.controller.admin.meetingroominfo.vo.MeetingRoomBookRecordReqVO">
         select a.id,b.name,b.position,b.capacity,b.id as meetingRoomId,a.meeting_book_id,a.date_meeting,a.time_key,a.subject,a.user_phone
         from hk_meeting_room_info b
-            left join (select * from hk_meeting_room_book_record where deleted = 0 and date_meeting = #{date}
+            left join (select * from hk_meeting_room_book_record where deleted = 0 and date_meeting = #{date} and status = 0
         <if test="meetingIdList != null and meetingIdList.size() > 0">
             <foreach item="item" index="index" collection="meetingIdList" open="AND (" separator="OR" close=")">
                 meeting_room_id = #{item}
@@ -16,6 +16,11 @@
         </if>
                 )  a on a.meeting_room_id=b.id
          where b.deleted=0 and b.status = 0
+        <if test="meetingIdList != null and meetingIdList.size() > 0">
+            <foreach item="item" index="index" collection="meetingIdList" open="AND (" separator="OR" close=")">
+                b.id = #{item}
+            </foreach>
+        </if>
             order by b.id,a.time_key
     </select>
 

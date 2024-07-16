@@ -1,11 +1,13 @@
 package com.hk.jigai.module.system.dal.mysql.meetingroominfo;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.mybatis.core.query.LambdaQueryWrapperX;
 import com.hk.jigai.framework.mybatis.core.mapper.BaseMapperX;
 import com.hk.jigai.module.system.dal.dataobject.meetingroominfo.UserBookMeetingDO;
+import com.hk.jigai.module.system.dal.dataobject.notify.NotifyMessageDO;
 import org.apache.ibatis.annotations.Mapper;
 import com.hk.jigai.module.system.controller.admin.meetingroominfo.vo.*;
 
@@ -23,14 +25,19 @@ public interface UserBookMeetingMapper extends BaseMapperX<UserBookMeetingDO> {
                 .eqIfPresent(UserBookMeetingDO::getUserPhone, reqVO.getUserPhone())
                 .eqIfPresent(UserBookMeetingDO::getMeetingRoomId, reqVO.getMeetingRoomId())
                 .eqIfPresent(UserBookMeetingDO::getSubject, reqVO.getSubject())
-                .eqIfPresent(UserBookMeetingDO::getDateMeeting, reqVO.getDateMeeting())
-                .betweenIfPresent(UserBookMeetingDO::getStartTime, reqVO.getStartTime())
-                .betweenIfPresent(UserBookMeetingDO::getEndTime, reqVO.getEndTime())
+                .betweenIfPresent(UserBookMeetingDO::getDateMeeting, reqVO.getDate())
                 .eqIfPresent(UserBookMeetingDO::getEquipment, reqVO.getEquipment())
                 .eqIfPresent(UserBookMeetingDO::getCapacity, reqVO.getCapacity())
                 .eqIfPresent(UserBookMeetingDO::getRemark, reqVO.getRemark())
                 .betweenIfPresent(UserBookMeetingDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(UserBookMeetingDO::getId));
     }
+
+    default int cancel(Long id){
+        return update(new UserBookMeetingDO().setStatus(new Integer(1)),
+                new LambdaQueryWrapperX<UserBookMeetingDO>()
+                        .eq(UserBookMeetingDO::getId, id));
+    }
+
 
 }

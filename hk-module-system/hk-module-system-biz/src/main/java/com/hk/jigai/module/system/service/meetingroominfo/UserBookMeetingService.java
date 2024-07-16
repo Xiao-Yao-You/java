@@ -37,6 +37,13 @@ public interface UserBookMeetingService {
     void deleteUserBookMeeting(Long id);
 
     /**
+     * 撤销用户预定会议记录
+     *
+     * @param id 编号
+     */
+    void cancelUserBookMeeting(Long id);
+
+    /**
      * 获得用户预定会议记录
      *
      * @param id 编号

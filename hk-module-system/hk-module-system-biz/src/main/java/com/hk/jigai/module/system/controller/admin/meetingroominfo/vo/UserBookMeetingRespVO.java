@@ -23,6 +23,10 @@ public class UserBookMeetingRespVO {
     @ExcelProperty("用户ID")
     private Long userId;
 
+    @Schema(description = "用户昵称", example = "15793")
+    @ExcelProperty("用户昵称")
+    private Long userNickName;
+
     @Schema(description = "用户联系电话", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("用户联系电话")
     private String userPhone;
@@ -30,6 +34,10 @@ public class UserBookMeetingRespVO {
     @Schema(description = "会议室ID", requiredMode = Schema.RequiredMode.REQUIRED, example = "21506")
     @ExcelProperty("会议室ID")
     private Long meetingRoomId;
+
+    @Schema(description = "会议室名称",  example = "21506")
+    @ExcelProperty("会议室名称")
+    private Long meetingRoomName;
 
     @Schema(description = "名称", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("名称")
@@ -65,5 +73,8 @@ public class UserBookMeetingRespVO {
 
     @Schema(description = "参会人员列表")
     private List<Long> joinUserIdList;
+
+    @Schema(description = "状态")
+    private Integer status;
 
 }

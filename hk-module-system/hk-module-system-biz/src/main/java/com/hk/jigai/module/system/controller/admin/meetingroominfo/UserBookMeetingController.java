@@ -66,6 +66,15 @@ public class UserBookMeetingController {
         return success(true);
     }
 
+    @PutMapping("/cancel")
+    @Operation(summary = "撤销用户预定会议记录")
+    @Parameter(name = "id", description = "编号", required = true)
+    @PreAuthorize("@ss.hasPermission('hk:user-book-meeting:update')")
+    public CommonResult<Boolean> cancelUserBookMeeting(@RequestParam("id") Long id) {
+        userBookMeetingService.cancelUserBookMeeting(id);
+        return success(true);
+    }
+
     @GetMapping("/get")
     @Operation(summary = "获得用户预定会议记录")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")

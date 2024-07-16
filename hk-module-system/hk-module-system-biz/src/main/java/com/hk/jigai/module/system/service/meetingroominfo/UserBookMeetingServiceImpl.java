@@ -1,6 +1,7 @@
 package com.hk.jigai.module.system.service.meetingroominfo;
 
 import com.hk.jigai.framework.common.util.collection.CollectionUtils;
+import com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils;
 import com.hk.jigai.module.system.dal.dataobject.meetingroominfo.MeetingPersonAttendRecordDO;
 import com.hk.jigai.module.system.dal.dataobject.meetingroominfo.MeetingRoomBookRecordDO;
 import com.hk.jigai.module.system.dal.mysql.meetingroominfo.MeetingPersonAttendRecordMapper;
@@ -55,11 +56,12 @@ public class UserBookMeetingServiceImpl implements UserBookMeetingService {
         if(CollectionUtils.isAnyEmpty(bookRecord) || bookRecord.get(0)==null){
             throw exception(MEETING_ROOM_INFO_NOT_EXISTS);
         }
-        if(CollectionUtils.isAnyEmpty(bookRecord.get(0).getList()) || bookRecord.get(0).getList().size()!=1 || bookRecord.get(0).getList().get(0).getTimeKey() != null){
+        if(!CollectionUtils.isAnyEmpty(bookRecord.get(0).getList()) || bookRecord.get(0).getList().size()!=0 ){
             throw exception(USER_BOOK_MEETING_ALREADY_BOOKED);
         }
 
         UserBookMeetingDO userBookMeeting = BeanUtils.toBean(createReqVO, UserBookMeetingDO.class);
+        userBookMeeting.setUserId(SecurityFrameworkUtils.getLoginUser().getId());
         // 插入
         int bookId = userBookMeetingMapper.insert(userBookMeeting);
         //插入会议室预定记录表
@@ -138,6 +140,15 @@ public class UserBookMeetingServiceImpl implements UserBookMeetingService {
         meetingRoomBookRecordMapper.deleteByMeetingBookId(id);
         meetingPersonAttendRecordMapper.deleteByMeetingBookId(id);
 
+    }
+
+    @Override
+    public void cancelUserBookMeeting(Long id) {
+        // 校验存在
+        validateUserBookMeetingExists(id);
+        userBookMeetingMapper.cancel(id);
+        meetingRoomBookRecordMapper.deleteByMeetingBookId(id);
+        meetingPersonAttendRecordMapper.deleteByMeetingBookId(id);
     }
 
     private void validateUserBookMeetingExists(Long id) {
