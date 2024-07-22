@@ -2,8 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.hk.jigai.module.system.dal.mysql.meetingroominfo.MeetingPersonAttendRecordMapper">
 
-    <select id="selectByMeetingId" resultType="String" parameterType="Long">
-        select distinct user_id from hk_meeting_person_attend_record where meeting_book_id=#{meetingBookId} and deleted = 0
+    <select id="selectByMeetingId" resultType="com.hk.jigai.module.system.dal.dataobject.meetingroominfo.MeetingPersonAttendRecordDO" parameterType="Long">
+        select distinct user_id , user_nick_name  from hk_meeting_person_attend_record where meeting_book_id=#{meetingBookId} and deleted = 0
     </select>
 
 </mapper>

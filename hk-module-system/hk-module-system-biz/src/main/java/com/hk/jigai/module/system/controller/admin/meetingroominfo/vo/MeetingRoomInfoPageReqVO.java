@@ -25,7 +25,7 @@ public class MeetingRoomInfoPageReqVO extends PageParam {
     private String roomNo;
 
     @Schema(description = "容纳人数")
-    private Integer capacity;
+    private Integer[] capacityList;
 
     @Schema(description = "状态(0:开启,1:禁用)", example = "1")
     private Integer status;

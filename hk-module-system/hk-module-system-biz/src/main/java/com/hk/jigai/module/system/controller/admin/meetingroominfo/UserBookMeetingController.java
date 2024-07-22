@@ -35,7 +35,6 @@ import com.hk.jigai.module.system.service.meetingroominfo.UserBookMeetingService
 @RequestMapping("/bookMeeting")
 @Validated
 public class UserBookMeetingController {
-
     @Resource
     private UserBookMeetingService userBookMeetingService;
 
@@ -84,8 +83,7 @@ public class UserBookMeetingController {
         UserBookMeetingRespVO result = BeanUtils.toBean(userBookMeeting, UserBookMeetingRespVO.class);
         //参会人员列表
         if(result != null){
-            List<Long> userIdList = meetingPersonAttendRecordService.getMeetingPersonAttendRecord(id);
-            result.setJoinUserIdList(userIdList);
+            result.setJoinUserList(meetingPersonAttendRecordService.getMeetingPersonAttendRecord(id));
         }
         return success(result);
     }
@@ -110,5 +108,4 @@ public class UserBookMeetingController {
         ExcelUtils.write(response, "用户预定会议记录.xls", "数据", UserBookMeetingRespVO.class,
                         BeanUtils.toBean(list, UserBookMeetingRespVO.class));
     }
-
 }

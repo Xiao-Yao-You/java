@@ -1,5 +1,6 @@
 package com.hk.jigai.module.system.controller.admin.meetingroominfo.vo;
 
+import com.hk.jigai.module.system.dal.dataobject.meetingroominfo.MeetingPersonAttendRecordDO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -25,7 +26,11 @@ public class UserBookMeetingRespVO {
 
     @Schema(description = "用户昵称", example = "15793")
     @ExcelProperty("用户昵称")
-    private Long userNickName;
+    private String userNickName;
+
+    @Schema(description = "用户昵称", example = "15793")
+    @ExcelProperty("主持人名称")
+    private String hostUserNickName;
 
     @Schema(description = "用户联系电话", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("用户联系电话")
@@ -37,7 +42,7 @@ public class UserBookMeetingRespVO {
 
     @Schema(description = "会议室名称",  example = "21506")
     @ExcelProperty("会议室名称")
-    private Long meetingRoomName;
+    private String meetingRoomName;
 
     @Schema(description = "名称", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("名称")
@@ -57,7 +62,7 @@ public class UserBookMeetingRespVO {
 
     @Schema(description = "设备")
     @ExcelProperty("设备")
-    private Set<Long> equipment;
+    private Set<String> equipment;
 
     @Schema(description = "总人数", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("总人数")
@@ -72,9 +77,10 @@ public class UserBookMeetingRespVO {
     private LocalDateTime createTime;
 
     @Schema(description = "参会人员列表")
-    private List<Long> joinUserIdList;
+    private List<MeetingPersonAttendRecordDO> joinUserList;
 
     @Schema(description = "状态")
     private Integer status;
+
 
 }

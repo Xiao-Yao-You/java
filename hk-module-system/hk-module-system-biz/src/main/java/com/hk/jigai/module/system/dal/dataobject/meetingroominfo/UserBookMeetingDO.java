@@ -1,12 +1,17 @@
 package com.hk.jigai.module.system.dal.dataobject.meetingroominfo;
 
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.hk.jigai.framework.common.util.collection.CollectionUtils;
 import com.hk.jigai.framework.mybatis.core.type.JsonLongSetTypeHandler;
+import com.hk.jigai.framework.mybatis.core.type.JsonStringSetTypeHandler;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.util.*;
 import java.time.LocalDateTime;
 import java.time.LocalDateTime;
+
 import com.baomidou.mybatisplus.annotation.*;
 import com.hk.jigai.framework.mybatis.core.dataobject.BaseDO;
 import org.apache.commons.lang3.StringUtils;
@@ -16,13 +21,14 @@ import org.apache.commons.lang3.StringUtils;
  *
  * @author 超级管理员
  */
-@TableName("hk_user_book_meeting")
+@TableName(value = "hk_user_book_meeting", autoResultMap = true)
 @KeySequence("hk_user_book_meeting_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class UserBookMeetingDO extends BaseDO {
 
     /**
@@ -38,7 +44,13 @@ public class UserBookMeetingDO extends BaseDO {
     /**
      * 用户name
      */
-    private Long userNickName;
+    private String userNickName;
+
+    /**
+    * 主持人姓名
+     */
+    private String hostUserNickName;
+
     /**
      * 用户联系电话
      */
@@ -50,7 +62,7 @@ public class UserBookMeetingDO extends BaseDO {
     /**
      * 会议室name
      */
-    private Long meetingRoomName;
+    private String meetingRoomName;
 
     /**
      * 名称
@@ -71,21 +83,8 @@ public class UserBookMeetingDO extends BaseDO {
     /**
      * 设备数组
      */
-    private Set<Long> equipment;
-
-    public void setEquipment(String equipment) {
-        if(StringUtils.isNotBlank(equipment)){
-            String equipment2 = equipment.replace("[","").replace("]","");
-            String[] array = equipment2.split(",");
-            if(array!=null && array.length>0){
-                Set<Long> result = new HashSet<>();
-                for(String str:array){
-                    result.add(new Long(str));
-                }
-                this.equipment = result;
-            }
-        }
-    }
+    @TableField(typeHandler = JsonStringSetTypeHandler.class)
+    private Set<String> equipment;
 
     /**
      * 总人数

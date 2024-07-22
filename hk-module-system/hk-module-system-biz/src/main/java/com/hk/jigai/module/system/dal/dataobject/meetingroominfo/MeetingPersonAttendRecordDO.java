@@ -36,4 +36,9 @@ public class MeetingPersonAttendRecordDO extends BaseDO {
      */
     private Long userId;
 
+    /**
+     * 用户昵称
+     */
+    private String userNickName;
+
 }

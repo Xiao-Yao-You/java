@@ -1,5 +1,8 @@
 package com.hk.jigai.module.system.controller.admin.meetingroominfo.vo;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.hk.jigai.framework.mybatis.core.type.JsonLongSetTypeHandler;
+import com.hk.jigai.module.system.dal.dataobject.meetingroominfo.MeetingPersonAttendRecordDO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -17,7 +20,10 @@ public class UserBookMeetingSaveReqVO {
     private Long userId;
 
     @Schema(description = "用户昵称", example = "15793")
-    private Long userNickName;
+    private String userNickName;
+
+    @Schema(description = "主持人用户昵称", example = "15793")
+    private String hostUserNickName;
 
     @Schema(description = "用户联系电话")
     @NotEmpty(message = "用户联系电话不能为空")
@@ -27,8 +33,8 @@ public class UserBookMeetingSaveReqVO {
     @NotNull(message = "会议室ID不能为空")
     private Long meetingRoomId;
 
-    @Schema(description = "会议室名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "21506")
-    private Long meetingRoomName;
+    @Schema(description = "会议室名称",  example = "21506")
+    private String meetingRoomName;
 
     @Schema(description = "名称", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "名称不能为空")
@@ -47,8 +53,7 @@ public class UserBookMeetingSaveReqVO {
     private Integer endTime;
 
     @Schema(description = "设备")
-
-    private Set<Long> equipment;
+    private Set<String> equipment;
 
     @Schema(description = "总人数", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "总人数不能为空")
@@ -58,6 +63,6 @@ public class UserBookMeetingSaveReqVO {
     private String remark;
 
     @Schema(description = "参会人员", requiredMode = Schema.RequiredMode.REQUIRED)
-    private List<Long> joinUserId;
+    private List<MeetingPersonAttendRecordDO> joinUserList;
 
 }

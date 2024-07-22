@@ -24,10 +24,10 @@ public interface UserBookMeetingMapper extends BaseMapperX<UserBookMeetingDO> {
                 .eqIfPresent(UserBookMeetingDO::getUserId, reqVO.getUserId())
                 .eqIfPresent(UserBookMeetingDO::getUserPhone, reqVO.getUserPhone())
                 .eqIfPresent(UserBookMeetingDO::getMeetingRoomId, reqVO.getMeetingRoomId())
+                .betweenIfPresent(UserBookMeetingDO::getCapacity,reqVO.getCapacityList())
                 .eqIfPresent(UserBookMeetingDO::getSubject, reqVO.getSubject())
                 .betweenIfPresent(UserBookMeetingDO::getDateMeeting, reqVO.getDate())
                 .eqIfPresent(UserBookMeetingDO::getEquipment, reqVO.getEquipment())
-                .eqIfPresent(UserBookMeetingDO::getCapacity, reqVO.getCapacity())
                 .eqIfPresent(UserBookMeetingDO::getRemark, reqVO.getRemark())
                 .betweenIfPresent(UserBookMeetingDO::getCreateTime, reqVO.getCreateTime())
                 .orderByDesc(UserBookMeetingDO::getId));

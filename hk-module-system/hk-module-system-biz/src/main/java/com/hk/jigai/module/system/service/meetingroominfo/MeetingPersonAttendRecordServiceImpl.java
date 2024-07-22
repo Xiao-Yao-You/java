@@ -21,7 +21,7 @@ public class MeetingPersonAttendRecordServiceImpl implements MeetingPersonAttend
     private MeetingPersonAttendRecordMapper meetingPersonAttendRecordMapper;
 
     @Override
-    public List<Long> getMeetingPersonAttendRecord(Long meetingBookId) {
+    public List<MeetingPersonAttendRecordDO> getMeetingPersonAttendRecord(Long meetingBookId) {
         return meetingPersonAttendRecordMapper.selectByMeetingId(meetingBookId);
     }
 

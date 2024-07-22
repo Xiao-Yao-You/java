@@ -54,4 +54,9 @@ public class MeetingRoomBookRecordDO extends BaseDO {
      */
     private String userPhone;
 
+    /**
+     * 状态(0:正常,1:禁用)
+     */
+    private Integer status;
+
 }

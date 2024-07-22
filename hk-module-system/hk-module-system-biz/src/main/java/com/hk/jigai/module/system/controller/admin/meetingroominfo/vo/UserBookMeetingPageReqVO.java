@@ -37,10 +37,10 @@ public class UserBookMeetingPageReqVO extends PageParam {
     private LocalDate[] date;
 
     @Schema(description = "设备")
-    private Set<Long> equipment;
+    private Set<String> equipment;
 
-    @Schema(description = "总人数")
-    private Integer capacity;
+    @Schema(description = "人数")
+    private Integer[] capacityList;
 
     @Schema(description = "备注", example = "随便")
     private String remark;

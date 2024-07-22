@@ -20,5 +20,5 @@ public interface MeetingPersonAttendRecordMapper extends BaseMapperX<MeetingPers
         return delete(MeetingPersonAttendRecordDO::getMeetingBookId, meetingBookId);
     }
 
-    List<Long> selectByMeetingId(Long meetingBookId);
+    List<MeetingPersonAttendRecordDO> selectByMeetingId(Long meetingBookId);
 }

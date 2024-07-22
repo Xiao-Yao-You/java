@@ -20,6 +20,6 @@ public interface MeetingPersonAttendRecordService {
      * @param meetingBookId 会议编号
      * @return 参会人员记录
      */
-    List<Long> getMeetingPersonAttendRecord(Long meetingBookId);
+    List<MeetingPersonAttendRecordDO> getMeetingPersonAttendRecord(Long meetingBookId);
 
 }
