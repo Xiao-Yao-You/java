@@ -59,35 +59,43 @@ public class BaseInfoJob implements JobHandler {
     @Resource
     private UserDeptMapper userDeptMapper;
 
+    @Resource
+    private BaseInfoService baseInfoService;
+
     private static int deptid;
     private static int postId;
     private static int userId;
+    private static int userDeptId;
+    private static int userPostId;
+
     @Override
     public String execute(String param) throws Exception {
-        deptid = 200;
-        postId = 200;
-        userId = 200;
+        deptid = 500;
+        postId = 500;
+        userId = 500;
+        userDeptId = 500;
+        userPostId = 500;
 
         TenantContextHolder.setTenantId(new Long(JobConstant.TENANT_ID));
 
         //1.恒科信改，信息获取接口调用
-//        List<BaseInfoVO> baseInfoList = baseInfoService.callPerson("http://172.21.27.12:9877/person", HttpMethod.POST);
-//        if(CollectionUtils.isAnyEmpty(baseInfoList)){
-//            return "";
-//        }
+        List<BaseInfoVO> baseInfoList = baseInfoService.callPerson("http://172.21.27.12:9877/person", HttpMethod.POST);
+        if(CollectionUtils.isAnyEmpty(baseInfoList)){
+            return "";
+        }
 
         //test 一条数据
-        List<BaseInfoVO> b = new ArrayList<>();
-        BaseInfoVO bb = new BaseInfoVO();
-        bb.setGender("男");
-        bb.setPhone("19522714581");
-        bb.setPersonName("吕远恒");
-        bb.setPersonNO("10001184");
-        bb.setBirthday("1999-07-02");
-        bb.setPersonType("EHR员工");
-        bb.setDep_fullName("长丝部/长丝MN区/长丝M区生产/长丝M2生产/运转班/甲班（南）");
-        bb.setPersonJob("长丝生产运转组长");
-        b.add(bb);
+//        List<BaseInfoVO> b = new ArrayList<>();
+//        BaseInfoVO bb = new BaseInfoVO();
+//        bb.setGender("男");
+//        bb.setPhone("19522714581");
+//        bb.setPersonName("吕远恒");
+//        bb.setPersonNO("10001184");
+//        bb.setBirthday("1999-07-02");
+//        bb.setPersonType("EHR员工");
+//        bb.setDep_fullName("长丝部/长丝MN区/长丝M区生产/长丝M2生产/运转班/甲班（南）");
+//        bb.setPersonJob("长丝生产运转组长");
+//        b.add(bb);
         //2.部门跟职位基表处理
         DeptDTO root = new DeptDTO(new Long(JobConstant.ROOT_DEPT_ID),JobConstant.ROOT_DEPT_NAME,null);//民用丝部/内贸部/差别化销售部/恒科差别化产品二部
         List<DeptDO> deptList = initDeptList();
@@ -96,7 +104,7 @@ public class BaseInfoJob implements JobHandler {
         List<PostDO> postList = new ArrayList();
         List<UserPostDO> userPostDOS = new ArrayList<>();
         Map<String,Long> postMap = new HashMap<>();
-        for(BaseInfoVO baseInfo : b){
+        for(BaseInfoVO baseInfo : baseInfoList){
             baseInfo.setId(new Long(userId));
             if("男".equals(baseInfo.getGender())){
                 baseInfo.setSex(SexEnum.MALE.getSex());
@@ -123,35 +131,37 @@ public class BaseInfoJob implements JobHandler {
                     postId++;
                 }
                 UserPostDO userPostDO = new UserPostDO();
+                Long newUserPostId = new Long(userPostId++);
+                userPostDO.setId(newUserPostId);
                 userPostDO.setPostId(postMap.get(postName));
                 userPostDO.setUserId(new Long(userId));
                 userPostDOS.add(userPostDO);
+
+                Set<Long> userPostSet = new HashSet<>();
+                userPostSet.add(userPostDO.getId());
+                baseInfo.setUserPostSet(userPostSet);
             }
             userId++;
         }
-        //部门与职位基表全删全插
+        //部门基表全删全插 todo 根据部门全称先查后插,如果已经存在则简单更新，如果不存在插入
         if(!CollectionUtils.isAnyEmpty(deptList)){
-            //deptMapper.
             deptMapper.insertBatch(deptList);
         }
-
+        //职位基表全删全插 todo 根据职位全称先查后插,如果已经存在则简单更新，如果不存在插入
         if(!CollectionUtils.isAnyEmpty(postList)){
             postMapper.insertBatch(postList);
         }
-        //4.人员处理 todo 全删全插，考虑部分特殊数据
-        //4.1 插入人员 todo密码的处理备份
-
-
-
-        userMapper.insertBatch(CollectionUtils.convertList(b,
+        //4.人员处理
+        //4.1 插入人员  todo 根据员工no先查后插,如果已经存在则简单更新，如果不存在插入
+        userMapper.insertBatch(CollectionUtils.convertList(baseInfoList,
                 baseInfo -> new AdminUserDO().setId(baseInfo.getId()).setStatus(0).setPassword(passwordEncoder.encode(JobConstant.FIRST_PASSWORD))
                         .setUsername(baseInfo.getPersonNO()).setNickname(baseInfo.getPersonName()).setSex(baseInfo.getSex())
-                        .setMobile(baseInfo.getPhone())));
-        // 4.2 插入关联岗位
+                        .setMobile(baseInfo.getPhone()).setPostIds(baseInfo.getUserPostSet())));
+        // 4.2 插入关联岗位  todo 根据userId 查询是否有数据，如果存在则更新，不存在则插入
         if (CollectionUtil.isNotEmpty(userPostDOS)){
             userPostMapper.insertBatch(userPostDOS);
         }
-        // 4.3 插入关联部门
+        // 4.3 插入关联部门  todo 根据userId 查询是否有数据，如果存在则更新，不存在则插入
         if (CollectionUtil.isNotEmpty(userDeptDOS)) {
             userDeptMapper.insertBatch(userDeptDOS);
         }
@@ -175,7 +185,9 @@ public class BaseInfoJob implements JobHandler {
         String[] deptArray = deptDesc.split(JobConstant.SPLIT_CHAR);
         if(deptArray != null && deptArray.length > 0){
             Long parentId = new Long(JobConstant.ROOT_DEPT_ID);
+            StringBuffer deptFullName = new StringBuffer("");
             for(String deptName : deptArray) {
+                deptFullName.append("/" + deptName);
                 DeptDTO currentDept =  findDepartmentByName(root, deptName, parentId);
                 if(currentDept == null){
                     Long newId = new Long(deptid++);
@@ -183,6 +195,7 @@ public class BaseInfoJob implements JobHandler {
                     DeptDO deptDO = new DeptDO();
                     deptDO.setId(newId);
                     deptDO.setName(deptName);
+                    deptDO.setFullName(deptFullName.toString());
                     deptDO.setParentId(parentId);
                     deptDO.setSort(new Integer(String.valueOf(newId)));
                     deptDO.setStatus(new Integer(0));
@@ -207,6 +220,8 @@ public class BaseInfoJob implements JobHandler {
             }
         }
         UserDeptDO userDeptDO = new UserDeptDO();
+        Long newUserDepId = new Long(userDeptId++);
+        userDeptDO.setId(newUserDepId);
         userDeptDO.setUserId(userId);
         userDeptDO.setDeptId(returnId);
         userDeptDOS.add(userDeptDO);

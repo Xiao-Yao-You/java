@@ -283,6 +283,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put("username",reqVO.getUsername());
         requestMap.put("mobile",reqVO.getMobile());
+        requestMap.put("nickname",reqVO.getNikeName());
         requestMap.put("status",reqVO.getStatus());
         requestMap.put("createTimeArray",reqVO.getCreateTime());
         requestMap.put("deptList",getDeptCondition(reqVO.getDeptId()));

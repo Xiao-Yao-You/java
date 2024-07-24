@@ -124,6 +124,7 @@ public class UserBookMeetingServiceImpl implements UserBookMeetingService {
             meetingRoomBookRecordDO.setMeetingRoomId(updateObj.getMeetingRoomId());
             meetingRoomBookRecordDO.setUserPhone(updateObj.getUserPhone());
             meetingRoomBookRecordDO.setSubject(updateObj.getSubject());
+            meetingRoomBookRecordDO.setMeetingBookId(updateReqVO.getId());
             meetingRoomBookRecordDO.setDateMeeting(updateObj.getDateMeeting());
             meetingRoomBookRecordDO.setTimeKey(new Long(i));
             roomBookRecordList.add(meetingRoomBookRecordDO);

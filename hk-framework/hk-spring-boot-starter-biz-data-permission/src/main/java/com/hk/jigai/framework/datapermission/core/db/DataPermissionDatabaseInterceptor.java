@@ -507,7 +507,7 @@ public class DataPermissionDatabaseInterceptor extends JsqlParserSupport impleme
 
             // 单条规则的条件
             Expression oneExpress = rule.getExpression(tableName, table.getAlias());
-            if (oneExpress == null){
+            if (oneExpress == null || "NULL".equals(oneExpress.toString().toUpperCase())){
                 continue;
             }
             // 拼接到 allExpression 中

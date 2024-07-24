@@ -25,7 +25,7 @@ public interface UserBookMeetingMapper extends BaseMapperX<UserBookMeetingDO> {
                 .eqIfPresent(UserBookMeetingDO::getUserPhone, reqVO.getUserPhone())
                 .eqIfPresent(UserBookMeetingDO::getMeetingRoomId, reqVO.getMeetingRoomId())
                 .betweenIfPresent(UserBookMeetingDO::getCapacity,reqVO.getCapacityList())
-                .eqIfPresent(UserBookMeetingDO::getSubject, reqVO.getSubject())
+                .likeIfPresent(UserBookMeetingDO::getSubject, reqVO.getSubject())
                 .betweenIfPresent(UserBookMeetingDO::getDateMeeting, reqVO.getDate())
                 .eqIfPresent(UserBookMeetingDO::getEquipment, reqVO.getEquipment())
                 .eqIfPresent(UserBookMeetingDO::getRemark, reqVO.getRemark())

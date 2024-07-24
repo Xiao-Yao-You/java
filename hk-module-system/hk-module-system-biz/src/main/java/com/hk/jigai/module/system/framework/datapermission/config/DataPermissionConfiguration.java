@@ -18,7 +18,7 @@ public class DataPermissionConfiguration {
     public DeptDataPermissionRuleCustomizer sysDeptDataPermissionRuleCustomizer() {
         return rule -> {
             // dept
-            rule.addDeptColumn(AdminUserDO.class);
+            //rule.addDeptColumn(AdminUserDO.class);  该字段调整为user_dept表
             rule.addDeptColumn(DeptDO.class, "id");
             // user
             rule.addUserColumn(AdminUserDO.class, "id");
