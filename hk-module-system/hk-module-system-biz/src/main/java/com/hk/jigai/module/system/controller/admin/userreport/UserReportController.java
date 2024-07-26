@@ -1,5 +1,10 @@
 package com.hk.jigai.module.system.controller.admin.userreport;
 
+import com.hk.jigai.module.system.controller.admin.userreport.vo.UserReportPageReqVO;
+import com.hk.jigai.module.system.controller.admin.userreport.vo.UserReportRespVO;
+import com.hk.jigai.module.system.controller.admin.userreport.vo.UserReportSaveReqVO;
+import com.hk.jigai.module.system.dal.dataobject.userreport.UserReportDO;
+import com.hk.jigai.module.system.service.userreport.UserReportService;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -7,6 +12,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
+
+import javax.validation.constraints.*;
 import javax.validation.*;
 import javax.servlet.http.*;
 import java.util.*;
@@ -23,13 +30,11 @@ import com.hk.jigai.framework.excel.core.util.ExcelUtils;
 import com.hk.jigai.framework.apilog.core.annotation.ApiAccessLog;
 import static com.hk.jigai.framework.apilog.core.enums.OperateTypeEnum.*;
 
-import com.hk.jigai.module.system.controller.admin.userreport.vo.*;
-import com.hk.jigai.module.system.dal.dataobject.userreport.UserReportDO;
-import com.hk.jigai.module.system.service.userreport.UserReportService;
+
 
 @Tag(name = "管理后台 - 用户汇报")
 @RestController
-@RequestMapping("/hk/user-report")
+@RequestMapping("/user-report")
 @Validated
 public class UserReportController {
 
@@ -64,8 +69,9 @@ public class UserReportController {
     @Operation(summary = "获得用户汇报")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     @PreAuthorize("@ss.hasPermission('hk:user-report:query')")
-    public CommonResult<UserReportSaveReqVO> getUserReport(@RequestParam("id") Long id) {
-        return success(userReportService.getUserReport(id));
+    public CommonResult<UserReportRespVO> getUserReport(@RequestParam("id") Long id) {
+        UserReportDO userReport = userReportService.getUserReport(id);
+        return success(BeanUtils.toBean(userReport, UserReportRespVO.class));
     }
 
     @GetMapping("/page")

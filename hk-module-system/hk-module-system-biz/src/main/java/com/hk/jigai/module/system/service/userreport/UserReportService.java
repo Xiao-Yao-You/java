@@ -2,10 +2,12 @@ package com.hk.jigai.module.system.service.userreport;
 
 import java.util.*;
 import javax.validation.*;
-import com.hk.jigai.module.system.controller.admin.userreport.vo.*;
-import com.hk.jigai.module.system.dal.dataobject.userreport.UserReportDO;
+
 import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.common.pojo.PageParam;
+import com.hk.jigai.module.system.controller.admin.userreport.vo.UserReportPageReqVO;
+import com.hk.jigai.module.system.controller.admin.userreport.vo.UserReportSaveReqVO;
+import com.hk.jigai.module.system.dal.dataobject.userreport.UserReportDO;
 
 /**
  * 用户汇报 Service 接口
@@ -42,7 +44,7 @@ public interface UserReportService {
      * @param id 编号
      * @return 用户汇报
      */
-    UserReportSaveReqVO getUserReport(Long id);
+    UserReportDO getUserReport(Long id);
 
     /**
      * 获得用户汇报分页

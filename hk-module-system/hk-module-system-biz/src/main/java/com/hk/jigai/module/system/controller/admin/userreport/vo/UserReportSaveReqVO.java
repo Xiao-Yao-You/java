@@ -1,8 +1,5 @@
 package com.hk.jigai.module.system.controller.admin.userreport.vo;
 
-import com.hk.jigai.module.system.dal.dataobject.userreport.ReportJobPlanDO;
-import com.hk.jigai.module.system.dal.dataobject.userreport.ReportJobScheduleDO;
-import com.hk.jigai.module.system.dal.dataobject.userreport.ReportObjectDO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -16,23 +13,20 @@ import java.time.LocalDateTime;
 @Data
 public class UserReportSaveReqVO {
 
-    @Schema(description = "主键", example = "7668")
+    @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "7668")
     private Long id;
+
+    @Schema(description = "用户id", requiredMode = Schema.RequiredMode.REQUIRED, example = "21060")
+    @NotNull(message = "用户id不能为空")
+    private Long userId;
 
     @Schema(description = "部门id", requiredMode = Schema.RequiredMode.REQUIRED, example = "8060")
     @NotNull(message = "部门id不能为空")
     private Long deptId;
 
-    @Schema(description = "报告对象list", requiredMode = Schema.RequiredMode.REQUIRED)
-    private List<ReportObjectDO> reportObjectList;
-
     @Schema(description = "汇报日期", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "汇报日期不能为空")
     private LocalDate dateReport;
-
-    @Schema(description = "类型(00:正常,01:补交)", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @NotEmpty(message = "类型(00:正常,01:补交)不能为空")
-    private String type;
 
     @Schema(description = "提交时间")
     private LocalDateTime commitTime;
@@ -40,10 +34,15 @@ public class UserReportSaveReqVO {
     @Schema(description = "备注", example = "随便")
     private String remark;
 
-    @Schema(description = "工作进度列表")
-    private List<ReportJobScheduleDO> scheduleList;
+    @Schema(description = "用户昵称", example = "王五")
+    private String userNikeName;
 
-    @Schema(description = "工作计划列表")
-    private List<ReportJobPlanDO> planList;
+    @Schema(description = "领导查看状态(00:未查看,01已查看)", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotEmpty(message = "领导查看状态(00:未查看,01已查看)不能为空")
+    private String checkSatus;
+
+    @Schema(description = "类型(00:正常,01:补交,02:缺)", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @NotEmpty(message = "类型(00:正常,01:补交,02:缺)不能为空")
+    private String type;
 
 }
