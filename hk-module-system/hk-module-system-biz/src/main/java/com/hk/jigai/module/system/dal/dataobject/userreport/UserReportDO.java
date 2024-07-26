@@ -43,15 +43,6 @@ public class UserReportDO extends BaseDO {
      */
     private LocalDate dateReport;
     /**
-     * 类型(00:正常,01:补交)
-     */
-    private String type;
-
-    /**
-     * 领导查看状态(00:未查看,01:已查看)
-     */
-    private String checkSatus;
-    /**
      * 提交时间
      */
     private LocalDateTime commitTime;
@@ -59,7 +50,17 @@ public class UserReportDO extends BaseDO {
      * 备注
      */
     private String remark;
-
-
+    /**
+     * 用户昵称
+     */
+    private String userNikeName;
+    /**
+     * 领导查看状态(00:未查看,01已查看)
+     */
+    private String checkSatus;
+    /**
+     * 类型(00:正常,01:补交,02:缺)
+     */
+    private String type;
 
 }

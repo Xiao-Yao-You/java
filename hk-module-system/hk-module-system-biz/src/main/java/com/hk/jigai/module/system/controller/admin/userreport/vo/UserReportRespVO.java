@@ -31,14 +31,6 @@ public class UserReportRespVO {
     @ExcelProperty("汇报日期")
     private LocalDate dateReport;
 
-    @Schema(description = "类型(00:正常,01:补交)", requiredMode = Schema.RequiredMode.REQUIRED, example = "00")
-    @ExcelProperty("类型(00:正常,01:补交)")
-    private String type;
-
-    @Schema(description = "领导查看状态(00:未查看,01:已查看)", example = "00")
-    @ExcelProperty("领导查看状态(00:未查看,01:已查看)")
-    private String checkSatus;
-
     @Schema(description = "提交时间")
     @ExcelProperty("提交时间")
     private LocalDateTime commitTime;
@@ -50,5 +42,17 @@ public class UserReportRespVO {
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
+
+    @Schema(description = "用户昵称", example = "王五")
+    @ExcelProperty("用户昵称")
+    private String userNikeName;
+
+    @Schema(description = "领导查看状态(00:未查看,01已查看)", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("领导查看状态(00:未查看,01已查看)")
+    private String checkSatus;
+
+    @Schema(description = "类型(00:正常,01:补交,02:缺)", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
+    @ExcelProperty("类型(00:正常,01:补交,02:缺)")
+    private String type;
 
 }
