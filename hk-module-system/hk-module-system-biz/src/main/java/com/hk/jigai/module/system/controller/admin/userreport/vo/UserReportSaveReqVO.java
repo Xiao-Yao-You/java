@@ -1,12 +1,14 @@
 package com.hk.jigai.module.system.controller.admin.userreport.vo;
 
+import com.hk.jigai.module.system.dal.dataobject.reportjobplan.ReportJobPlanDO;
+import com.hk.jigai.module.system.dal.dataobject.reportjobschedule.ReportJobScheduleDO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.util.*;
 import javax.validation.constraints.*;
-import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
 
 @Schema(description = "管理后台 - 用户汇报新增/修改 Request VO")
@@ -35,14 +37,21 @@ public class UserReportSaveReqVO {
     private String remark;
 
     @Schema(description = "用户昵称", example = "王五")
-    private String userNikeName;
+    private String userNickName;
 
     @Schema(description = "领导查看状态(00:未查看,01已查看)", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotEmpty(message = "领导查看状态(00:未查看,01已查看)不能为空")
-    private String checkSatus;
+    private String checkStatus;
 
     @Schema(description = "类型(00:正常,01:补交,02:缺)", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
-    @NotEmpty(message = "类型(00:正常,01:补交,02:缺)不能为空")
     private String type;
+
+    @Schema(description = "汇报对象")
+    private Set<Long> reportObject;
+
+    @Schema(description = "工作进度集合")
+    private List<ReportJobScheduleDO> reportJobScheduleDOList;
+
+    @Schema(description = "工作计划集合")
+    private List<ReportJobPlanDO> reportJobPlanDOList;
 
 }

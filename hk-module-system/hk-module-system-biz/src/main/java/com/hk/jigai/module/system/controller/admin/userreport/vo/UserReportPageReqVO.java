@@ -19,12 +19,9 @@ public class UserReportPageReqVO extends PageParam {
 
     @Schema(description = "汇报日期")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private LocalDate[] dateReport;
-
-    @Schema(description = "备注", example = "随便")
-    private String remark;
+    private String[] dateReport;
 
     @Schema(description = "用户昵称", example = "王五")
-    private String userNikeName;
+    private String userNickName;
 
 }

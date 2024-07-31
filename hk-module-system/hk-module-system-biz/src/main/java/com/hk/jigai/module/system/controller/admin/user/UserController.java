@@ -190,7 +190,7 @@ public class UserController {
     public CommonResult<PageResult<UserRespVO>> ignoreTenantGetUserPage(@Valid UserPageReqVO pageReqVO) {
         //权限校验,只有超级管理员才有该权限，加菜单也能控制，可以删除该判断
         Set<Long> roleIds = permissionService.getUserRoleIdListByUserId(getLoginUserId());
-        if(CollectionUtils.isAnyEmpty() || !roleIds.contains(1)){
+        if (CollectionUtils.isAnyEmpty() || !roleIds.contains(1)) {
             throw exception(GlobalErrorCodeConstants.FORBIDDEN);
         }
         // 获得用户分页列表
@@ -211,13 +211,12 @@ public class UserController {
     public CommonResult<Boolean> updateUserTenant(@Valid @RequestBody UserTenantReqVO reqVO) {
         //权限校验,只有超级管理员才有该权限，加菜单也能控制，可以删除该判断
         Set<Long> roleIds = permissionService.getUserRoleIdListByUserId(getLoginUserId());
-        if(CollectionUtils.isAnyEmpty(roleIds) || !roleIds.contains(new Long(1))){
+        if (CollectionUtils.isAnyEmpty(roleIds) || !roleIds.contains(new Long(1))) {
             throw exception(GlobalErrorCodeConstants.FORBIDDEN);
         }
         userService.updateUserTenant(reqVO);
         return success(true);
     }
-
 
 
     @GetMapping("/queryUserTenantByName")
@@ -232,5 +231,12 @@ public class UserController {
         //查询
         UserProfileTenantRespVO result = userService.queryUserTenantByName(userName);
         return success(result);
+    }
+
+    @GetMapping("/getAllUser")
+    @Operation(summary = "获取所有用户")
+    public CommonResult<List<UserRespVO>> getAllUser(@RequestParam("nickname") String nickname) {
+        List<UserRespVO> allUser = userService.getAllUser(nickname);
+        return success(allUser);
     }
 }

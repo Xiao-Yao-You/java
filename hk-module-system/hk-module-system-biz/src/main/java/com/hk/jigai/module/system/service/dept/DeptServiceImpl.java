@@ -1,14 +1,20 @@
 package com.hk.jigai.module.system.service.dept;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hk.jigai.framework.common.enums.CommonStatusEnum;
+import com.hk.jigai.framework.common.util.collection.CollectionUtils;
 import com.hk.jigai.framework.common.util.object.BeanUtils;
 import com.hk.jigai.framework.datapermission.core.annotation.DataPermission;
 import com.hk.jigai.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
+import com.hk.jigai.module.system.controller.admin.dept.vo.dept.DeptRespVO;
 import com.hk.jigai.module.system.controller.admin.dept.vo.dept.DeptSaveReqVO;
 import com.hk.jigai.module.system.dal.dataobject.dept.DeptDO;
+import com.hk.jigai.module.system.dal.dataobject.dept.UserDeptDO;
 import com.hk.jigai.module.system.dal.mysql.dept.DeptMapper;
+import com.hk.jigai.module.system.dal.mysql.dept.UserDeptMapper;
 import com.hk.jigai.module.system.dal.redis.RedisKeyConstants;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
@@ -16,9 +22,11 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.servlet.handler.ConversionServiceExposingInterceptor;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.hk.jigai.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static com.hk.jigai.framework.common.util.collection.CollectionUtils.convertSet;
@@ -36,6 +44,9 @@ public class DeptServiceImpl implements DeptService {
 
     @Resource
     private DeptMapper deptMapper;
+
+    @Resource
+    UserDeptMapper userDeptMapper;
 
     @Override
     @CacheEvict(cacheNames = RedisKeyConstants.DEPT_CHILDREN_ID_LIST,
@@ -213,6 +224,18 @@ public class DeptServiceImpl implements DeptService {
                 throw exception(DEPT_NOT_ENABLE, dept.getName());
             }
         });
+    }
+
+    @Override
+    public List<DeptRespVO> getDeptsByUserId(Long userId) {
+        List<UserDeptDO> userDeptDOS = userDeptMapper.selectList(new QueryWrapper<UserDeptDO>().lambda().eq(UserDeptDO::getUserId, userId));
+        List<DeptDO> deptDOS = new ArrayList<>();
+        if (CollectionUtil.isNotEmpty(userDeptDOS)){
+            List<Long> deptIds = userDeptDOS.stream().map(UserDeptDO::getDeptId).collect(Collectors.toList());
+            deptDOS = deptMapper.selectList(new QueryWrapper<DeptDO>().lambda().in(DeptDO::getId, deptIds));
+        }
+        List<DeptRespVO> deptRespVOList = BeanUtils.toBean(deptDOS, DeptRespVO.class);
+        return deptRespVOList;
     }
 
 }

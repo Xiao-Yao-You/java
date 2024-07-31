@@ -2,6 +2,7 @@ package com.hk.jigai.module.system.service.dept;
 
 import com.hk.jigai.framework.common.util.collection.CollectionUtils;
 import com.hk.jigai.module.system.controller.admin.dept.vo.dept.DeptListReqVO;
+import com.hk.jigai.module.system.controller.admin.dept.vo.dept.DeptRespVO;
 import com.hk.jigai.module.system.controller.admin.dept.vo.dept.DeptSaveReqVO;
 import com.hk.jigai.module.system.dal.dataobject.dept.DeptDO;
 
@@ -99,4 +100,10 @@ public interface DeptService {
      */
     void validateDeptList(Collection<Long> ids);
 
+    /**
+     * 根据用户id查询用户所在部门集合
+     * @param userId
+     * @return
+     */
+    List<DeptRespVO> getDeptsByUserId(Long userId);
 }
