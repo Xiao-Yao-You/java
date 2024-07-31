@@ -92,8 +92,20 @@ public class UserReportServiceImpl implements UserReportService {
     public void updateUserReport(UserReportSaveReqVO updateReqVO) {
         // 校验存在
         validateUserReportExists(updateReqVO.getId());
-        // 更新
         UserReportDO updateObj = BeanUtils.toBean(updateReqVO, UserReportDO.class);
+        //根据汇报日期校验当天是否已经提交过汇报
+        List<UserReportDO> userReportDOS = userReportMapper.selectList(new QueryWrapper<UserReportDO>().lambda().eq(UserReportDO::getDateReport, updateReqVO.getDateReport()));
+        if (CollectionUtil.isNotEmpty(userReportDOS)) {
+            throw exception(USER_REPORT_EXISTS);
+        }
+        //设置汇报类型，当天为正常0，往期为补交1
+        updateObj.setCommitTime(LocalDateTime.now());
+        if (updateObj.getDateReport().equals(updateObj.getCommitTime().toLocalDate())) {
+            updateObj.setType("0");
+        } else {
+            updateObj.setType("1");
+        }
+
         //更新对应的工作进度和计划
         reportJobScheduleMapper.delete(new QueryWrapper<ReportJobScheduleDO>().lambda().eq(ReportJobScheduleDO::getUserReportId, updateObj.getId()));
         reportJobPlanMapper.delete(new QueryWrapper<ReportJobPlanDO>().lambda().eq(ReportJobPlanDO::getUserReportId, updateObj.getId()));
@@ -116,6 +128,7 @@ public class UserReportServiceImpl implements UserReportService {
             // 处理计划表数据
             reportJobPlanMapper.insertBatch(reportJobPlanDOList);
         }
+        // 更新
         userReportMapper.updateById(updateObj);
     }
 
