@@ -1,5 +1,8 @@
 package com.hk.jigai.module.system.dal.dataobject.userreport;
 
+import com.hk.jigai.framework.mybatis.core.type.JsonLongSetTypeHandler;
+import com.hk.jigai.module.system.dal.dataobject.reportjobplan.ReportJobPlanDO;
+import com.hk.jigai.module.system.dal.dataobject.reportjobschedule.ReportJobScheduleDO;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -15,7 +18,7 @@ import com.hk.jigai.framework.mybatis.core.dataobject.BaseDO;
  *
  * @author 超级管理员
  */
-@TableName("hk_user_report")
+@TableName(value = "hk_user_report",autoResultMap = true)
 @KeySequence("hk_user_report_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -53,14 +56,31 @@ public class UserReportDO extends BaseDO {
     /**
      * 用户昵称
      */
-    private String userNikeName;
+    private String userNickName;
     /**
      * 领导查看状态(00:未查看,01已查看)
      */
-    private String checkSatus;
+    private String checkStatus;
     /**
      * 类型(00:正常,01:补交,02:缺)
      */
     private String type;
+
+    /**
+     * 汇报对象集合
+     */
+    @TableField(typeHandler = JsonLongSetTypeHandler.class)
+    private Set<Long> reportObject;
+
+    /**
+     * 部门名称
+     */
+    private String deptName;
+
+    @TableField(exist = false)
+    private List<ReportJobScheduleDO> reportJobScheduleDOList;
+
+    @TableField(exist = false)
+    private List<ReportJobPlanDO> reportJobPlanDOList;
 
 }

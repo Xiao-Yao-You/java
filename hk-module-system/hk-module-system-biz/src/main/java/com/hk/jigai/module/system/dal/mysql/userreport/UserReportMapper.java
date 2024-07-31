@@ -20,8 +20,7 @@ public interface UserReportMapper extends BaseMapperX<UserReportDO> {
     default PageResult<UserReportDO> selectPage(UserReportPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<UserReportDO>()
                 .betweenIfPresent(UserReportDO::getDateReport, reqVO.getDateReport())
-                .eqIfPresent(UserReportDO::getRemark, reqVO.getRemark())
-                .likeIfPresent(UserReportDO::getUserNikeName, reqVO.getUserNikeName())
+                .likeIfPresent(UserReportDO::getUserNickName, reqVO.getUserNickName())
                 .orderByDesc(UserReportDO::getId));
     }
 

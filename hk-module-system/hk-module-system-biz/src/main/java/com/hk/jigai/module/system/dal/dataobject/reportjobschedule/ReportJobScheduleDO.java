@@ -1,6 +1,9 @@
-package com.hk.jigai.module.system.dal.dataobject.userreport;
+package com.hk.jigai.module.system.dal.dataobject.reportjobschedule;
 
 import lombok.*;
+import java.util.*;
+import java.time.LocalDateTime;
+import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.*;
 import com.hk.jigai.framework.mybatis.core.dataobject.BaseDO;
 

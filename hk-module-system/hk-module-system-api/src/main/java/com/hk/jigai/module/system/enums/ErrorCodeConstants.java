@@ -4,7 +4,7 @@ import com.hk.jigai.framework.common.exception.ErrorCode;
 
 /**
  * System 错误码枚举类
- *
+ * <p>
  * system 系统，使用 1-002-000-000 段
  */
 public interface ErrorCodeConstants {
@@ -44,7 +44,7 @@ public interface ErrorCodeConstants {
 
     // ========== 部门模块 1-002-004-000 ==========
     ErrorCode DEPT_NAME_DUPLICATE = new ErrorCode(1_002_004_000, "已经存在该名字的部门");
-    ErrorCode DEPT_PARENT_NOT_EXITS = new ErrorCode(1_002_004_001,"父级部门不存在");
+    ErrorCode DEPT_PARENT_NOT_EXITS = new ErrorCode(1_002_004_001, "父级部门不存在");
     ErrorCode DEPT_NOT_FOUND = new ErrorCode(1_002_004_002, "当前部门不存在");
     ErrorCode DEPT_EXITS_CHILDREN = new ErrorCode(1_002_004_003, "存在子部门，无法删除");
     ErrorCode DEPT_PARENT_ERROR = new ErrorCode(1_002_004_004, "不能设置自己为父部门");
@@ -178,8 +178,13 @@ public interface ErrorCodeConstants {
     ErrorCode USER_BOOK_MEETING_NOT_EXISTS = new ErrorCode(1_002_031_001, "会议预定信息不存在");
     ErrorCode USER_BOOK_MEETING_ALREADY_BOOKED = new ErrorCode(1_002_031_002, "该会议室该时间段有其他会议已预定，麻烦检查！");
 
-    // ========== 单据编码类型配置 1-002-032-000 ==========
+    // ========== 用户汇报配置 1-002-032-000 ==========
     ErrorCode USER_REPORT_NOT_EXISTS = new ErrorCode(1_002_032_000, "汇报信息不存在");
     ErrorCode USER_REPORT_ALREADY_COMMIT = new ErrorCode(1_002_032_001, "用户的汇报信息重复了！");
+    // ========== 用户汇报-工作进度配置 ==========
+    ErrorCode REPORT_JOB_SCHEDULE_NOT_EXISTS = new ErrorCode(1_002_032_002, "汇报工作进度不存在");
+    // ========== 用户汇报-工作计划配置 ==========
+    ErrorCode REPORT_JOB_PLAN_NOT_EXISTS = new ErrorCode(1_002_032_003, "汇报工作计划不存在");
+    ErrorCode USER_REPORT_EXISTS = new ErrorCode(1_002_032_004, "当天已存在汇报内容");
 
 }

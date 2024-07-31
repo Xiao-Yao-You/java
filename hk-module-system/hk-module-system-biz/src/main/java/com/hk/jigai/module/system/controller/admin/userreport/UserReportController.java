@@ -3,10 +3,14 @@ package com.hk.jigai.module.system.controller.admin.userreport;
 import com.hk.jigai.module.system.controller.admin.userreport.vo.UserReportPageReqVO;
 import com.hk.jigai.module.system.controller.admin.userreport.vo.UserReportRespVO;
 import com.hk.jigai.module.system.controller.admin.userreport.vo.UserReportSaveReqVO;
+import com.hk.jigai.module.system.dal.dataobject.user.AdminUserDO;
 import com.hk.jigai.module.system.dal.dataobject.userreport.UserReportDO;
+import com.hk.jigai.module.system.service.user.AdminUserService;
 import com.hk.jigai.module.system.service.userreport.UserReportService;
 import org.springframework.web.bind.annotation.*;
+
 import javax.annotation.Resource;
+
 import org.springframework.validation.annotation.Validated;
 import org.springframework.security.access.prepost.PreAuthorize;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,13 +27,14 @@ import com.hk.jigai.framework.common.pojo.PageParam;
 import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.common.pojo.CommonResult;
 import com.hk.jigai.framework.common.util.object.BeanUtils;
+
 import static com.hk.jigai.framework.common.pojo.CommonResult.success;
 
 import com.hk.jigai.framework.excel.core.util.ExcelUtils;
 
 import com.hk.jigai.framework.apilog.core.annotation.ApiAccessLog;
-import static com.hk.jigai.framework.apilog.core.enums.OperateTypeEnum.*;
 
+import static com.hk.jigai.framework.apilog.core.enums.OperateTypeEnum.*;
 
 
 @Tag(name = "管理后台 - 用户汇报")
@@ -40,6 +45,9 @@ public class UserReportController {
 
     @Resource
     private UserReportService userReportService;
+
+    @Resource
+    private AdminUserService userService;
 
     @PostMapping("/create")
     @Operation(summary = "创建用户汇报")
@@ -71,7 +79,10 @@ public class UserReportController {
     @PreAuthorize("@ss.hasPermission('hk:user-report:query')")
     public CommonResult<UserReportRespVO> getUserReport(@RequestParam("id") Long id) {
         UserReportDO userReport = userReportService.getUserReport(id);
-        return success(BeanUtils.toBean(userReport, UserReportRespVO.class));
+        List<AdminUserDO> userDOS = userService.selectByUserIds(userReport.getReportObject());
+        UserReportRespVO userReportRespVO = BeanUtils.toBean(userReport, UserReportRespVO.class);
+        userReportRespVO.setUserList(userDOS);
+        return success(userReportRespVO);
     }
 
     @GetMapping("/page")
@@ -87,12 +98,12 @@ public class UserReportController {
     @PreAuthorize("@ss.hasPermission('hk:user-report:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportUserReportExcel(@Valid UserReportPageReqVO pageReqVO,
-              HttpServletResponse response) throws IOException {
+                                      HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<UserReportDO> list = userReportService.getUserReportPage(pageReqVO).getList();
         // 导出 Excel
         ExcelUtils.write(response, "用户汇报.xls", "数据", UserReportRespVO.class,
-                        BeanUtils.toBean(list, UserReportRespVO.class));
+                BeanUtils.toBean(list, UserReportRespVO.class));
     }
 
 }

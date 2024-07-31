@@ -91,4 +91,11 @@ public class DeptController {
         return success(BeanUtils.toBean(dept, DeptRespVO.class));
     }
 
+    @GetMapping("/getDeptsByUserId")
+    @Operation(summary = "根据用户id获取用户拥有的部门集合")
+    public CommonResult<List<DeptRespVO>> getDeptsByUserId(@RequestParam("userId") Long userId){
+        List<DeptRespVO> deptRespVOList = deptService.getDeptsByUserId(userId);
+        return success(deptRespVOList);
+    }
+
 }

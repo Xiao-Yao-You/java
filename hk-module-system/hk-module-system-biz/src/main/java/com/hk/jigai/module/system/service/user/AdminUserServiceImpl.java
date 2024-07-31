@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hk.jigai.framework.common.enums.CommonStatusEnum;
 import com.hk.jigai.framework.common.exception.ServiceException;
 import com.hk.jigai.framework.common.pojo.PageResult;
@@ -577,10 +578,20 @@ public class AdminUserServiceImpl implements AdminUserService {
         result.setTenantDOList(userTenantMapper.selectListByUserName(userName));
         return result;
     }
-
     @Override
     public void updateUserOpenid(Long id, String openid) {
         userMapper.updateById(new AdminUserDO().setId(id).setOpenid(openid));
+    }
+    @Override
+    public List<UserRespVO> getAllUser(String nickname) {
+        List<AdminUserDO> adminUserDOS = userMapper.selectList(new QueryWrapper<AdminUserDO>().lambda().like(AdminUserDO::getNickname, nickname));
+        return BeanUtils.toBean(adminUserDOS, UserRespVO.class);
+    }
+
+    @Override
+    public List<AdminUserDO> selectByUserIds(Set<Long> reportObject) {
+        List<AdminUserDO> userDOS = userMapper.selectList(new QueryWrapper<AdminUserDO>().lambda().in(AdminUserDO::getId, reportObject));
+        return userDOS;
     }
 
     /**
