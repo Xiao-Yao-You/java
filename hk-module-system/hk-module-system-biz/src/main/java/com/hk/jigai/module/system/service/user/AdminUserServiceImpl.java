@@ -106,7 +106,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         });
         // 1.2 校验正确性
         List<Long> deptList = new ArrayList<>();
-        if(!CollectionUtils.isAnyEmpty(createReqVO.getDeptList())){
+        if (!CollectionUtils.isAnyEmpty(createReqVO.getDeptList())) {
             deptList = createReqVO.getDeptList().stream().map(UserDeptRespVO::getId).collect(Collectors.toList());
         }
         validateUserForCreateOrUpdate(null, createReqVO.getUsername(),
