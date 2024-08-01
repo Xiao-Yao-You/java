@@ -42,7 +42,13 @@ public interface PermissionService {
      * @param menuIds 菜单编号集合
      */
     void assignRoleMenu(Long roleId, Set<Long> menuIds);
-
+    /**
+     * 设置角色微信菜单
+     *
+     * @param roleId  角色编号
+     * @param menuIds 菜单编号集合
+     */
+    void assignWechatRoleMenu(Long roleId, Set<Long> menuIds);
     /**
      * 处理角色删除时，删除关联授权数据
      *
@@ -58,15 +64,30 @@ public interface PermissionService {
     void processMenuDeleted(Long menuId);
 
     /**
-     * 获得角色拥有的菜单编号集合
+     * 处理微信菜单删除时，删除关联授权数据
+     * @param menuId
+     */
+    void processWechatMenuDeleted(Long menuId);
+
+
+        /**
+         * 获得角色拥有的菜单编号集合
+         *
+         * @param roleId 角色编号
+         * @return 菜单编号集合
+         */
+    default Set<Long> getRoleMenuListByRoleId(Long roleId) {
+        return getRoleMenuListByRoleId(singleton(roleId));
+    }
+    /**
+     * 获得角色拥有的微信菜单编号集合
      *
      * @param roleId 角色编号
      * @return 菜单编号集合
      */
-    default Set<Long> getRoleMenuListByRoleId(Long roleId) {
-        return getRoleMenuListByRoleId(singleton(roleId));
+    default Set<Long> getRoleWechatMenuListByRoleId(Long roleId) {
+        return getRoleWechatMenuListByRoleId(singleton(roleId));
     }
-
     /**
      * 获得角色们拥有的菜单编号集合
      *
@@ -75,6 +96,14 @@ public interface PermissionService {
      */
     Set<Long> getRoleMenuListByRoleId(Collection<Long> roleIds);
 
+
+    /**
+     * 获得角色们拥有的微信菜单编号集合
+     *
+     * @param roleIds 角色编号数组
+     * @return 菜单编号集合
+     */
+    Set<Long> getRoleWechatMenuListByRoleId(Collection<Long> roleIds);
     /**
      * 获得拥有指定菜单的角色编号数组，从缓存中获取
      *
@@ -83,7 +112,15 @@ public interface PermissionService {
      */
     Set<Long> getMenuRoleIdListByMenuIdFromCache(Long menuId);
 
-    // ========== 用户-角色的相关方法  ==========
+    /**
+     * 获得拥有指定微信菜单的角色编号数组，从缓存中获取
+     * @param menuId
+     * @return
+     */
+    Set<Long> getWechatMenuRoleIdListByMenuIdFromCache(Long menuId);
+
+
+        // ========== 用户-角色的相关方法  ==========
 
     /**
      * 设置用户角色

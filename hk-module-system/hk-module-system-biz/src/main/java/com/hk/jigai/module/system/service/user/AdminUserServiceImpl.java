@@ -578,6 +578,11 @@ public class AdminUserServiceImpl implements AdminUserService {
         return result;
     }
 
+    @Override
+    public void updateUserOpenid(Long id, String openid) {
+        userMapper.updateById(new AdminUserDO().setId(id).setOpenid(openid));
+    }
+
     /**
      * 对密码进行加密
      *

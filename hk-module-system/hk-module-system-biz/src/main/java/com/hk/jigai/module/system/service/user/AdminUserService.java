@@ -224,5 +224,6 @@ public interface AdminUserService {
      */
     UserProfileTenantRespVO queryUserTenantByName(String userName);
 
+    void updateUserOpenid(Long id, String openid);
 
 }

@@ -9,12 +9,10 @@ import com.hk.jigai.framework.common.util.collection.CollectionUtils;
 import com.hk.jigai.framework.datapermission.core.annotation.DataPermission;
 import com.hk.jigai.module.system.api.permission.dto.DeptDataPermissionRespDTO;
 import com.hk.jigai.module.system.controller.admin.user.vo.user.UserDeptRespVO;
-import com.hk.jigai.module.system.dal.dataobject.permission.MenuDO;
-import com.hk.jigai.module.system.dal.dataobject.permission.RoleDO;
-import com.hk.jigai.module.system.dal.dataobject.permission.RoleMenuDO;
-import com.hk.jigai.module.system.dal.dataobject.permission.UserRoleDO;
+import com.hk.jigai.module.system.dal.dataobject.permission.*;
 import com.hk.jigai.module.system.dal.mysql.permission.RoleMenuMapper;
 import com.hk.jigai.module.system.dal.mysql.permission.UserRoleMapper;
+import com.hk.jigai.module.system.dal.mysql.permission.WechatRoleMenuMapper;
 import com.hk.jigai.module.system.dal.redis.RedisKeyConstants;
 import com.hk.jigai.module.system.enums.permission.DataScopeEnum;
 import com.hk.jigai.module.system.service.dept.DeptService;
@@ -51,15 +49,20 @@ public class PermissionServiceImpl implements PermissionService {
     private RoleMenuMapper roleMenuMapper;
     @Resource
     private UserRoleMapper userRoleMapper;
-
+    @Resource
+    private WechatRoleMenuMapper wechatRoleMenuMapper;
     @Resource
     private RoleService roleService;
     @Resource
     private MenuService menuService;
     @Resource
+    private WechatMenuService wechatMenuService;
+    @Resource
     private DeptService deptService;
     @Resource
     private AdminUserService userService;
+
+
 
     @Override
     public boolean hasAnyPermissions(Long userId, String... permissions) {
@@ -109,6 +112,23 @@ public class PermissionServiceImpl implements PermissionService {
                 return true;
             }
         }
+        //微信端
+        List<Long> wechatMenuIds = wechatMenuService.getMenuIdListByPermissionFromCache(permission);
+        // 采用严格模式，如果权限找不到对应的 Menu 的话，也认为没有权限
+        if (CollUtil.isEmpty(wechatMenuIds)) {
+            return false;
+        }
+
+        // 判断是否有权限
+        for (Long menuId : menuIds) {
+            // 获得拥有该菜单的角色编号集合
+            Set<Long> menuRoleIds = getSelf().getWechatMenuRoleIdListByMenuIdFromCache(menuId);
+            // 如果有交集，说明有权限
+            if (CollUtil.containsAny(menuRoleIds, roleIds)) {
+                return true;
+            }
+        }
+
         return false;
     }
 
@@ -158,9 +178,35 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
+    @DSTransactional // 多数据源，使用 @DSTransactional 保证本地事务，以及数据源的切换
+    @CacheEvict(value = RedisKeyConstants.WECHAT_MENU_ROLE_ID_LIST, allEntries = true) // allEntries 清空所有缓存，主要一次更新涉及到的 menuIds 较多，反倒批量会更快
+    public void assignWechatRoleMenu(Long roleId, Set<Long> menuIds) {
+        // 获得角色拥有菜单编号
+        Set<Long> dbMenuIds = convertSet(wechatRoleMenuMapper.selectListByRoleId(roleId), WechatRoleMenuDO::getMenuId);
+        // 计算新增和删除的菜单编号
+        Set<Long> menuIdList = CollUtil.emptyIfNull(menuIds);
+        Collection<Long> createMenuIds = CollUtil.subtract(menuIdList, dbMenuIds);
+        Collection<Long> deleteMenuIds = CollUtil.subtract(dbMenuIds, menuIdList);
+        // 执行新增和删除。对于已经授权的菜单，不用做任何处理
+        if (CollUtil.isNotEmpty(createMenuIds)) {
+            wechatRoleMenuMapper.insertBatch(CollectionUtils.convertList(createMenuIds, menuId -> {
+                WechatRoleMenuDO entity = new WechatRoleMenuDO();
+                entity.setRoleId(roleId);
+                entity.setMenuId(menuId);
+                return entity;
+            }));
+        }
+        if (CollUtil.isNotEmpty(deleteMenuIds)) {
+            wechatRoleMenuMapper.deleteListByRoleIdAndMenuIds(roleId, deleteMenuIds);
+        }
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     @Caching(evict = {
             @CacheEvict(value = RedisKeyConstants.MENU_ROLE_ID_LIST,
+                    allEntries = true), // allEntries 清空所有缓存，此处无法方便获得 roleId 对应的 menu 缓存们
+            @CacheEvict(value = RedisKeyConstants.WECHAT_MENU_ROLE_ID_LIST,
                     allEntries = true), // allEntries 清空所有缓存，此处无法方便获得 roleId 对应的 menu 缓存们
             @CacheEvict(value = RedisKeyConstants.USER_ROLE_ID_LIST,
                     allEntries = true) // allEntries 清空所有缓存，此处无法方便获得 roleId 对应的 user 缓存们
@@ -170,12 +216,20 @@ public class PermissionServiceImpl implements PermissionService {
         userRoleMapper.deleteListByRoleId(roleId);
         // 标记删除 RoleMenu
         roleMenuMapper.deleteListByRoleId(roleId);
+        // 标记删除 wechatRoleMenu
+        wechatRoleMenuMapper.deleteListByRoleId(roleId);
     }
 
     @Override
     @CacheEvict(value = RedisKeyConstants.MENU_ROLE_ID_LIST, key = "#menuId")
     public void processMenuDeleted(Long menuId) {
         roleMenuMapper.deleteListByMenuId(menuId);
+    }
+
+    @Override
+    @CacheEvict(value = RedisKeyConstants.WECHAT_MENU_ROLE_ID_LIST, key = "#menuId")
+    public void processWechatMenuDeleted(Long menuId) {
+        wechatRoleMenuMapper.deleteListByMenuId(menuId);
     }
 
     @Override
@@ -193,11 +247,30 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
+    public Set<Long> getRoleWechatMenuListByRoleId(Collection<Long> roleIds) {
+        if (CollUtil.isEmpty(roleIds)) {
+            return Collections.emptySet();
+        }
+
+        // 如果是管理员的情况下，获取全部菜单编号
+        if (roleService.hasAnySuperAdmin(roleIds)) {
+            return convertSet(wechatMenuService.getMenuList(), WechatMenuDO::getId);
+        }
+        // 如果是非管理员的情况下，获得拥有的菜单编号
+        return convertSet(wechatRoleMenuMapper.selectListByRoleId(roleIds), WechatRoleMenuDO::getMenuId);
+    }
+
+    @Override
     @Cacheable(value = RedisKeyConstants.MENU_ROLE_ID_LIST, key = "#menuId")
     public Set<Long> getMenuRoleIdListByMenuIdFromCache(Long menuId) {
         return convertSet(roleMenuMapper.selectListByMenuId(menuId), RoleMenuDO::getRoleId);
     }
 
+    @Override
+    @Cacheable(value = RedisKeyConstants.WECHAT_MENU_ROLE_ID_LIST, key = "#menuId")
+    public Set<Long> getWechatMenuRoleIdListByMenuIdFromCache(Long menuId) {
+        return convertSet(wechatRoleMenuMapper.selectListByMenuId(menuId), WechatRoleMenuDO::getRoleId);
+    }
     // ========== 用户-角色的相关方法  ==========
 
     @Override

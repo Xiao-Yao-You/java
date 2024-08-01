@@ -65,4 +65,7 @@ public class UserBookMeetingSaveReqVO {
     @Schema(description = "参会人员", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<MeetingPersonAttendRecordDO> joinUserList;
 
+    @Schema(description = "其他参会者", example = "张赞，历史")
+    private String otherAttend;
+
 }

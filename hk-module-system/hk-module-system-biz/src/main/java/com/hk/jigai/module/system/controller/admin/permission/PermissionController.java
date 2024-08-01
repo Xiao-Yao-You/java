@@ -55,6 +55,17 @@ public class PermissionController {
         return success(true);
     }
 
+    @PostMapping("/assign-wechat-role-menu")
+    @Operation(summary = "赋予角色微信菜单")
+    @PreAuthorize("@ss.hasPermission('system:permission:assign-role-menu')")
+    public CommonResult<Boolean> assignWechatRoleMenu(@Validated @RequestBody PermissionAssignRoleMenuReqVO reqVO) {
+        //system_tenant_package  套餐相关的，目前微信菜单暂不考虑这个
+        //tenantService.handleTenantMenu(menuIds -> reqVO.getMenuIds().removeIf(menuId -> !CollUtil.contains(menuIds, menuId)));
+        // 执行菜单的分配
+        permissionService.assignWechatRoleMenu(reqVO.getRoleId(), reqVO.getMenuIds());
+        return success(true);
+    }
+
     @PostMapping("/assign-role-data-scope")
     @Operation(summary = "赋予角色数据权限")
     @PreAuthorize("@ss.hasPermission('system:permission:assign-role-data-scope')")

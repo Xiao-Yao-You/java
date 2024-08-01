@@ -82,5 +82,6 @@ public class UserBookMeetingRespVO {
     @Schema(description = "状态")
     private Integer status;
 
-
+    @Schema(description = "其他参会者")
+    private String otherAttend;
 }

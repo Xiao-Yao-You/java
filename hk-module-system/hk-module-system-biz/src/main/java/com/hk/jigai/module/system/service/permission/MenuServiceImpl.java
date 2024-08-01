@@ -97,6 +97,7 @@ public class MenuServiceImpl implements MenuService {
         menuMapper.deleteById(id);
         // 删除授予给角色的权限
         permissionService.processMenuDeleted(id);
+        permissionService.processWechatMenuDeleted(id);
     }
 
     @Override

@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.hk.jigai.module.system.dal.mysql.meetingroominfo.MeetingPersonAttendRecordMapper">
-
     <select id="selectByMeetingId" resultType="com.hk.jigai.module.system.dal.dataobject.meetingroominfo.MeetingPersonAttendRecordDO" parameterType="Long">
         select distinct user_id , user_nick_name  from hk_meeting_person_attend_record where meeting_book_id=#{meetingBookId} and deleted = 0
     </select>
 
+    <select id="selectOppenidByMeetingId" resultType="Long" parameterType="Long">
+        select b.openid
+          from hk_meeting_person_attend_record a
+          join system_users b on a.user_id = b.id and b.openid is not null
+         where a.meeting_book_id = #{meetingBookId} and a.deleted = 0 and a.deleted=0
+    </select>
 </mapper>
