@@ -2,6 +2,7 @@ package com.hk.jigai.server;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * 项目的启动类
@@ -14,6 +15,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SuppressWarnings("SpringComponentScan") // 忽略 IDEA 无法识别 ${hk.info.base-package}
 @SpringBootApplication(scanBasePackages = {"${hk.info.base-package}.server", "${hk.info.base-package}.module"})
+@EnableScheduling
 public class HkServerApplication {
 
     public static void main(String[] args) {
