@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 import static com.hk.jigai.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -32,7 +33,13 @@ public class UserPageReqVO extends PageParam {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
 
-    @Schema(description = "部门编号，同时筛选子部门", example = "1024")
+    @Schema(description = "部门编号，同时筛选子部门")
+    private Set<Long> deptIds;
+
+    @Schema(description = "部门编号，同时筛选子部门")
     private Long deptId;
+
+    @Schema(description = "用户昵称，模糊匹配", example = "hk")
+    private String nickname;
 
 }

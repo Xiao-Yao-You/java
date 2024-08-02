@@ -59,4 +59,9 @@ public class MeetingRoomBookRecordDO extends BaseDO {
      */
     private Integer status;
 
+    /**
+     * 其他参会者
+     */
+    private String otherAttend;
+
 }

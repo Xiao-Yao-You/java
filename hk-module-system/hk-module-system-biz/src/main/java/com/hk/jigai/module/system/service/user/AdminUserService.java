@@ -40,7 +40,7 @@ public interface AdminUserService {
     /**
      * 更新用户的最后登陆信息
      *
-     * @param id      用户编号
+     * @param id 用户编号
      * @param loginIp 登陆 IP
      */
     void updateUserLogin(Long id, String loginIp);
@@ -48,7 +48,7 @@ public interface AdminUserService {
     /**
      * 修改用户个人信息
      *
-     * @param id    用户编号
+     * @param id 用户编号
      * @param reqVO 用户个人信息
      */
     void updateUserProfile(Long id, @Valid UserProfileUpdateReqVO reqVO);
@@ -56,7 +56,7 @@ public interface AdminUserService {
     /**
      * 修改用户个人密码
      *
-     * @param id    用户编号
+     * @param id 用户编号
      * @param reqVO 更新用户个人密码
      */
     void updateUserPassword(Long id, @Valid UserProfileUpdatePasswordReqVO reqVO);
@@ -198,7 +198,7 @@ public interface AdminUserService {
     /**
      * 判断密码是否匹配
      *
-     * @param rawPassword     未加密的密码
+     * @param rawPassword 未加密的密码
      * @param encodedPassword 加密后的密码
      * @return 是否匹配
      */
@@ -206,14 +206,12 @@ public interface AdminUserService {
 
     /**
      * 更新用户的租户信息
-     *
      * @param reqVO
      */
     void updateUserTenant(UserTenantReqVO reqVO);
 
     /**
      * 查询用户的租户信息
-     *
      * @param userId 用户id
      * @return
      */
@@ -221,7 +219,6 @@ public interface AdminUserService {
 
     /**
      * 根据用户登录账号查询租户信息
-     *
      * @param userName
      * @return
      */
@@ -242,4 +239,6 @@ public interface AdminUserService {
      * @return
      */
     List<AdminUserDO> selectByUserIds(Set<Long> reportObject);
+
+    void updateUserOpenid(Long id, String openid);
 }

@@ -224,7 +224,7 @@ public class UserController {
     @Operation(summary = "根据用户账号查询个人租户信息")
     public CommonResult<UserProfileTenantRespVO> queryUserTenant(@RequestParam("userName") String userName) {
         //先校验userName是否存在
-        AdminUserDO user = userService.getUserByUsername(userName);
+         AdminUserDO user = userService.getUserByUsername(userName);
         if (user == null) {
             throw exception(ErrorCodeConstants.USER_NOT_EXISTS);
         }

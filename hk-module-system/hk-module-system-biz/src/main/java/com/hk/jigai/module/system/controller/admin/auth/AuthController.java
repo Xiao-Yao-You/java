@@ -11,12 +11,14 @@ import com.hk.jigai.module.system.controller.admin.auth.vo.*;
 import com.hk.jigai.module.system.convert.auth.AuthConvert;
 import com.hk.jigai.module.system.dal.dataobject.permission.MenuDO;
 import com.hk.jigai.module.system.dal.dataobject.permission.RoleDO;
+import com.hk.jigai.module.system.dal.dataobject.permission.WechatMenuDO;
 import com.hk.jigai.module.system.dal.dataobject.user.AdminUserDO;
 import com.hk.jigai.module.system.enums.logger.LoginLogTypeEnum;
 import com.hk.jigai.module.system.service.auth.AdminAuthService;
 import com.hk.jigai.module.system.service.permission.MenuService;
 import com.hk.jigai.module.system.service.permission.PermissionService;
 import com.hk.jigai.module.system.service.permission.RoleService;
+import com.hk.jigai.module.system.service.permission.WechatMenuService;
 import com.hk.jigai.module.system.service.social.SocialClientService;
 import com.hk.jigai.module.system.service.user.AdminUserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,6 +56,8 @@ public class AuthController {
     private RoleService roleService;
     @Resource
     private MenuService menuService;
+    @Resource
+    private WechatMenuService wechatMenuService;
     @Resource
     private PermissionService permissionService;
     @Resource
@@ -101,7 +105,7 @@ public class AuthController {
         // 1.2 获得角色列表
         Set<Long> roleIds = permissionService.getUserRoleIdListByUserId(getLoginUserId());
         if (CollUtil.isEmpty(roleIds)) {
-            return success(AuthConvert.INSTANCE.convert(user, Collections.emptyList(), Collections.emptyList()));
+            return success(AuthConvert.INSTANCE.convert(user, Collections.emptyList(), Collections.emptyList(), Collections.emptyList()));
         }
         List<RoleDO> roles = roleService.getRoleList(roleIds);
         roles.removeIf(role -> !CommonStatusEnum.ENABLE.getStatus().equals(role.getStatus())); // 移除禁用的角色
@@ -111,8 +115,12 @@ public class AuthController {
         List<MenuDO> menuList = menuService.getMenuList(menuIds);
         menuList.removeIf(menu -> !CommonStatusEnum.ENABLE.getStatus().equals(menu.getStatus())); // 移除禁用的菜单
 
+        Set<Long> wechatMenuIds = permissionService.getRoleWechatMenuListByRoleId(convertSet(roles, RoleDO::getId));
+        List<WechatMenuDO> wechatMenuList = wechatMenuService.getMenuList(wechatMenuIds);
+        wechatMenuList.removeIf(menu -> !CommonStatusEnum.ENABLE.getStatus().equals(menu.getStatus())); // 移除禁用的菜单
+
         // 2. 拼接结果返回
-        return success(AuthConvert.INSTANCE.convert(user, roles, menuList));
+        return success(AuthConvert.INSTANCE.convert(user, roles, menuList,wechatMenuList));
     }
 
     // ========== 短信登录相关 ==========

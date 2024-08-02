@@ -199,6 +199,7 @@ hk:
       - /admin-api/map/feedback #地图反馈
       - /admin-api/system/dict-data/pageIgnoreLogin #针对字典查询接口
       - /admin-api/system/user/queryUserTenantByName #针对首页，用户名查询租户信息
+      - /admin-api/wechat/open/** #微信公众号开放平台，微信回调接口，无法携带租户编号
     ignore-tables:
       - system_users
       - system_tenant
@@ -207,6 +208,7 @@ hk:
       - system_dict_type
       - system_error_code
       - system_menu
+      - wechat_menu
       - system_sms_channel
       - system_sms_template
       - system_sms_log

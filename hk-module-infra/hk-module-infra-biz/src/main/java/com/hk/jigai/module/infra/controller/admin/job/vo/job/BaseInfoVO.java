@@ -23,4 +23,5 @@ public class BaseInfoVO {
     private String dep_fullName;
     private String nation;
     private String phone;
+    private Set<Long> userPostSet;
 }

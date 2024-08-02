@@ -8,6 +8,7 @@ import com.hk.jigai.module.system.dal.dataobject.user.AdminUserDO;
 import com.hk.jigai.module.system.dal.mysql.meetingroominfo.MeetingPersonAttendRecordMapper;
 import com.hk.jigai.module.system.dal.mysql.meetingroominfo.MeetingRoomBookRecordMapper;
 import com.hk.jigai.module.system.dal.mysql.user.AdminUserMapper;
+import com.hk.jigai.module.system.service.wechat.MeetingReminderService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -15,6 +16,8 @@ import javax.annotation.Resource;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import com.hk.jigai.module.system.controller.admin.meetingroominfo.vo.*;
@@ -47,6 +50,9 @@ public class UserBookMeetingServiceImpl implements UserBookMeetingService {
 
     @Resource
     private AdminUserMapper adminUserMapper;
+
+    @Resource
+    private MeetingReminderService meetingReminderService;
 
     @Override
     @Transactional
@@ -102,6 +108,13 @@ public class UserBookMeetingServiceImpl implements UserBookMeetingService {
             personAttendRecordList.add(personAttendRecord);
         }
         meetingPersonAttendRecordMapper.insertBatch(personAttendRecordList);
+        //会议创建完成后，需要发送微信通知
+        Integer startTime = createReqVO.getStartTime();
+        int a = (startTime.intValue()-1 )%2 ;
+        int hour = (startTime.intValue()-1 )/2 ;
+        LocalDate dateMeeting = createReqVO.getDateMeeting();
+        LocalDateTime meetingTime = LocalDateTime.of(dateMeeting.getYear(),dateMeeting.getMonth(),dateMeeting.getDayOfMonth(),hour,(a==1)?30:0);
+        meetingReminderService.scheduleReminder(new Long(userBookMeeting.getId()), meetingTime);
         // 返回
         return userBookMeeting.getId();
     }
@@ -124,6 +137,7 @@ public class UserBookMeetingServiceImpl implements UserBookMeetingService {
             meetingRoomBookRecordDO.setMeetingRoomId(updateObj.getMeetingRoomId());
             meetingRoomBookRecordDO.setUserPhone(updateObj.getUserPhone());
             meetingRoomBookRecordDO.setSubject(updateObj.getSubject());
+            meetingRoomBookRecordDO.setMeetingBookId(updateReqVO.getId());
             meetingRoomBookRecordDO.setDateMeeting(updateObj.getDateMeeting());
             meetingRoomBookRecordDO.setTimeKey(new Long(i));
             roomBookRecordList.add(meetingRoomBookRecordDO);
@@ -141,6 +155,8 @@ public class UserBookMeetingServiceImpl implements UserBookMeetingService {
             personAttendRecordList.add(personAttendRecord);
         }
         meetingPersonAttendRecordMapper.insertBatch(personAttendRecordList);
+
+        meetingReminderService.updateReminder(updateReqVO.getId());
     }
 
     @Override
@@ -152,6 +168,7 @@ public class UserBookMeetingServiceImpl implements UserBookMeetingService {
         userBookMeetingMapper.deleteById(id);
         meetingRoomBookRecordMapper.deleteByMeetingBookId(id);
         meetingPersonAttendRecordMapper.deleteByMeetingBookId(id);
+        meetingReminderService.updateReminder(id);
 
     }
 
@@ -161,6 +178,7 @@ public class UserBookMeetingServiceImpl implements UserBookMeetingService {
         validateUserBookMeetingExists(id);
         userBookMeetingMapper.cancel(id);
         meetingRoomBookRecordMapper.cancel(id);
+        meetingReminderService.updateReminder(id);
     }
 
     private void validateUserBookMeetingExists(Long id) {

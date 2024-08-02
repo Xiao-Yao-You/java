@@ -17,6 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -58,7 +59,6 @@ public class DeptController {
 
     @GetMapping("/list")
     @Operation(summary = "获取部门列表")
-    @PreAuthorize("@ss.hasPermission('system:dept:query')")
     public CommonResult<List<DeptRespVO>> getDeptList(DeptListReqVO reqVO) {
         List<DeptDO> list = deptService.getDeptList(reqVO);
         return success(BeanUtils.toBean(list, DeptRespVO.class));
@@ -67,6 +67,16 @@ public class DeptController {
     @GetMapping(value = {"/list-all-simple", "/simple-list"})
     @Operation(summary = "获取部门精简信息列表", description = "只包含被开启的部门，主要用于前端的下拉选项")
     public CommonResult<List<DeptSimpleRespVO>> getSimpleDeptList() {
+        List<DeptDO> list = deptService.getDeptList(
+                new DeptListReqVO().setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        return success(BeanUtils.toBean(list, DeptSimpleRespVO.class));
+    }
+
+
+    @GetMapping(value = {"/getAllSimpleDeptList"})
+    @Operation(summary = "获取部门精简信息列表", description = "只包含被开启的部门，主要用于前端的下拉选项")
+    @PermitAll
+    public CommonResult<List<DeptSimpleRespVO>> getSimpleDeptListAll() {
         List<DeptDO> list = deptService.getDeptList(
                 new DeptListReqVO().setStatus(CommonStatusEnum.ENABLE.getStatus()));
         return success(BeanUtils.toBean(list, DeptSimpleRespVO.class));

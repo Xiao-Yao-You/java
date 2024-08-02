@@ -42,6 +42,14 @@ public interface RedisKeyConstants {
     String MENU_ROLE_ID_LIST = "menu_role_ids";
 
     /**
+     * 拥有指定菜单的角色编号的缓存
+     * <p>
+     * KEY 格式：menu_role_ids:{menuId}
+     * VALUE 数据类型：String 角色编号集合
+     */
+    String WECHAT_MENU_ROLE_ID_LIST = "wechat_menu_role_ids";
+
+    /**
      * 拥有权限对应的菜单编号数组的缓存
      * <p>
      * KEY 格式：permission_menu_ids:{permission}
@@ -98,4 +106,12 @@ public interface RedisKeyConstants {
      * VALUE 数据格式：String 模版信息
      */
     String SMS_TEMPLATE = "sms_template";
+
+    /**
+     * 微信公众号authtoken
+     * <p>
+     * KEY 格式：wechat_authtoken:{authtoken}
+     * VALUE 数据格式：String authtoken值
+     */
+    String WECHAT_AUTHTOKEN = "wechat_authtoken";
 }

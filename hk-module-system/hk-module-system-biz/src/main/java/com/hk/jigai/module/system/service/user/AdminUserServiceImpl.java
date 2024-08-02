@@ -282,15 +282,16 @@ public class AdminUserServiceImpl implements AdminUserService {
     @Override
     public PageResult<AdminUserDO> getUserPage(UserPageReqVO reqVO) {
         Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put("username", reqVO.getUsername());
-        requestMap.put("mobile", reqVO.getMobile());
-        requestMap.put("status", reqVO.getStatus());
-        requestMap.put("createTimeArray", reqVO.getCreateTime());
-        requestMap.put("deptList", getDeptCondition(reqVO.getDeptId()));
-        requestMap.put("offset", (reqVO.getPageNo() - 1) * reqVO.getPageSize());
+        requestMap.put("username",reqVO.getUsername());
+        requestMap.put("mobile",reqVO.getMobile());
+        requestMap.put("nickname",reqVO.getNickname());
+        requestMap.put("status",reqVO.getStatus());
+        requestMap.put("createTimeArray",reqVO.getCreateTime());
+        requestMap.put("deptList",getDeptCondition(reqVO.getDeptIds(),reqVO.getDeptId()));
+        requestMap.put("offset", (reqVO.getPageNo()-1) * reqVO.getPageSize());
         requestMap.put("pageSize", reqVO.getPageSize());
         Integer count = userMapper.selectCount1(requestMap);
-        Integer total = count % reqVO.getPageSize() == 0 ? count / reqVO.getPageSize() : (count / reqVO.getPageSize() + 1);
+        Integer total = count%reqVO.getPageSize() == 0 ? count/reqVO.getPageSize() :(count/reqVO.getPageSize()+1);
         PageResult<AdminUserDO> result = new PageResult<>();
         //result.setTotal(Long.valueOf(total));
         result.setTotal(Long.valueOf(count));
@@ -358,16 +359,26 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     /**
      * 获得部门条件：查询指定部门的子部门编号们，包括自身
-     *
-     * @param deptId 部门编号
+     * @param deptIdSet 部门编号
      * @return 部门编号集合
      */
-    private Set<Long> getDeptCondition(Long deptId) {
-        if (deptId == null) {
+    private Set<Long> getDeptCondition(Set<Long> deptIdSet, Long deptId) {
+        if (CollectionUtils.isAnyEmpty(deptIdSet) && deptId ==null) {
             return Collections.emptySet();
         }
-        Set<Long> deptIds = convertSet(deptService.getChildDeptList(deptId), DeptDO::getId);
-        deptIds.add(deptId); // 包括自身
+        if(!CollectionUtils.isAnyEmpty(deptIdSet) && deptId !=null){
+            deptIdSet.add(deptId);
+        }
+        if(CollectionUtils.isAnyEmpty(deptIdSet)){
+            deptIdSet = new HashSet<>();
+            deptIdSet.add(deptId);
+        }
+
+        Set<Long> deptIds = new HashSet<>();
+        for(Long id : deptIdSet){
+            deptIds.addAll(convertSet(deptService.getChildDeptList(id), DeptDO::getId));
+            deptIds.add(id); // 包括自身
+        }
         return deptIds;
     }
 
@@ -461,7 +472,6 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     /**
      * 校验旧密码
-     *
      * @param id          用户 id
      * @param oldPassword 旧密码
      */
@@ -486,10 +496,10 @@ public class AdminUserServiceImpl implements AdminUserService {
                 .updateUsernames(new ArrayList<>()).failureUsernames(new LinkedHashMap<>()).build();
         importUsers.forEach(importUser -> {
             // 校验，判断是否有不符合的原因
-            List<Long> deptIdList = StrUtils.splitToLong(importUser.getDeptIds(), ",");
+            List<Long> deptIdList = StrUtils.splitToLong(importUser.getDeptIds(),",");
             try {
                 validateUserForCreateOrUpdate(null, null, importUser.getMobile(), importUser.getEmail(),
-                        deptIdList, null, null);
+                        deptIdList , null, null);
             } catch (ServiceException ex) {
                 respVO.getFailureUsernames().put(importUser.getUsername(), ex.getMessage());
                 return;
@@ -499,7 +509,7 @@ public class AdminUserServiceImpl implements AdminUserService {
             if (existUser == null) {
                 int userId = userMapper.insert(BeanUtils.toBean(importUser, AdminUserDO.class)
                         .setPassword(encodePassword(userInitPassword)).setPostIds(new HashSet<>())); // 设置默认密码及空岗位编号数组
-                if (!CollectionUtils.isAnyEmpty(deptIdList)) {
+                if(!CollectionUtils.isAnyEmpty(deptIdList)){
                     userDeptMapper.insertBatch(convertList(deptIdList,
                             deptId -> new UserDeptDO().setUserId(Long.valueOf(userId)).setDeptId(deptId)));
                 }
@@ -515,7 +525,7 @@ public class AdminUserServiceImpl implements AdminUserService {
             updateUser.setId(existUser.getId());
             userMapper.updateById(updateUser);
             userDeptMapper.deleteByUserId(updateUser.getId());
-            if (!CollectionUtils.isAnyEmpty(deptIdList)) {
+            if(!CollectionUtils.isAnyEmpty(deptIdList)){
                 userDeptMapper.insertBatch(convertList(deptIdList,
                         deptId -> new UserDeptDO().setUserId(Long.valueOf(updateUser.getId())).setDeptId(deptId)));
             }
@@ -568,7 +578,10 @@ public class AdminUserServiceImpl implements AdminUserService {
         result.setTenantDOList(userTenantMapper.selectListByUserName(userName));
         return result;
     }
-
+    @Override
+    public void updateUserOpenid(Long id, String openid) {
+        userMapper.updateById(new AdminUserDO().setId(id).setOpenid(openid));
+    }
     @Override
     public List<UserRespVO> getAllUser(String nickname) {
         List<AdminUserDO> adminUserDOS = userMapper.selectList(new QueryWrapper<AdminUserDO>().lambda().like(AdminUserDO::getNickname, nickname));

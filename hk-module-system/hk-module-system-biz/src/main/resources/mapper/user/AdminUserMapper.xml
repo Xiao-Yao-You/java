@@ -132,6 +132,9 @@
         <if test="username != null and username != ''">
             and su.username like CONCAT('%' , #{username} , '%')
         </if>
+        <if test="nickname != null  and nickname != ''">
+            and su.nickname like CONCAT('%' , #{nickname} , '%')
+        </if>
         <if test="mobile != null and mobile != ''">
             and su.mobile  like CONCAT('%' , #{mobile} , '%')
         </if>
@@ -160,6 +163,9 @@
         WHERE 1=1 and su.deleted = 0
             <if test="username != null  and username != ''">
                 and su.username like CONCAT('%' , #{username} , '%')
+            </if>
+            <if test="nickname != null  and nickname != ''">
+                and su.nickname like CONCAT('%' , #{nickname} , '%')
             </if>
             <if test="mobile != null  and mobile != ''">
                 and su.mobile  like CONCAT('%' , #{mobile} , '%')
