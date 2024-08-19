@@ -1,5 +1,6 @@
 package com.hk.jigai.module.system.controller.admin.permission.vo.menu;
 
+import com.alibaba.excel.annotation.ExcelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import java.util.*;
@@ -16,8 +17,7 @@ public class WechatMenuSaveReqVO {
     @NotEmpty(message = "菜单名称不能为空")
     private String name;
 
-    @Schema(description = "权限标识", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotEmpty(message = "权限标识不能为空")
+    @Schema(description = "权限标识")
     private String permission;
 
     @Schema(description = "菜单类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
@@ -43,6 +43,9 @@ public class WechatMenuSaveReqVO {
 
     @Schema(description = "组件名", example = "赵六")
     private String componentName;
+
+    @Schema(description = "背景色")
+    private String bgcolor;
 
     @Schema(description = "菜单状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @NotNull(message = "菜单状态不能为空")

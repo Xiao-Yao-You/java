@@ -1,7 +1,7 @@
 package com.hk.jigai.module.system.controller.admin.userreport.vo;
 
-import com.hk.jigai.module.system.dal.dataobject.reportjobplan.ReportJobPlanDO;
-import com.hk.jigai.module.system.dal.dataobject.reportjobschedule.ReportJobScheduleDO;
+import com.hk.jigai.module.system.dal.dataobject.userreport.ReportJobPlanDO;
+import com.hk.jigai.module.system.dal.dataobject.userreport.ReportJobScheduleDO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -18,15 +18,15 @@ public class UserReportSaveReqVO {
     @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "7668")
     private Long id;
 
-    @Schema(description = "用户id", requiredMode = Schema.RequiredMode.REQUIRED, example = "21060")
+    @Schema(description = "用户id", example = "21060")
     @NotNull(message = "用户id不能为空")
     private Long userId;
 
-    @Schema(description = "部门id", requiredMode = Schema.RequiredMode.REQUIRED, example = "8060")
+    @Schema(description = "部门id", example = "8060")
     @NotNull(message = "部门id不能为空")
     private Long deptId;
 
-    @Schema(description = "汇报日期", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "汇报日期")
     @NotNull(message = "汇报日期不能为空")
     private LocalDate dateReport;
 

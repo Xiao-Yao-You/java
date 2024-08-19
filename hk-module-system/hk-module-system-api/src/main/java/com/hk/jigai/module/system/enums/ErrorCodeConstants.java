@@ -181,10 +181,10 @@ public interface ErrorCodeConstants {
     // ========== 用户汇报配置 1-002-032-000 ==========
     ErrorCode USER_REPORT_NOT_EXISTS = new ErrorCode(1_002_032_000, "汇报信息不存在");
     ErrorCode USER_REPORT_ALREADY_COMMIT = new ErrorCode(1_002_032_001, "用户的汇报信息重复了！");
-    // ========== 用户汇报-工作进度配置 ==========
     ErrorCode REPORT_JOB_SCHEDULE_NOT_EXISTS = new ErrorCode(1_002_032_002, "汇报工作进度不存在");
-    // ========== 用户汇报-工作计划配置 ==========
     ErrorCode REPORT_JOB_PLAN_NOT_EXISTS = new ErrorCode(1_002_032_003, "汇报工作计划不存在");
     ErrorCode USER_REPORT_EXISTS = new ErrorCode(1_002_032_004, "当天已存在汇报内容");
-
+    ErrorCode USER_REPORT_NOT_OPERATE = new ErrorCode(1_002_032_005, "当前用户无权限操作");
+    ErrorCode USER_REPORT_INFO_NOT_EXISTS = new ErrorCode(1_002_032_006, "信息不存在");
+    ErrorCode REPORT_ATTENTION_NOT_EXISTS = new ErrorCode(1_002_032_007, "关注信息不存在");
 }

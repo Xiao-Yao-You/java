@@ -19,6 +19,7 @@ import com.hk.jigai.module.system.convert.tenant.TenantConvert;
 import com.hk.jigai.module.system.dal.dataobject.dept.DeptDO;
 import com.hk.jigai.module.system.dal.dataobject.permission.MenuDO;
 import com.hk.jigai.module.system.dal.dataobject.permission.RoleDO;
+import com.hk.jigai.module.system.dal.dataobject.permission.WechatMenuDO;
 import com.hk.jigai.module.system.dal.dataobject.tenant.TenantDO;
 import com.hk.jigai.module.system.dal.dataobject.tenant.TenantPackageDO;
 import com.hk.jigai.module.system.dal.mysql.tenant.TenantMapper;
@@ -27,6 +28,7 @@ import com.hk.jigai.module.system.enums.permission.RoleTypeEnum;
 import com.hk.jigai.module.system.service.permission.MenuService;
 import com.hk.jigai.module.system.service.permission.PermissionService;
 import com.hk.jigai.module.system.service.permission.RoleService;
+import com.hk.jigai.module.system.service.permission.WechatMenuService;
 import com.hk.jigai.module.system.service.tenant.handler.TenantInfoHandler;
 import com.hk.jigai.module.system.service.tenant.handler.TenantMenuHandler;
 import com.hk.jigai.module.system.service.user.AdminUserService;
@@ -70,6 +72,8 @@ public class TenantServiceImpl implements TenantService {
     private RoleService roleService;
     @Resource
     private MenuService menuService;
+    @Resource
+    private WechatMenuService wechatMenuService;
     @Resource
     private PermissionService permissionService;
 
@@ -320,6 +324,24 @@ public class TenantServiceImpl implements TenantService {
         Set<Long> menuIds;
         if (isSystemTenant(tenant)) { // 系统租户，菜单是全量的
             menuIds = CollectionUtils.convertSet(menuService.getMenuList(), MenuDO::getId);
+        } else {
+            menuIds = tenantPackageService.getTenantPackage(tenant.getPackageId()).getMenuIds();
+        }
+        // 执行处理器
+        handler.handle(menuIds);
+    }
+
+    @Override
+    public void handleTenantWechatMenu(TenantMenuHandler handler) {
+        // 如果禁用，则不执行逻辑
+        if (isTenantDisable()) {
+            return;
+        }
+        // 获得租户，然后获得菜单
+        TenantDO tenant = getTenant(TenantContextHolder.getRequiredTenantId());
+        Set<Long> menuIds;
+        if (isSystemTenant(tenant)) { // 系统租户，菜单是全量的
+            menuIds = CollectionUtils.convertSet(wechatMenuService.getMenuList(), WechatMenuDO::getId);
         } else {
             menuIds = tenantPackageService.getTenantPackage(tenant.getPackageId()).getMenuIds();
         }

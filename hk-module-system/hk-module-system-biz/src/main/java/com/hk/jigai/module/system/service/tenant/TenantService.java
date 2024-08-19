@@ -117,6 +117,15 @@ public interface TenantService {
      */
     void handleTenantMenu(TenantMenuHandler handler);
 
+
+    /**
+     * 进行租户的菜单处理逻辑
+     * 其中，租户编号从 {@link TenantContextHolder} 上下文中获取
+     *
+     * @param handler 处理器
+     */
+    void handleTenantWechatMenu(TenantMenuHandler handler);
+
     /**
      * 获得所有租户
      *

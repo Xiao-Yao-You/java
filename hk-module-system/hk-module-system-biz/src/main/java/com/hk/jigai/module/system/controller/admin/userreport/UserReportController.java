@@ -1,8 +1,6 @@
 package com.hk.jigai.module.system.controller.admin.userreport;
 
-import com.hk.jigai.module.system.controller.admin.userreport.vo.UserReportPageReqVO;
-import com.hk.jigai.module.system.controller.admin.userreport.vo.UserReportRespVO;
-import com.hk.jigai.module.system.controller.admin.userreport.vo.UserReportSaveReqVO;
+import com.hk.jigai.module.system.controller.admin.userreport.vo.*;
 import com.hk.jigai.module.system.dal.dataobject.user.AdminUserDO;
 import com.hk.jigai.module.system.dal.dataobject.userreport.UserReportDO;
 import com.hk.jigai.module.system.service.user.AdminUserService;
@@ -106,4 +104,24 @@ public class UserReportController {
                 BeanUtils.toBean(list, UserReportRespVO.class));
     }
 
+    @GetMapping("/statistics")
+    @Operation(summary = "统计")
+    @PreAuthorize("@ss.hasPermission('hk:user-report:query')")
+    public CommonResult<List<StatisticsRespVO>> statistics(@Valid StatisticsReqVO reqVO) {
+        return success(userReportService.statistics(reqVO));
+    }
+
+    @GetMapping("/summary")
+    @Operation(summary = "汇总")
+    @PreAuthorize("@ss.hasPermission('hk:user-report:query')")
+    public CommonResult<SummaryRespVO> summary(@Valid StatisticsReqVO reqVO) {
+        return success(userReportService.summary(reqVO));
+    }
+
+    @GetMapping("/queryAttentionList")
+    @Operation(summary = "已被关注的下拉")
+    @PreAuthorize("@ss.hasPermission('hk:report-attention:query')")
+    public CommonResult<List<AttentionAlertRespVO>> queryAttentionList() {
+        return success(userReportService.queryAttentionList());
+    }
 }

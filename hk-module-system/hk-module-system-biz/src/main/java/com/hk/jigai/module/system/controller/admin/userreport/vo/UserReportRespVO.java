@@ -1,16 +1,13 @@
 package com.hk.jigai.module.system.controller.admin.userreport.vo;
 
-import com.hk.jigai.module.system.dal.dataobject.reportjobplan.ReportJobPlanDO;
-import com.hk.jigai.module.system.dal.dataobject.reportjobschedule.ReportJobScheduleDO;
+import com.hk.jigai.module.system.dal.dataobject.userreport.ReportJobPlanDO;
+import com.hk.jigai.module.system.dal.dataobject.userreport.ReportJobScheduleDO;
 import com.hk.jigai.module.system.dal.dataobject.user.AdminUserDO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.*;
-
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 

@@ -4,11 +4,14 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.google.gson.JsonObject;
 import com.hk.jigai.framework.common.enums.CommonStatusEnum;
 import com.hk.jigai.framework.common.exception.ServiceException;
 import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.common.util.collection.CollectionUtils;
+import com.hk.jigai.framework.common.util.json.JsonUtils;
 import com.hk.jigai.framework.common.util.object.BeanUtils;
 import com.hk.jigai.framework.common.util.string.StrUtils;
 import com.hk.jigai.framework.datapermission.core.util.DataPermissionUtils;
@@ -35,6 +38,7 @@ import com.mzt.logapi.context.LogRecordContext;
 import com.mzt.logapi.service.impl.DiffParseFunction;
 import com.mzt.logapi.starter.annotation.LogRecord;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -293,7 +297,6 @@ public class AdminUserServiceImpl implements AdminUserService {
         Integer count = userMapper.selectCount1(requestMap);
         Integer total = count%reqVO.getPageSize() == 0 ? count/reqVO.getPageSize() :(count/reqVO.getPageSize()+1);
         PageResult<AdminUserDO> result = new PageResult<>();
-        //result.setTotal(Long.valueOf(total));
         result.setTotal(Long.valueOf(count));
         result.setList(userMapper.selectPage(requestMap));
         return result;
@@ -359,10 +362,17 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     /**
      * 获得部门条件：查询指定部门的子部门编号们，包括自身
-     * @param deptIdSet 部门编号
+     * @param deptIdJson 部门编号
      * @return 部门编号集合
      */
-    private Set<Long> getDeptCondition(Set<Long> deptIdSet, Long deptId) {
+    private Set<Long> getDeptCondition(String deptIdJson, Long deptId) {
+        Set<Long> deptIdSet = null;
+        if(StringUtils.isNotBlank(deptIdJson)){
+            List<Long> deptIdList = JsonUtils.parseArray(deptIdJson, Long.class);
+            if(!CollectionUtils.isAnyEmpty(deptIdList)){
+                deptIdSet = new HashSet<>(deptIdList);
+            }
+        }
         if (CollectionUtils.isAnyEmpty(deptIdSet) && deptId ==null) {
             return Collections.emptySet();
         }

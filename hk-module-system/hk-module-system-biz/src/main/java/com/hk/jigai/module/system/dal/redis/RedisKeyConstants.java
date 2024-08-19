@@ -57,6 +57,16 @@ public interface RedisKeyConstants {
      */
     String PERMISSION_MENU_ID_LIST = "permission_menu_ids";
 
+
+
+    /**
+     * 拥有权限对应的菜单编号数组的缓存
+     * <p>
+     * KEY 格式：permission_menu_ids:{permission}
+     * VALUE 数据类型：String 菜单编号数组
+     */
+    String PERMISSION_WECHAT_MENU_ID_LIST = "permission_wechat_menu_ids";
+
     /**
      * OAuth2 客户端的缓存
      * <p>

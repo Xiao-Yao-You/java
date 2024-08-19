@@ -1,8 +1,8 @@
 package com.hk.jigai.module.system.controller.admin.wechat;
 
-import com.hk.jigai.module.system.controller.admin.permission.vo.menu.WechatMenuPageReqVO;
-import com.hk.jigai.module.system.controller.admin.permission.vo.menu.WechatMenuRespVO;
-import com.hk.jigai.module.system.controller.admin.permission.vo.menu.WechatMenuSaveReqVO;
+import com.hk.jigai.framework.common.enums.CommonStatusEnum;
+import com.hk.jigai.module.system.controller.admin.permission.vo.menu.*;
+import com.hk.jigai.module.system.dal.dataobject.permission.MenuDO;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -72,25 +72,23 @@ public class WechatMenuController {
         return success(BeanUtils.toBean(menu, WechatMenuRespVO.class));
     }
 
-    @GetMapping("/page")
-    @Operation(summary = "获得wechat菜单权限分页")
-    @PreAuthorize("@ss.hasPermission('wechat:menu:query')")
-    public CommonResult<PageResult<WechatMenuRespVO>> getMenuPage(@Valid WechatMenuPageReqVO pageReqVO) {
-        PageResult<WechatMenuDO> pageResult = wechatMenuService.getMenuPage(pageReqVO);
-        return success(BeanUtils.toBean(pageResult, WechatMenuRespVO.class));
+    @GetMapping("/list")
+    @Operation(summary = "获取菜单列表", description = "用于【菜单管理】界面")
+    @PreAuthorize("@ss.hasPermission('system:menu:query')")
+    public CommonResult<List<WechatMenuRespVO>> getMenuList(MenuListReqVO reqVO) {
+        List<WechatMenuDO> list = wechatMenuService.getMenuList(reqVO);
+        list.sort(Comparator.comparing(WechatMenuDO::getSort));
+        return success(BeanUtils.toBean(list, WechatMenuRespVO.class));
     }
 
-    @GetMapping("/export-excel")
-    @Operation(summary = "导出wechat菜单权限 Excel")
-    @PreAuthorize("@ss.hasPermission('wechat:menu:export')")
-    @ApiAccessLog(operateType = EXPORT)
-    public void exportMenuExcel(@Valid WechatMenuPageReqVO pageReqVO,
-              HttpServletResponse response) throws IOException {
-        pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<WechatMenuDO> list = wechatMenuService.getMenuPage(pageReqVO).getList();
-        // 导出 Excel
-        ExcelUtils.write(response, "wechat菜单权限.xls", "数据", WechatMenuRespVO.class,
-                        BeanUtils.toBean(list, WechatMenuRespVO.class));
+    @GetMapping({"/list-all-simple", "simple-list"})
+    @Operation(summary = "获取wechat菜单精简信息列表", description = "只包含被开启的菜单，用于【角色分配菜单】功能的选项。" +
+            "在多租户的场景下，会只返回租户所在套餐有的菜单")
+    public CommonResult<List<MenuSimpleRespVO>> getSimpleMenuList() {
+        List<WechatMenuDO> list = wechatMenuService.getMenuListByTenant(
+                new MenuListReqVO().setStatus(CommonStatusEnum.ENABLE.getStatus()));
+        list.sort(Comparator.comparing(WechatMenuDO::getSort));
+        return success(BeanUtils.toBean(list, MenuSimpleRespVO.class));
     }
 
 }

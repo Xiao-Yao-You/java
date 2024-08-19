@@ -120,7 +120,7 @@ public class PermissionServiceImpl implements PermissionService {
         }
 
         // 判断是否有权限
-        for (Long menuId : menuIds) {
+        for (Long menuId : wechatMenuIds) {
             // 获得拥有该菜单的角色编号集合
             Set<Long> menuRoleIds = getSelf().getWechatMenuRoleIdListByMenuIdFromCache(menuId);
             // 如果有交集，说明有权限

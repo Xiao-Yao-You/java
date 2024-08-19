@@ -3,11 +3,8 @@ package com.hk.jigai.module.system.service.permission;
 import javax.validation.*;
 
 import com.hk.jigai.module.system.controller.admin.permission.vo.menu.MenuListReqVO;
-import com.hk.jigai.module.system.controller.admin.permission.vo.menu.WechatMenuPageReqVO;
 import com.hk.jigai.module.system.controller.admin.permission.vo.menu.WechatMenuSaveReqVO;
-import com.hk.jigai.module.system.dal.dataobject.permission.MenuDO;
 import com.hk.jigai.module.system.dal.dataobject.permission.WechatMenuDO;
-import com.hk.jigai.framework.common.pojo.PageResult;
 
 import java.util.Collection;
 import java.util.List;
@@ -50,14 +47,6 @@ public interface WechatMenuService {
     WechatMenuDO getMenu(Long id);
 
     /**
-     * 获得wechat菜单权限分页
-     *
-     * @param pageReqVO 分页查询
-     * @return wechat菜单权限分页
-     */
-    PageResult<WechatMenuDO> getMenuPage(WechatMenuPageReqVO pageReqVO);
-
-    /**
      * 获得所有菜单列表
      *
      * @return 菜单列表
@@ -79,5 +68,22 @@ public interface WechatMenuService {
      * @return 数组
      */
     List<Long> getMenuIdListByPermissionFromCache(String permission);
+
+    /**
+     * 筛选菜单列表
+     *
+     * @param reqVO 筛选条件请求 VO
+     * @return 菜单列表
+     */
+    List<WechatMenuDO> getMenuList(MenuListReqVO reqVO);
+
+    /**
+     * 基于租户，筛选菜单列表
+     * 注意，如果是系统租户，返回的还是全菜单
+     *
+     * @param reqVO 筛选条件请求 VO
+     * @return 菜单列表
+     */
+    List<WechatMenuDO> getMenuListByTenant(MenuListReqVO reqVO);
 
 }

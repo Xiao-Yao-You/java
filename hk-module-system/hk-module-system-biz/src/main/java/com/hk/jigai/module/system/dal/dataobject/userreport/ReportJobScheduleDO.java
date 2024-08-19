@@ -1,4 +1,4 @@
-package com.hk.jigai.module.system.dal.dataobject.reportjobschedule;
+package com.hk.jigai.module.system.dal.dataobject.userreport;
 
 import lombok.*;
 import java.util.*;

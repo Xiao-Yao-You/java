@@ -29,7 +29,7 @@ public interface AuthConvert {
 
     AuthLoginRespVO convert(OAuth2AccessTokenDO bean);
 
-    default AuthPermissionInfoRespVO convert(AdminUserDO user, List<RoleDO> roleList, List<MenuDO> menuList, List<WechatMenuDO> wechatMenuList) {
+    default AuthPermissionInfoRespVO convert(AdminUserDO user, List<RoleDO> roleList, List<MenuDO> menuList) {
         return AuthPermissionInfoRespVO.builder()
                 .user(BeanUtils.toBean(user, AuthPermissionInfoRespVO.UserVO.class))
                 .roles(convertSet(roleList, RoleDO::getCode))
@@ -37,7 +37,17 @@ public interface AuthConvert {
                 .permissions(convertSet(menuList, MenuDO::getPermission))
                 // 菜单树
                 .menus(buildMenuTree(menuList))
-                .wechatMenus(buildWechatMenuTree(wechatMenuList))
+                .build();
+    }
+
+    default AuthPermissionInfoRespVO convertWechat(AdminUserDO user, List<RoleDO> roleList, List<WechatMenuDO> wechatMenuList) {
+        return AuthPermissionInfoRespVO.builder()
+                .user(BeanUtils.toBean(user, AuthPermissionInfoRespVO.UserVO.class))
+                .roles(convertSet(roleList, RoleDO::getCode))
+                // 权限标识信息
+                .permissions(convertSet(wechatMenuList, WechatMenuDO::getPermission))
+                // 菜单树
+                .menus(buildWechatMenuTree(wechatMenuList))
                 .build();
     }
 

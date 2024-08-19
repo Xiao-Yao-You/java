@@ -2,14 +2,13 @@ package com.hk.jigai.module.system.service.userreport;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.hk.jigai.module.system.controller.admin.userreport.vo.UserReportPageReqVO;
-import com.hk.jigai.module.system.controller.admin.userreport.vo.UserReportSaveReqVO;
-import com.hk.jigai.module.system.dal.dataobject.reportjobplan.ReportJobPlanDO;
-import com.hk.jigai.module.system.dal.dataobject.reportjobschedule.ReportJobScheduleDO;
-import com.hk.jigai.module.system.dal.dataobject.userreport.UserReportDO;
+import com.hk.jigai.framework.common.util.collection.CollectionUtils;
+import com.hk.jigai.module.system.controller.admin.userreport.vo.*;
+import com.hk.jigai.module.system.dal.dataobject.userreport.*;
 import com.hk.jigai.module.system.dal.mysql.dept.DeptMapper;
-import com.hk.jigai.module.system.dal.mysql.reportjobplan.ReportJobPlanMapper;
-import com.hk.jigai.module.system.dal.mysql.reportjobschedule.ReportJobScheduleMapper;
+import com.hk.jigai.module.system.dal.mysql.userreport.ReportJobPlanMapper;
+import com.hk.jigai.module.system.dal.mysql.userreport.ReportJobScheduleMapper;
+import com.hk.jigai.module.system.dal.mysql.userreport.ReportAttentionMapper;
 import com.hk.jigai.module.system.dal.mysql.userreport.UserReportMapper;
 import org.springframework.stereotype.Service;
 
@@ -26,8 +25,9 @@ import com.hk.jigai.framework.common.util.object.BeanUtils;
 
 
 import static com.hk.jigai.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static com.hk.jigai.module.system.enums.ErrorCodeConstants.USER_REPORT_EXISTS;
-import static com.hk.jigai.module.system.enums.ErrorCodeConstants.USER_REPORT_NOT_EXISTS;
+import static com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+import static com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils.getLoginUserNickname;
+import static com.hk.jigai.module.system.enums.ErrorCodeConstants.*;
 
 /**
  * 用户汇报 Service 实现类
@@ -37,7 +37,6 @@ import static com.hk.jigai.module.system.enums.ErrorCodeConstants.USER_REPORT_NO
 @Service
 @Validated
 public class UserReportServiceImpl implements UserReportService {
-
     @Resource
     private UserReportMapper userReportMapper;
     @Resource
@@ -46,6 +45,8 @@ public class UserReportServiceImpl implements UserReportService {
     private ReportJobPlanMapper reportJobPlanMapper;
     @Resource
     private DeptMapper deptMapper;
+    @Resource
+    private ReportAttentionMapper reportAttentionMapper;
 
     @Override
     @Transactional
@@ -164,6 +165,35 @@ public class UserReportServiceImpl implements UserReportService {
     public PageResult<UserReportDO> getUserReportPage(UserReportPageReqVO pageReqVO) {
         return userReportMapper.selectPage(pageReqVO);
     }
+
+    @Override
+    public List<StatisticsRespVO> statistics(StatisticsReqVO reqVO) {
+        reqVO.setUserId(String.valueOf(getLoginUserId()));
+        //先查询汇报给当前人的
+        List<StatisticsRespVO> list = userReportMapper.statistics(reqVO);
+        //如果未查到汇报给自己的，显示自己的汇报数据
+        if(CollectionUtils.isAnyEmpty(list)){
+            list = userReportMapper.statisticsSelf(reqVO);
+        }
+        return list;
+    }
+
+    @Override
+    public SummaryRespVO summary(StatisticsReqVO reqVO){
+        reqVO.setUserId(String.valueOf(getLoginUserId()));
+        SummaryRespVO result = new SummaryRespVO();
+        //1.查询出漏交人员姓名
+        result.setNotSubmitUserNameList(userReportMapper.queryNotSubmitUser(reqVO));
+        //2.查询灰熊记录
+        result.setReportList(userReportMapper.querySummaryReport(reqVO));
+        return result;
+    }
+
+    @Override
+    public List<AttentionAlertRespVO> queryAttentionList() {
+        return userReportMapper.queryAttentionList(getLoginUserId());
+    }
+
 
 
 }

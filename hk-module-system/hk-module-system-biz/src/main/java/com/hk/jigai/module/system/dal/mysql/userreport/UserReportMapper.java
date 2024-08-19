@@ -5,8 +5,13 @@ import java.util.*;
 import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.mybatis.core.query.LambdaQueryWrapperX;
 import com.hk.jigai.framework.mybatis.core.mapper.BaseMapperX;
+import com.hk.jigai.module.system.controller.admin.userreport.vo.AttentionAlertRespVO;
+import com.hk.jigai.module.system.controller.admin.userreport.vo.StatisticsReqVO;
+import com.hk.jigai.module.system.controller.admin.userreport.vo.StatisticsRespVO;
 import com.hk.jigai.module.system.controller.admin.userreport.vo.UserReportPageReqVO;
+import com.hk.jigai.module.system.dal.dataobject.userreport.AttentionOtherInfoDO;
 import com.hk.jigai.module.system.dal.dataobject.userreport.UserReportDO;
+import com.hk.jigai.module.system.dal.dataobject.userreport.UserSummaryReportDO;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -23,5 +28,20 @@ public interface UserReportMapper extends BaseMapperX<UserReportDO> {
                 .likeIfPresent(UserReportDO::getUserNickName, reqVO.getUserNickName())
                 .orderByDesc(UserReportDO::getId));
     }
+
+
+    List<StatisticsRespVO> statistics(StatisticsReqVO reqVO);
+
+    List<StatisticsRespVO> statisticsSelf(StatisticsReqVO reqVO);
+
+    List<String> queryNotSubmitUser(StatisticsReqVO reqVO);
+
+    List<UserSummaryReportDO> querySummaryReport(StatisticsReqVO reqVO);
+
+    List<AttentionAlertRespVO> queryAttentionList(Long userId);
+
+    AttentionOtherInfoDO queryByschedule(Long jobId);
+
+    AttentionOtherInfoDO queryByPlan(Long jobId);
 
 }

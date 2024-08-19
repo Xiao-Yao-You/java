@@ -1,15 +1,12 @@
 package com.hk.jigai.module.system.dal.dataobject.userreport;
 
 import com.hk.jigai.framework.mybatis.core.type.JsonLongSetTypeHandler;
-import com.hk.jigai.module.system.dal.dataobject.reportjobplan.ReportJobPlanDO;
-import com.hk.jigai.module.system.dal.dataobject.reportjobschedule.ReportJobScheduleDO;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.util.*;
 import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.LocalDateTime;
+
 import com.baomidou.mybatisplus.annotation.*;
 import com.hk.jigai.framework.mybatis.core.dataobject.BaseDO;
 
@@ -62,7 +59,7 @@ public class UserReportDO extends BaseDO {
      */
     private String checkStatus;
     /**
-     * 类型(00:正常,01:补交,02:缺)
+     * 类型(0:正常,1:补交,2:缺)
      */
     private String type;
 

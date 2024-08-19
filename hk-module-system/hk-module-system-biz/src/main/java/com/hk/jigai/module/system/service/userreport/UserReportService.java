@@ -5,9 +5,9 @@ import javax.validation.*;
 
 import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.common.pojo.PageParam;
-import com.hk.jigai.module.system.controller.admin.userreport.vo.UserReportPageReqVO;
-import com.hk.jigai.module.system.controller.admin.userreport.vo.UserReportSaveReqVO;
+import com.hk.jigai.module.system.controller.admin.userreport.vo.*;
 import com.hk.jigai.module.system.dal.dataobject.userreport.UserReportDO;
+import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * 用户汇报 Service 接口
@@ -53,5 +53,26 @@ public interface UserReportService {
      * @return 用户汇报分页
      */
     PageResult<UserReportDO> getUserReportPage(UserReportPageReqVO pageReqVO);
+
+    /**
+     * 汇报统计
+     * @param reqVO
+     * @return
+     */
+    List<StatisticsRespVO> statistics(@Valid StatisticsReqVO reqVO);
+
+    /**
+     * 汇报汇总
+     * @param reqVO
+     * @return
+     */
+    SummaryRespVO summary(StatisticsReqVO reqVO);
+
+    /**
+     * 关注下拉
+     * @return
+     */
+    List<AttentionAlertRespVO> queryAttentionList();
+
 
 }

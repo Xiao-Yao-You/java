@@ -1,5 +1,6 @@
 package com.hk.jigai.module.system.service.wechat;
 
+import com.alibaba.fastjson.JSON;
 import com.hk.jigai.framework.common.util.collection.CollectionUtils;
 import com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils;
 import com.hk.jigai.module.system.dal.dataobject.meetingroominfo.MeetingPersonAttendRecordDO;
@@ -85,7 +86,7 @@ public class MeetingReminderServiceImpl implements MeetingReminderService{
 
     //文档参考https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html
     //跳转接口，根据code获取accessToken以及openid，将该openid落地user表
-    //https://api.weixin.qq.com/sns/oauth2/access_token?appid=APPID&secret=SECRET&code=CODE&grant_type=authorization_code
+    //https://api.weixin.qq.com/sns/oauth2/access_token?appid=wx145112d98bdbfbfe&secret=3d82310d78a1a2e54b2232ca97bbfdb7&code=CODE&grant_type=authorization_code
     /**
      * {
      *   "access_token":"ACCESS_TOKEN",
@@ -97,16 +98,19 @@ public class MeetingReminderServiceImpl implements MeetingReminderService{
      *   "unionid": "UNIONID"
      * }
      */
+    //https://api.weixin.qq.com/sns/jscode2session
+    //https://api.weixin.qq.com/sns/oauth2/access_token
     @Override
     public String wechatQueryOpenid(String code) {
-        Map authMap = restTemplate.exchange("https://api.weixin.qq.com/sns/oauth2/access_token?appid=wx145112d98bdbfbfe&secret=3d82310d78a1a2e54b2232ca97bbfdb7&code=" + code + "&grant_type=authorization_code", HttpMethod.POST, null,
-                new ParameterizedTypeReference<HashMap>() {}).getBody();
-        String openid = (String)authMap.get("openid");
-        if(StringUtils.isNotBlank(openid)){
-            Long userid = SecurityFrameworkUtils.getLoginUser().getId();
-            adminUserService.updateUserOpenid(userid, openid);
+        String authStr = restTemplate.exchange("https://api.weixin.qq.com/sns/oauth2/access_token?appid=wx145112d98bdbfbfe&secret=3d82310d78a1a2e54b2232ca97bbfdb7&code=" + code + "&grant_type=authorization_code", HttpMethod.GET, null,
+                new ParameterizedTypeReference<String>() {}).getBody();
+        Map authMap = (Map)JSON.parse(authStr);
+        if(authMap == null || authMap.get("openid")== null){
+            return null;
         }
-        return null;
+        String openid = (String)authMap.get("openid");
+        adminUserService.updateUserOpenid(SecurityFrameworkUtils.getLoginUser().getId(), openid);
+        return openid;
     }
 
     private void sendReminder(Long meetingId) {
@@ -127,7 +131,7 @@ public class MeetingReminderServiceImpl implements MeetingReminderService{
                 redisTemplate.opsForValue().set(RedisKeyConstants.WECHAT_AUTHTOKEN,authToken,7000,TimeUnit.SECONDS);
                 //2.发送诶新消息
                 //2.1 查询该会议下，所有参与人的openid
-                List<Long> openidList = meetingPersonAttendRecordMapper.selectOppenidByMeetingId(meetingId);
+                List<Long> openidList = meetingPersonAttendRecordMapper.selectOpenidByMeetingId(meetingId);
                 if(!CollectionUtils.isAnyEmpty(openidList)){
                     HttpHeaders headers = new HttpHeaders();
                     headers.setContentType(MediaType.APPLICATION_JSON);

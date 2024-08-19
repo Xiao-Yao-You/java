@@ -19,7 +19,8 @@
                 su.create_time,
                 sd.id as deptId,
                 sd.name as deptName,
-                sd.parent_id as parentId
+                sd.parent_id as parentId,
+                su.openid
         FROM system_users su
    LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
    LEFT JOIN system_dept sd ON sud.dept_id=sd.id and sd.deleted = 0
@@ -124,7 +125,8 @@
     </select>
 
     <select id="selectPage" parameterType="map" resultMap="userMap">
-        SELECT  su.id,su.username,su.password,su.nickname,su.remark,su.post_ids,su.email,su.mobile,su.sex,su.avatar,su.status,su.login_ip,su.login_date,su.create_time,sd.id as deptId,sd.name as deptName
+        SELECT  su.id,su.username,su.password,su.nickname,su.remark,su.post_ids,su.email,su.mobile,su.sex,
+               su.avatar,su.status,su.login_ip,su.login_date,su.create_time,sd.id as deptId,sd.name as deptName
           FROM system_users su
      LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
      LEFT JOIN system_dept sd ON sud.dept_id=sd.id and su.deleted = 0
@@ -150,7 +152,7 @@
                 #{item}
             </foreach>
         </if>
-        ORDER BY su.id DESC
+        ORDER BY cast(su.nickname as char character set gbk)
         LIMIT #{offset},#{pageSize}
     </select>
 
@@ -251,6 +253,7 @@
         <result property="mobile" column="mobile"/>
         <result property="sex" column="sex"/>
         <result property="avatar" column="avatar"/>
+        <result property="openid" column="openid"/>
         <result property="status" column="status"/>
         <result property="loginIp" column="login_ip"/>
         <result property="loginDate" column="login_date"/>

@@ -1,12 +1,10 @@
-package com.hk.jigai.module.system.dal.mysql.reportjobplan;
-
-import java.util.*;
+package com.hk.jigai.module.system.dal.mysql.userreport;
 
 import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.mybatis.core.query.LambdaQueryWrapperX;
 import com.hk.jigai.framework.mybatis.core.mapper.BaseMapperX;
 import com.hk.jigai.module.system.controller.admin.reportjobplan.vo.ReportJobPlanPageReqVO;
-import com.hk.jigai.module.system.dal.dataobject.reportjobplan.ReportJobPlanDO;
+import com.hk.jigai.module.system.dal.dataobject.userreport.ReportJobPlanDO;
 import org.apache.ibatis.annotations.Mapper;
 
 /**

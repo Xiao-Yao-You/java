@@ -53,6 +53,10 @@ public class WechatMenuRespVO {
     @ExcelProperty("组件名")
     private String componentName;
 
+    @Schema(description = "背景色")
+    @ExcelProperty("背景色")
+    private String bgcolor;
+
     @Schema(description = "菜单状态", requiredMode = Schema.RequiredMode.REQUIRED, example = "2")
     @ExcelProperty("菜单状态")
     private Integer status;
@@ -72,5 +76,7 @@ public class WechatMenuRespVO {
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
+
+
 
 }

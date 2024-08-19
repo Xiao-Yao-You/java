@@ -43,6 +43,14 @@ public class PermissionController {
         return success(permissionService.getRoleMenuListByRoleId(roleId));
     }
 
+    @Operation(summary = "获得角色拥有的微信菜单编号")
+    @Parameter(name = "roleId", description = "角色编号", required = true)
+    @GetMapping("/list-role-wechat-menus")
+    @PreAuthorize("@ss.hasPermission('system:permission:assign-role-wechat-menu')")
+    public CommonResult<Set<Long>> getRoleWechatMenuList(Long roleId) {
+        return success(permissionService.getRoleWechatMenuListByRoleId(roleId));
+    }
+
     @PostMapping("/assign-role-menu")
     @Operation(summary = "赋予角色菜单")
     @PreAuthorize("@ss.hasPermission('system:permission:assign-role-menu')")
@@ -57,7 +65,7 @@ public class PermissionController {
 
     @PostMapping("/assign-wechat-role-menu")
     @Operation(summary = "赋予角色微信菜单")
-    @PreAuthorize("@ss.hasPermission('system:permission:assign-role-menu')")
+    @PreAuthorize("@ss.hasPermission('system:permission:assign-role-wechat-menu')")
     public CommonResult<Boolean> assignWechatRoleMenu(@Validated @RequestBody PermissionAssignRoleMenuReqVO reqVO) {
         //system_tenant_package  套餐相关的，目前微信菜单暂不考虑这个
         //tenantService.handleTenantMenu(menuIds -> reqVO.getMenuIds().removeIf(menuId -> !CollUtil.contains(menuIds, menuId)));

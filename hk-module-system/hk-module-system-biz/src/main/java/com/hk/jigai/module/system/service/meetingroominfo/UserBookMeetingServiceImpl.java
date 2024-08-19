@@ -1,13 +1,22 @@
 package com.hk.jigai.module.system.service.meetingroominfo;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.CollectionUtil;
+import com.hk.jigai.framework.common.enums.CommonStatusEnum;
 import com.hk.jigai.framework.common.util.collection.CollectionUtils;
 import com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils;
+import com.hk.jigai.module.system.convert.auth.AuthConvert;
 import com.hk.jigai.module.system.dal.dataobject.meetingroominfo.MeetingPersonAttendRecordDO;
 import com.hk.jigai.module.system.dal.dataobject.meetingroominfo.MeetingRoomBookRecordDO;
+import com.hk.jigai.module.system.dal.dataobject.permission.RoleDO;
+import com.hk.jigai.module.system.dal.dataobject.permission.UserRoleDO;
 import com.hk.jigai.module.system.dal.dataobject.user.AdminUserDO;
 import com.hk.jigai.module.system.dal.mysql.meetingroominfo.MeetingPersonAttendRecordMapper;
 import com.hk.jigai.module.system.dal.mysql.meetingroominfo.MeetingRoomBookRecordMapper;
+import com.hk.jigai.module.system.dal.mysql.permission.RoleMapper;
+import com.hk.jigai.module.system.dal.mysql.permission.UserRoleMapper;
 import com.hk.jigai.module.system.dal.mysql.user.AdminUserMapper;
+import com.hk.jigai.module.system.enums.permission.RoleCodeEnum;
 import com.hk.jigai.module.system.service.wechat.MeetingReminderService;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +37,9 @@ import com.hk.jigai.framework.common.util.object.BeanUtils;
 import com.hk.jigai.module.system.dal.mysql.meetingroominfo.UserBookMeetingMapper;
 
 import static com.hk.jigai.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static com.hk.jigai.framework.common.pojo.CommonResult.success;
+import static com.hk.jigai.framework.common.util.collection.CollectionUtils.convertSet;
+import static com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static com.hk.jigai.module.system.enums.ErrorCodeConstants.*;
 
 /**
@@ -53,6 +65,12 @@ public class UserBookMeetingServiceImpl implements UserBookMeetingService {
 
     @Resource
     private MeetingReminderService meetingReminderService;
+
+    @Resource
+    private UserRoleMapper userRoleMapper;
+
+    @Resource
+    private RoleMapper roleMapper;
 
     @Override
     @Transactional
@@ -194,7 +212,37 @@ public class UserBookMeetingServiceImpl implements UserBookMeetingService {
 
     @Override
     public PageResult<UserBookMeetingDO> getUserBookMeetingPage(UserBookMeetingPageReqVO pageReqVO) {
-        return userBookMeetingMapper.selectPage(pageReqVO);
-    }
+        // 1.2 获得角色列表
+        Set<Long> roleIds = convertSet(userRoleMapper.selectListByUserId(getLoginUserId()), UserRoleDO::getRoleId);
+        if (CollUtil.isEmpty(roleIds)) {
+            return null;
+        }
+        List<RoleDO> roles = roleMapper.selectBatchIds(roleIds);
+        roles.removeIf(role -> !CommonStatusEnum.ENABLE.getStatus().equals(role.getStatus())); // 移除禁用的角色
+        boolean isSuperAdmin = false;
+        for(RoleDO roleDO : roles){
+            if(RoleCodeEnum.isSuperAdmin(roleDO.getCode())){
+                isSuperAdmin = true;
+                break;
+            }
+        }
+        if(!isSuperAdmin){
+            pageReqVO.setUserId(getLoginUserId());
+        }
 
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("userPhone",pageReqVO.getUserPhone());
+        requestMap.put("meetingRoomId",pageReqVO.getMeetingRoomId());
+        requestMap.put("capacityList",pageReqVO.getCapacityList());
+        requestMap.put("subject",pageReqVO.getSubject());
+        requestMap.put("date",pageReqVO.getDate());
+        requestMap.put("userId",pageReqVO.getUserId());
+        requestMap.put("offset", (pageReqVO.getPageNo()-1) * pageReqVO.getPageSize());
+        requestMap.put("pageSize", pageReqVO.getPageSize());
+        Integer count = userBookMeetingMapper.selectCount1(requestMap);
+        PageResult<UserBookMeetingDO> result = new PageResult<>();
+        result.setTotal(Long.valueOf(count));
+        result.setList(userBookMeetingMapper.selectPage(requestMap));
+        return result;
+    }
 }

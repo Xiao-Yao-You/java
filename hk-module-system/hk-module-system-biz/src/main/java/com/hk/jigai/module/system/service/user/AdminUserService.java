@@ -240,5 +240,10 @@ public interface AdminUserService {
      */
     List<AdminUserDO> selectByUserIds(Set<Long> reportObject);
 
+    /**
+     * 更新用户，微信相关信息
+     * @param id
+     * @param openid
+     */
     void updateUserOpenid(Long id, String openid);
 }

@@ -22,6 +22,6 @@ public interface MeetingPersonAttendRecordMapper extends BaseMapperX<MeetingPers
 
     List<MeetingPersonAttendRecordDO> selectByMeetingId(Long meetingBookId);
 
-    List<Long> selectOppenidByMeetingId(Long meetingBookId);
+    List<Long> selectOpenidByMeetingId(Long meetingBookId);
 
 }

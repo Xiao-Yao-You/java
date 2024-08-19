@@ -1,6 +1,8 @@
 package com.hk.jigai.module.system.controller.admin.user.vo.user;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.hk.jigai.framework.common.pojo.PageParam;
+import com.hk.jigai.framework.mybatis.core.type.JsonLongSetTypeHandler;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -34,7 +36,7 @@ public class UserPageReqVO extends PageParam {
     private LocalDateTime[] createTime;
 
     @Schema(description = "部门编号，同时筛选子部门")
-    private Set<Long> deptIds;
+    private String deptIds;
 
     @Schema(description = "部门编号，同时筛选子部门")
     private Long deptId;

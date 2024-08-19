@@ -102,5 +102,9 @@ public class AdminUserDO extends TenantBaseDO {
      */
     private LocalDateTime loginDate;
 
+    /**
+     * 微信公众号openid
+     */
     private String openid;
+
 }

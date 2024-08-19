@@ -29,9 +29,6 @@ public class AuthPermissionInfoRespVO {
     @Schema(description = "菜单树", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<MenuVO> menus;
 
-    @Schema(description = "微信菜单树", requiredMode = Schema.RequiredMode.REQUIRED)
-    private List<MenuVO> wechatMenus;
-
     @Schema(description = "用户信息 VO")
     @Data
     @NoArgsConstructor
@@ -55,6 +52,9 @@ public class AuthPermissionInfoRespVO {
         //private Long deptId;
         @Schema(description = "部门编号集合", requiredMode = Schema.RequiredMode.REQUIRED, example = "{2048}")
         private List<UserDeptRespVO> deptList;
+
+        @Schema(description = "微信公众号openid")
+        private String openid;
     }
 
     @Schema(description = "管理后台 - 登录用户的菜单信息 Response VO")
@@ -98,6 +98,9 @@ public class AuthPermissionInfoRespVO {
          * 子路由
          */
         private List<MenuVO> children;
+
+        @Schema(description = "背景颜色")
+        private String bgcolor;
 
     }
 

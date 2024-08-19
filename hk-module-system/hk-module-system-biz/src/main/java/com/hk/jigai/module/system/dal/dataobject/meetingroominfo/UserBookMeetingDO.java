@@ -100,4 +100,9 @@ public class UserBookMeetingDO extends BaseDO {
      */
     private Integer status;
 
+    /**
+     * 其他参与者
+     */
+    @TableField(typeHandler = JsonStringSetTypeHandler.class)
+    private Set<String> otherAttend;
 }
