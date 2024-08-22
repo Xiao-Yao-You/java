@@ -105,7 +105,7 @@ public class ReportAttentionController {
 
     @GetMapping("/queryFollowPage")
     @Operation(summary = "跟进列表")
-    @PreAuthorize("@ss.hasPermission('hk:report-attention:query')")
+    @PreAuthorize("@ss.hasPermission('hk:report-follow:query')")
     public CommonResult<PageResult<ReportAttentionRespVO>> queryFollowList(@Valid ReportAttentionPageReqVO pageReqVO) {
         pageReqVO.setReplyUserId(getLoginUserId());
         PageResult<ReportAttentionDO> pageResult = reportAttentionService.getReportAttentionPage(pageReqVO);
@@ -114,7 +114,7 @@ public class ReportAttentionController {
 
     @PutMapping("/transfer")
     @Operation(summary = "转交")
-    @PreAuthorize("@ss.hasPermission('hk:report-attention:update')")
+    @PreAuthorize("@ss.hasPermission('hk:report-transfer:update')")
     public CommonResult<Boolean> transfer(@Valid @RequestBody ReportAttentionTransferReqVO updateReqVO) {
         reportAttentionService.transfer(updateReqVO);
         return success(true);
@@ -122,7 +122,7 @@ public class ReportAttentionController {
 
     @PutMapping("/follow")
     @Operation(summary = "跟进")
-    @PreAuthorize("@ss.hasPermission('hk:report-attention:update')")
+    @PreAuthorize("@ss.hasPermission('hk:report-follow:update')")
     public CommonResult<Long> follow(@Valid @RequestBody ReportAttentionFollowReqVO updateReqVO) {
         return success(reportAttentionService.follow(updateReqVO));
     }

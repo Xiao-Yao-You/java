@@ -1,5 +1,6 @@
 package com.hk.jigai.module.system.controller.admin.userreport;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.hk.jigai.module.system.controller.admin.userreport.vo.*;
 import com.hk.jigai.module.system.dal.dataobject.user.AdminUserDO;
 import com.hk.jigai.module.system.dal.dataobject.userreport.UserReportDO;
@@ -18,6 +19,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import javax.validation.constraints.*;
 import javax.validation.*;
 import javax.servlet.http.*;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 import java.io.IOException;
 
@@ -113,8 +116,25 @@ public class UserReportController {
 
     @GetMapping("/summary")
     @Operation(summary = "汇总")
-    @PreAuthorize("@ss.hasPermission('hk:user-report:query')")
+    @PreAuthorize("@ss.hasPermission('hk:user-summary:query')")
     public CommonResult<SummaryRespVO> summary(@Valid StatisticsReqVO reqVO) {
+        //判断查询时间是否为空，若为空则赋值当天的日期
+        if (CollectionUtil.isEmpty(reqVO.getDateReport())) {
+            Date current = new Date();
+            SimpleDateFormat startDateFormat = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
+            SimpleDateFormat endDateFormat = new SimpleDateFormat("yyyy-MM-dd 23:59:59");
+            String currentStart = startDateFormat.format(current);
+            String currentEnd = endDateFormat.format(current);
+            List<String> dateArr = new ArrayList<>();
+            dateArr.add(currentStart);
+            dateArr.add(currentEnd);
+            reqVO.setDateReport(dateArr);
+//            LocalDate[] dates = new LocalDate[2];
+//            dates[0] = LocalDate.now();
+//            dates[1] = LocalDate.now();
+//            reqVO.setDateReport(dates);
+        }
+
         return success(userReportService.summary(reqVO));
     }
 

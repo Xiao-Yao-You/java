@@ -3,7 +3,8 @@ package com.hk.jigai.module.system.controller.admin.userreport.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
-import java.time.LocalDate;;
+import java.time.LocalDate;
+import java.util.List;;
 import static com.hk.jigai.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY;
 
 
@@ -15,8 +16,8 @@ public class StatisticsReqVO {
     private Long deptId;
 
     @Schema(description = "汇报日期")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY)
-    private LocalDate[] dateReport;
+//    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY)
+    private List<String> dateReport;
 
     private String userId;
 
