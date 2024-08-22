@@ -93,6 +93,27 @@
         or e.report_object = CONCAT('[' , #{userId} , ']')
         )
         order by e.date_report desc ,e.user_id
+        LIMIT #{offset},#{pageSize}
+    </select>
+
+
+    <select id="selectCount1" parameterType="com.hk.jigai.module.system.controller.admin.userreport.vo.StatisticsReqVO" resultType="Integer">
+        SELECT  count(1)
+          FROM hk_user_report e
+          join hk_report_job_schedule a on e.id = a.user_report_id and a.deleted = 0
+     left join hk_report_attention c on a.id = c.job_id and c.type = 0 and c.deleted=0 and c.user_id = #{userId}
+         where e.deleted = 0
+         -- 考虑部门不存在的人员的情况，比如一些虚拟账号，超管账号等
+         <if test="deptId!=null and deptId !=''">
+           and e.dept_id=#{deptId}
+         </if>
+          and e.date_report between #{dateReport[${0}]} and #{dateReport[${1}]}
+        and (
+               e.report_object like CONCAT('%,' , #{userId} , ',%')
+            or e.report_object like CONCAT('%,' , #{userId} , ']')
+            or e.report_object like CONCAT('[' , #{userId} , ',%')
+            or e.report_object = CONCAT('[' , #{userId} , ']')
+        )
     </select>
 
     <select id="queryAttentionList"

@@ -38,6 +38,8 @@ public interface UserReportMapper extends BaseMapperX<UserReportDO> {
 
     List<UserSummaryReportDO> querySummaryReport(StatisticsReqVO reqVO);
 
+    Integer selectCount1(StatisticsReqVO reqVO);
+
     List<AttentionAlertRespVO> queryAttentionList(Long userId);
 
     AttentionOtherInfoDO queryByschedule(Long jobId);

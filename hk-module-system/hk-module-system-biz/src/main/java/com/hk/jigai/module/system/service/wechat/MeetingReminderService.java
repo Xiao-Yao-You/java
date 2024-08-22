@@ -23,4 +23,7 @@ public interface MeetingReminderService {
      * @return
      */
     String wechatQueryOpenid(String code);
+
+    void sendReminder(Long meetingId);
+
 }

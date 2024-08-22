@@ -35,6 +35,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
+
+import static com.hk.jigai.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static com.hk.jigai.module.system.enums.ErrorCodeConstants.MEETING_SEND_TEMPLATE_FAILED;
+import static com.hk.jigai.module.system.enums.ErrorCodeConstants.USER_REPORT_EXISTS;
+
 @Service
 @Validated
 public class MeetingReminderServiceImpl implements MeetingReminderService{
@@ -85,19 +90,6 @@ public class MeetingReminderServiceImpl implements MeetingReminderService{
 
 
     //文档参考https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html
-    //跳转接口，根据code获取accessToken以及openid，将该openid落地user表
-    //https://api.weixin.qq.com/sns/oauth2/access_token?appid=wx145112d98bdbfbfe&secret=3d82310d78a1a2e54b2232ca97bbfdb7&code=CODE&grant_type=authorization_code
-    /**
-     * {
-     *   "access_token":"ACCESS_TOKEN",
-     *   "expires_in":7200,
-     *   "refresh_token":"REFRESH_TOKEN",
-     *   "openid":"OPENID",
-     *   "scope":"SCOPE",
-     *   "is_snapshotuser": 1,
-     *   "unionid": "UNIONID"
-     * }
-     */
     //https://api.weixin.qq.com/sns/jscode2session
     //https://api.weixin.qq.com/sns/oauth2/access_token
     @Override
@@ -113,82 +105,70 @@ public class MeetingReminderServiceImpl implements MeetingReminderService{
         return openid;
     }
 
-    private void sendReminder(Long meetingId) {
-        UserBookMeetingDO userBookMeetingDO = userBookMeetingMapper.selectById(meetingId);
-        MeetingRoomInfoDO meetingRoomInfoDO = meetingRoomInfoMapper.selectById(userBookMeetingDO.getMeetingRoomId());
-        if(userBookMeetingDO != null){
-            //1.先重新获取accessToken
-            String authToken = (String)redisTemplate.opsForValue().get(RedisKeyConstants.WECHAT_AUTHTOKEN);
-            if(!StringUtils.isNotBlank(authToken)){
-                Map authMap = restTemplate.exchange("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wx145112d98bdbfbfe&secret=3d82310d78a1a2e54b2232ca97bbfdb7", HttpMethod.POST, null,
-                        new ParameterizedTypeReference<HashMap>() {}).getBody();
-                if(authMap != null && authMap.get("access_token") != null) {
-                    authToken = (String) authMap.get("access_token");
+    @Override
+    public void sendReminder(Long meetingId) {
+        try{
+            //https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Template_Message_Interface.html
+            UserBookMeetingDO userBookMeetingDO = userBookMeetingMapper.selectById(meetingId);
+            MeetingRoomInfoDO meetingRoomInfoDO = meetingRoomInfoMapper.selectById(userBookMeetingDO.getMeetingRoomId());
+            if(userBookMeetingDO != null){
+                //1.先重新获取accessToken
+                String authToken = (String)redisTemplate.opsForValue().get(RedisKeyConstants.WECHAT_AUTHTOKEN);
+                if(!StringUtils.isNotBlank(authToken)){
+                    Map authMap = restTemplate.exchange("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wx145112d98bdbfbfe&secret=3d82310d78a1a2e54b2232ca97bbfdb7", HttpMethod.POST, null,
+                            new ParameterizedTypeReference<HashMap>() {}).getBody();
+                    if(authMap != null && authMap.get("access_token") != null) {
+                        authToken = (String) authMap.get("access_token");
+                    }
                 }
-            }
 
-            if(StringUtils.isNotBlank(authToken)){
-                redisTemplate.opsForValue().set(RedisKeyConstants.WECHAT_AUTHTOKEN,authToken,7000,TimeUnit.SECONDS);
-                //2.发送诶新消息
-                //2.1 查询该会议下，所有参与人的openid
-                List<Long> openidList = meetingPersonAttendRecordMapper.selectOpenidByMeetingId(meetingId);
-                if(!CollectionUtils.isAnyEmpty(openidList)){
-                    HttpHeaders headers = new HttpHeaders();
-                    headers.setContentType(MediaType.APPLICATION_JSON);
-                    for(Long openid : openidList){
-                        Integer startTime = userBookMeetingDO.getStartTime();
-                        int a = (startTime.intValue()-1 )%2 ;
-                        int hour = (startTime.intValue()-1 )/2 ;
+                if(StringUtils.isNotBlank(authToken)){
+                    redisTemplate.opsForValue().set(RedisKeyConstants.WECHAT_AUTHTOKEN,authToken,7000,TimeUnit.SECONDS);
+                    //2.发送诶新消息
+                    //2.1 查询该会议下，所有参与人的openid
+                    List<String> openidList = meetingPersonAttendRecordMapper.selectOpenidByMeetingId(meetingId);
+                    if(!CollectionUtils.isAnyEmpty(openidList)){
+                        HttpHeaders headers = new HttpHeaders();
+                        headers.setContentType(MediaType.APPLICATION_JSON);
+                        for(String openid : openidList){
+                            Integer startTime = userBookMeetingDO.getStartTime();
+                            int a = (startTime.intValue()-1 )%2 ;
+                            int hour = (startTime.intValue()-1 )/2 ;
 
-                        Map requestBody = new HashMap();
-                        requestBody.put("touser",openid.toString());
-                        requestBody.put("template_id","gqKg0G5-01cuXzj7Ldk-vnX7fFaOhudOdP6KZ0YNCO4");
-                        Map data = new HashMap();
-                        Map thing6 = new HashMap();
-                        data.put("thing6", thing6);
-                        thing6.put("value", userBookMeetingDO.getSubject());
-                        Map time4 = new HashMap();
-                        data.put("time4", time4);
-                        time4.put("value", userBookMeetingDO.getDateMeeting() + " " + hour +":"+ ((a==1)?30:0));
-                        Map thing7 = new HashMap();
-                        data.put("thing7", thing7);
-                        thing7.put("value", meetingRoomInfoDO.getName() + meetingRoomInfoDO.getRoomNo());
-                        requestBody.put("data",data);
-                        HttpEntity<HashMap> requestEntity = new HttpEntity(requestBody, headers);
-                        restTemplate.exchange("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token="+authToken, HttpMethod.POST, requestEntity,
-                                new ParameterizedTypeReference<HashMap>() {}).getBody();
+                            Map requestBody = new HashMap();
+                            requestBody.put("touser",openid);
+                            requestBody.put("template_id","gqKg0G5-01cuXzj7Ldk-vnX7fFaOhudOdP6KZ0YNCO4");
+                            Map miniprogram = new HashMap();
+                            miniprogram.put("appid","wx49590d619c10f743");
+                            miniprogram.put("pagepath","pages/meeting/meet-detail/index?id=" + meetingId);
+                            requestBody.put("miniprogram",miniprogram);
+                            Map data = new HashMap();
+                            Map thing6 = new HashMap();
+                            data.put("thing6", thing6);
+                            thing6.put("value", userBookMeetingDO.getSubject());
+                            Map time4 = new HashMap();
+                            data.put("time4", time4);
+                            time4.put("value", userBookMeetingDO.getDateMeeting() + " " + hour +":"+ ((a==1)?30:0));
+                            Map thing7 = new HashMap();
+                            data.put("thing7", thing7);
+                            String roomNo = meetingRoomInfoDO.getRoomNo();
+                            if(StringUtils.isBlank(roomNo) || "null".equals(roomNo)){
+                                roomNo = "";
+                            }
+                            thing7.put("value", meetingRoomInfoDO.getName() + roomNo);
+                            requestBody.put("data",data);
+                            HttpEntity<HashMap> requestEntity = new HttpEntity(requestBody, headers);
+                            HashMap result = restTemplate.exchange("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token="+authToken, HttpMethod.POST, requestEntity,
+                                    new ParameterizedTypeReference<HashMap>() {}).getBody();
+                            if(result == null || !"0".equals((String)result.get("errcode"))){
+                                throw new Exception("发送会议消息异常" + (String)result.get("errcode") + ":" +(String)result.get("errmsg"));
+                            }
+                        }
                     }
                 }
             }
+        } catch (Exception e){
+            throw exception(MEETING_SEND_TEMPLATE_FAILED);
         }
-//        {
-//            "touser":"OPENID",
-//                "template_id":"ngqIpbwh8bUfcSsECmogfXcV14J0tQlEpBO27izEYtY",
-//                "url":"http://weixin.qq.com/download",
-//                "miniprogram":{
-//            "appid":"xiaochengxuappid12345",
-//                    "pagepath":"index?foo=bar"
-//        },
-//            "client_msg_id":"MSG_000001",
-//                "data":{
-//
-//            "keyword1":{
-//                "value":"巧克力"
-//            },
-//            "keyword2": {
-//                "value":"39.8元"
-//            },
-//            "keyword3": {
-//                "value":"2014年9月22日"
-//            }
-//        }
-//        }
-
-//        {
-//            "errcode":0,
-//                "errmsg":"ok",
-//                "msgid":200228332
-//        }
-
     }
 }

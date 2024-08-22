@@ -177,6 +177,7 @@ public interface ErrorCodeConstants {
     ErrorCode MEETING_ROOM_INFO_NOT_EXISTS = new ErrorCode(1_002_031_000, "会议室基本信息不存在");
     ErrorCode USER_BOOK_MEETING_NOT_EXISTS = new ErrorCode(1_002_031_001, "会议预定信息不存在");
     ErrorCode USER_BOOK_MEETING_ALREADY_BOOKED = new ErrorCode(1_002_031_002, "该会议室该时间段有其他会议已预定，麻烦检查！");
+    ErrorCode MEETING_SEND_TEMPLATE_FAILED = new ErrorCode(1_002_031_003, "发送会议模板消息异常！");
 
     // ========== 用户汇报配置 1-002-032-000 ==========
     ErrorCode USER_REPORT_NOT_EXISTS = new ErrorCode(1_002_032_000, "汇报信息不存在");

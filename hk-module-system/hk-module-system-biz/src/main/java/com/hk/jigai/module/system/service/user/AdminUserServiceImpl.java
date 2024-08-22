@@ -295,7 +295,6 @@ public class AdminUserServiceImpl implements AdminUserService {
         requestMap.put("offset", (reqVO.getPageNo()-1) * reqVO.getPageSize());
         requestMap.put("pageSize", reqVO.getPageSize());
         Integer count = userMapper.selectCount1(requestMap);
-        Integer total = count%reqVO.getPageSize() == 0 ? count/reqVO.getPageSize() :(count/reqVO.getPageSize()+1);
         PageResult<AdminUserDO> result = new PageResult<>();
         result.setTotal(Long.valueOf(count));
         result.setList(userMapper.selectPage(requestMap));

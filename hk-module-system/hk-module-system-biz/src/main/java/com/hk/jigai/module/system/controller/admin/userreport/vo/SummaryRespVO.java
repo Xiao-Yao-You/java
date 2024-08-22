@@ -1,5 +1,6 @@
 package com.hk.jigai.module.system.controller.admin.userreport.vo;
 
+import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.module.system.dal.dataobject.userreport.UserSummaryReportDO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -13,6 +14,6 @@ public class SummaryRespVO {
     private List<String> notSubmitUserNameList;
 
     @Schema(description = "汇报列表")
-    private List<UserSummaryReportDO> reportList;
+    private PageResult<UserSummaryReportDO> reportList;
 
 }

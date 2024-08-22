@@ -180,12 +180,17 @@ public class UserReportServiceImpl implements UserReportService {
 
     @Override
     public SummaryRespVO summary(StatisticsReqVO reqVO){
-        reqVO.setUserId(String.valueOf(getLoginUserId()));
+        reqVO.setOffset((reqVO.getPageNo()-1) * reqVO.getPageSize());
         SummaryRespVO result = new SummaryRespVO();
+        reqVO.setUserId(String.valueOf(getLoginUserId()));
         //1.查询出漏交人员姓名
         result.setNotSubmitUserNameList(userReportMapper.queryNotSubmitUser(reqVO));
-        //2.查询灰熊记录
-        result.setReportList(userReportMapper.querySummaryReport(reqVO));
+        //2.查询汇报记录
+        Integer count = userReportMapper.selectCount1(reqVO);
+        PageResult<UserSummaryReportDO> page = new PageResult<>();
+        page.setTotal(Long.valueOf(count));
+        page.setList(userReportMapper.querySummaryReport(reqVO));
+        result.setReportList(page);
         return result;
     }
 
