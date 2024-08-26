@@ -32,7 +32,7 @@ import com.hk.jigai.module.system.service.userreport.ReportAttentionService;
 
 @Tag(name = "管理后台 - 汇报关注跟进")
 @RestController
-@RequestMapping("/hk/report-attention")
+@RequestMapping("/report-attention")
 @Validated
 public class ReportAttentionController {
 
