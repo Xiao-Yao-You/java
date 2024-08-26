@@ -31,4 +31,7 @@ public class UserSummaryReportDO extends BaseDO {
     @Schema(description = "关注userId,有值表示已关注")
     private Long attentionUserId;
 
+    @Schema(description = "0:工作进度,1:工作计划")
+    private Long type;
+
 }

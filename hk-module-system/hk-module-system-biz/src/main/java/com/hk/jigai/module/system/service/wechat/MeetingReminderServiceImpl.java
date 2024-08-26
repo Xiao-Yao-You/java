@@ -9,8 +9,10 @@ import com.hk.jigai.module.system.dal.dataobject.meetingroominfo.UserBookMeeting
 import com.hk.jigai.module.system.dal.mysql.meetingroominfo.MeetingPersonAttendRecordMapper;
 import com.hk.jigai.module.system.dal.mysql.meetingroominfo.MeetingRoomInfoMapper;
 import com.hk.jigai.module.system.dal.mysql.meetingroominfo.UserBookMeetingMapper;
+import com.hk.jigai.module.system.dal.mysql.user.AdminUserMapper;
 import com.hk.jigai.module.system.dal.redis.RedisKeyConstants;
 import com.hk.jigai.module.system.service.user.AdminUserService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -30,10 +32,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 
 import static com.hk.jigai.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -42,6 +41,7 @@ import static com.hk.jigai.module.system.enums.ErrorCodeConstants.USER_REPORT_EX
 
 @Service
 @Validated
+@Slf4j
 public class MeetingReminderServiceImpl implements MeetingReminderService{
     @Resource
     private UserBookMeetingMapper userBookMeetingMapper;
@@ -53,6 +53,9 @@ public class MeetingReminderServiceImpl implements MeetingReminderService{
     private RestTemplate restTemplate;
     @Resource
     private AdminUserService adminUserService;
+
+    @Resource
+    private AdminUserMapper adminUserMapper;
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
@@ -127,10 +130,15 @@ public class MeetingReminderServiceImpl implements MeetingReminderService{
                     //2.发送诶新消息
                     //2.1 查询该会议下，所有参与人的openid
                     List<String> openidList = meetingPersonAttendRecordMapper.selectOpenidByMeetingId(meetingId);
-                    if(!CollectionUtils.isAnyEmpty(openidList)){
+                    String launchOpenid = adminUserMapper.selectById(userBookMeetingDO.getUserId()).getOpenid();
+                    if(StringUtils.isNotBlank(launchOpenid)){
+                        openidList.add(launchOpenid);
+                    }
+                    Set<String> openidSet = new HashSet<String>(openidList);
+                    if(!CollectionUtils.isAnyEmpty(openidSet)){
                         HttpHeaders headers = new HttpHeaders();
                         headers.setContentType(MediaType.APPLICATION_JSON);
-                        for(String openid : openidList){
+                        for(String openid : openidSet){
                             Integer startTime = userBookMeetingDO.getStartTime();
                             int a = (startTime.intValue()-1 )%2 ;
                             int hour = (startTime.intValue()-1 )/2 ;
@@ -161,14 +169,14 @@ public class MeetingReminderServiceImpl implements MeetingReminderService{
                             HashMap result = restTemplate.exchange("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token="+authToken, HttpMethod.POST, requestEntity,
                                     new ParameterizedTypeReference<HashMap>() {}).getBody();
                             if(result == null || !"0".equals((String)result.get("errcode"))){
-                                throw new Exception("发送会议消息异常" + (String)result.get("errcode") + ":" +(String)result.get("errmsg"));
+                                log.info("发送会议消息异常" + (String)result.get("errcode") + ":" +(String)result.get("errmsg"));
                             }
                         }
                     }
                 }
             }
         } catch (Exception e){
-            throw exception(MEETING_SEND_TEMPLATE_FAILED);
+            log.info("发送会议模板消息异常！", e);
         }
     }
 }

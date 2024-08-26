@@ -18,6 +18,7 @@ import com.hk.jigai.module.system.dal.mysql.permission.UserRoleMapper;
 import com.hk.jigai.module.system.dal.mysql.user.AdminUserMapper;
 import com.hk.jigai.module.system.enums.permission.RoleCodeEnum;
 import com.hk.jigai.module.system.service.wechat.MeetingReminderService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -25,6 +26,7 @@ import javax.annotation.Resource;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -49,6 +51,7 @@ import static com.hk.jigai.module.system.enums.ErrorCodeConstants.*;
  */
 @Service
 @Validated
+@Slf4j
 public class UserBookMeetingServiceImpl implements UserBookMeetingService {
 
     @Resource
@@ -133,6 +136,9 @@ public class UserBookMeetingServiceImpl implements UserBookMeetingService {
         LocalDate dateMeeting = createReqVO.getDateMeeting();
         LocalDateTime meetingTime = LocalDateTime.of(dateMeeting.getYear(),dateMeeting.getMonth(),dateMeeting.getDayOfMonth(),hour,(a==1)?30:0);
         meetingReminderService.scheduleReminder(new Long(userBookMeeting.getId()), meetingTime);
+        if(Duration.between(LocalDateTime.now(),meetingTime).toMinutes()>15){
+            meetingReminderService.sendReminder(new Long(userBookMeeting.getId()));
+        }
         // 返回
         return userBookMeeting.getId();
     }
@@ -173,7 +179,6 @@ public class UserBookMeetingServiceImpl implements UserBookMeetingService {
             personAttendRecordList.add(personAttendRecord);
         }
         meetingPersonAttendRecordMapper.insertBatch(personAttendRecordList);
-
         meetingReminderService.updateReminder(updateReqVO.getId());
     }
 
@@ -187,7 +192,6 @@ public class UserBookMeetingServiceImpl implements UserBookMeetingService {
         meetingRoomBookRecordMapper.deleteByMeetingBookId(id);
         meetingPersonAttendRecordMapper.deleteByMeetingBookId(id);
         meetingReminderService.updateReminder(id);
-
     }
 
     @Override
