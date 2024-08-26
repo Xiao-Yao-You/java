@@ -81,7 +81,7 @@ public class ReportAttentionServiceImpl implements ReportAttentionService {
     public Long createAttention(CreateAttentionReqVO request) {
         //1、根据jobId查询相关信息，并校验当前登录人是否有权限做关注操作
         AttentionOtherInfoDO attentionOtherInfoDO;
-        if(request.getType().equals(new Long(0))){
+        if(request.getType().equals(new Integer(0))){
             attentionOtherInfoDO = userReportMapper.queryByschedule(request.getJobId());
         }else{
             attentionOtherInfoDO = userReportMapper.queryByPlan(request.getJobId());
