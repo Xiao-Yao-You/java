@@ -1,14 +1,21 @@
 package com.hk.jigai.module.system.dal.dataobject.userreport;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.hk.jigai.framework.mybatis.core.dataobject.BaseDO;
 import com.hk.jigai.framework.mybatis.core.type.JsonLongSetTypeHandler;
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.Set;
 
+@TableName(autoResultMap = true)
 @Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class AttentionOtherInfoDO extends BaseDO {
 
     /**
@@ -34,7 +41,6 @@ public class AttentionOtherInfoDO extends BaseDO {
     /**
      * 汇报对象集合
      */
-    @TableField(typeHandler = JsonLongSetTypeHandler.class)
     private Set<Long> reportObject;
     /**
      * 部门id

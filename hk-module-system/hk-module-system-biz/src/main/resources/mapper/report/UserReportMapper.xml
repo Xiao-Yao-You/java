@@ -132,10 +132,9 @@
         order by h.date_report desc
     </select>
 
-    <select id="queryByschedule" parameterType="Long"
-            resultType="com.hk.jigai.module.system.dal.dataobject.userreport.AttentionOtherInfoDO">
+    <select id="queryByschedule" parameterType="Long" resultMap="jobMap">
         select a.content,
-               a.connect_content,
+               a.connect_content as connectContent,
                b.user_id        as userId,
                b.user_nick_name as userNickName,
                b.date_report    as dateReport,
@@ -147,8 +146,7 @@
           and a.deleted = 0
     </select>
 
-    <select id="queryByPlan" parameterType="Long"
-            resultType="com.hk.jigai.module.system.dal.dataobject.userreport.AttentionOtherInfoDO">
+    <select id="queryByPlan" parameterType="Long" resultMap="jobMap">
         select a.content,
                b.user_id        as userId,
                b.user_nick_name as userNickName,
@@ -160,4 +158,14 @@
         where a.id = #{jobId}
           and a.deleted = 0
     </select>
+
+    <resultMap id="jobMap" type="com.hk.jigai.module.system.dal.dataobject.userreport.AttentionOtherInfoDO">
+        <result property="content" column="content"/>
+        <result property="connectContent" column="connectContent"/>
+        <result property="userId" column="userId"/>
+        <result property="userNickName" column="userNickName"/>
+        <result property="dateReport" column="dateReport"/>
+        <result property="reportObject" column="reportObject" typeHandler="com.hk.jigai.framework.mybatis.core.type.JsonLongSetTypeHandler"/>
+        <result property="deptId" column="deptId"/>
+    </resultMap>
 </mapper>

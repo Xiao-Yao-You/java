@@ -105,6 +105,7 @@ public class ReportAttentionServiceImpl implements ReportAttentionService {
         reportAttentionDO.setUserId(loginUserId);
         reportAttentionDO.setUserNickName(getLoginUserNickname());
         reportAttentionDO.setType(request.getType());
+        reportAttentionDO.setJobId(request.getJobId());
         //3.做插入操作
         reportAttentionMapper.insert(reportAttentionDO);
         return reportAttentionDO.getId();
