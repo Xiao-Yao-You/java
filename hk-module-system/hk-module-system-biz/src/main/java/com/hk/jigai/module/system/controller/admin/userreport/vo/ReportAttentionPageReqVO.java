@@ -47,6 +47,9 @@ public class ReportAttentionPageReqVO extends PageParam {
     @Schema(description = "跟进人id", example = "11207")
     private Long replyUserId;
 
+    @Schema(description = "汇报人姓名", example = "你猜")
+    private String replyUserNickName;
+
     @Schema(description = "跟进的完成情况")
     private String situation;
 

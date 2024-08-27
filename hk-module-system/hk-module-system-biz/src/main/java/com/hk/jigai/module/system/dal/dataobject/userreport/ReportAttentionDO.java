@@ -1,5 +1,6 @@
 package com.hk.jigai.module.system.dal.dataobject.userreport;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import com.baomidou.mybatisplus.annotation.*;
 import com.hk.jigai.framework.mybatis.core.dataobject.BaseDO;
@@ -54,6 +55,11 @@ public class ReportAttentionDO extends BaseDO {
      * 部门id
      */
     private Long deptId;
+
+    /**
+     * 部门name
+     */
+    private Long deptName;
     /**
      * 汇报日期
      */
@@ -70,6 +76,7 @@ public class ReportAttentionDO extends BaseDO {
      * 跟进人id
      */
     private Long replyUserId;
+
     /**
      * 跟进人昵称
      */

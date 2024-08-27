@@ -139,7 +139,8 @@
                b.user_nick_name as userNickName,
                b.date_report    as dateReport,
                b.report_object  as reportObject,
-               b.dept_id        as deptId
+               b.dept_id        as deptId,
+               b.dept_name      as deptName
         from hk_report_job_schedule a
                  join hk_user_report b on a.user_report_id = b.id and b.deleted = 0
         where a.id = #{jobId}
@@ -152,7 +153,8 @@
                b.user_nick_name as userNickName,
                b.date_report    as dateReport,
                b.report_object  as reportObject,
-               b.dept_id        as deptId
+               b.dept_id        as deptId,
+               b.dept_name      as deptName
         from hk_report_job_plan a
                  join hk_user_report b on a.user_report_id = b.id and b.deleted = 0
         where a.id = #{jobId}
@@ -167,5 +169,6 @@
         <result property="dateReport" column="dateReport"/>
         <result property="reportObject" column="reportObject" typeHandler="com.hk.jigai.framework.mybatis.core.type.JsonLongSetTypeHandler"/>
         <result property="deptId" column="deptId"/>
+        <result property="deptName" column="deptName"/>
     </resultMap>
 </mapper>

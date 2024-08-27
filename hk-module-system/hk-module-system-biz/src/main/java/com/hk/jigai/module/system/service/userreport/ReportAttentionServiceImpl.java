@@ -100,6 +100,7 @@ public class ReportAttentionServiceImpl implements ReportAttentionService {
         reportAttentionDO.setConnectContent(attentionOtherInfoDO.getConnectContent());
         reportAttentionDO.setReply(request.getReply());
         reportAttentionDO.setDeptId(attentionOtherInfoDO.getDeptId());
+        reportAttentionDO.setDeptName(attentionOtherInfoDO.getDeptName());
         reportAttentionDO.setReplyUserId(attentionOtherInfoDO.getUserId());
         reportAttentionDO.setReplyUserNickName(attentionOtherInfoDO.getUserNickName());
         reportAttentionDO.setUserId(loginUserId);

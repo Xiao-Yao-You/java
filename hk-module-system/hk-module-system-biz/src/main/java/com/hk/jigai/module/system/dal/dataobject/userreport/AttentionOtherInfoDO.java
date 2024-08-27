@@ -46,4 +46,9 @@ public class AttentionOtherInfoDO extends BaseDO {
      * 部门id
      */
     private Long deptId;
+
+    /**
+     * 部门name
+     */
+    private Long deptName;
 }
