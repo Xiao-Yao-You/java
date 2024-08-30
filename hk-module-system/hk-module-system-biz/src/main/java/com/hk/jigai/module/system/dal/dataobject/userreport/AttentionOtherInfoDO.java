@@ -1,9 +1,7 @@
 package com.hk.jigai.module.system.dal.dataobject.userreport;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.hk.jigai.framework.mybatis.core.dataobject.BaseDO;
-import com.hk.jigai.framework.mybatis.core.type.JsonLongSetTypeHandler;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -50,5 +48,5 @@ public class AttentionOtherInfoDO extends BaseDO {
     /**
      * 部门name
      */
-    private Long deptName;
+    private String deptName;
 }

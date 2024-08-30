@@ -59,11 +59,22 @@ public class ReportAttentionDO extends BaseDO {
     /**
      * 部门name
      */
-    private Long deptName;
+    private String deptName;
     /**
      * 汇报日期
      */
     private LocalDate dateReport;
+
+    /**
+     * 汇报人id
+     */
+    private Long reportUserId;
+
+    /**
+     * 汇报人昵称
+     */
+    private String reportUserNickName;
+
     /**
      * 关注事项工作内容
      */

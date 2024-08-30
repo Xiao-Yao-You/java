@@ -10,6 +10,8 @@ import com.hk.jigai.module.system.dal.dataobject.userreport.ReportAttentionDO;
 import org.apache.ibatis.annotations.Mapper;
 import com.hk.jigai.module.system.controller.admin.userreport.vo.*;
 
+import static com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+
 /**
  * 汇报关注跟进 Mapper
  *
@@ -26,7 +28,9 @@ public interface ReportAttentionMapper extends BaseMapperX<ReportAttentionDO> {
                 .eqIfPresent(ReportAttentionDO::getJobId, reqVO.getJobId())
                 .eqIfPresent(ReportAttentionDO::getConnectContent, reqVO.getConnectContent())
                 .eqIfPresent(ReportAttentionDO::getDeptId, reqVO.getDeptId())
-                .eqIfPresent(ReportAttentionDO::getDateReport, reqVO.getDateReport())
+                .betweenIfPresent(ReportAttentionDO::getDateReport, reqVO.getDateReport())
+                .likeIfPresent(ReportAttentionDO::getReplyUserNickName, reqVO.getReplyUserNickName())
+                .likeIfPresent(ReportAttentionDO::getReportUserNickName, reqVO.getReportUserNickName())
                 .eqIfPresent(ReportAttentionDO::getContent, reqVO.getContent())
                 .eqIfPresent(ReportAttentionDO::getTransferRemark, reqVO.getTransferRemark())
                 .eqIfPresent(ReportAttentionDO::getReplyUserId, reqVO.getReplyUserId())
@@ -34,6 +38,13 @@ public interface ReportAttentionMapper extends BaseMapperX<ReportAttentionDO> {
                 .eqIfPresent(ReportAttentionDO::getReplyStatus, reqVO.getReplyStatus())
                 .eqIfPresent(ReportAttentionDO::getJobScheduleId, reqVO.getJobScheduleId())
                 .betweenIfPresent(ReportAttentionDO::getCreateTime, reqVO.getCreateTime())
+                .orderByDesc(ReportAttentionDO::getId));
+    }
+
+    default List<ReportAttentionDO> selectList() {
+        return selectList(new LambdaQueryWrapperX<ReportAttentionDO>()
+                .eqIfPresent(ReportAttentionDO::getReplyUserId, getLoginUserId())
+                .eqIfPresent(ReportAttentionDO::getReplyStatus, "0")
                 .orderByDesc(ReportAttentionDO::getId));
     }
 

@@ -8,6 +8,7 @@ import com.hk.jigai.module.system.controller.admin.userreport.vo.*;
 import com.hk.jigai.module.system.dal.dataobject.userreport.ReportAttentionDO;
 import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.common.pojo.PageParam;
+import com.hk.jigai.module.system.dal.dataobject.userreport.ReportTransferRecordDO;
 import org.springframework.web.bind.annotation.RequestBody;
 
 /**
@@ -49,6 +50,12 @@ public interface ReportAttentionService {
     PageResult<ReportAttentionDO> getReportAttentionPage(ReportAttentionPageReqVO pageReqVO);
 
     /**
+     * 查询当前登录人未跟进的跟进列表
+     * @return
+     */
+    List<ReportAttentionDO> queryFollowUndo();
+
+    /**
      * 关注操作
      * @param request
      * @return
@@ -67,5 +74,12 @@ public interface ReportAttentionService {
      * @return
      */
     Long follow(ReportAttentionFollowReqVO updateReqVO);
+
+    /**
+     * 查询关注的转交记录
+     * @param id
+     * @return
+     */
+    List<ReportTransferRecordDO> queryTransferList(Long id);
 
 }

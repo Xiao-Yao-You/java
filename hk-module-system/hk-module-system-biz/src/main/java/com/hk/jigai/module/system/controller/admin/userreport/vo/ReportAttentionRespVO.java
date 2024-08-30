@@ -23,6 +23,10 @@ public class ReportAttentionRespVO {
     @ExcelProperty("部门领导id")
     private Long userId;
 
+    @Schema(description = "部门领导name")
+    @ExcelProperty("部门领导name")
+    private String userNickName;
+
     @Schema(description = "部门领导批复")
     @ExcelProperty("部门领导批复")
     private String reply;
@@ -45,11 +49,20 @@ public class ReportAttentionRespVO {
 
     @Schema(description = "部门name")
     @ExcelProperty("部门name")
-    private Long deptName;
+    private String deptName;
 
     @Schema(description = "汇报日期", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("汇报日期")
     private LocalDate dateReport;
+
+    @Schema(description = "汇报人")
+    @ExcelProperty("汇报人")
+    private Long reportUserId;
+
+    @Schema(description = "汇报人昵称")
+    @ExcelProperty("汇报人昵称")
+    private String reportUserNickName;
+
 
     @Schema(description = "关注事项工作内容")
     @ExcelProperty("关注事项工作内容")

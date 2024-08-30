@@ -73,8 +73,9 @@
     <select id="querySummaryReport"
             parameterType="com.hk.jigai.module.system.controller.admin.userreport.vo.StatisticsReqVO"
             resultType="com.hk.jigai.module.system.dal.dataobject.userreport.UserSummaryReportDO">
-        SELECT a.content as content,e.user_nick_name as userNickName,e.id as userReportId,
-        a.situation,a.connect_id,a.connect_content,a.id as reportScheduleId,c.user_id as attentionUserId,c.type
+        SELECT  e.user_nick_name as userNickName,e.id as userReportId,e.commit_time as commitTime, e.date_report as dateReport,
+                a.content as content,a.situation,a.connect_id,a.connect_content,a.id as reportScheduleId,
+                c.user_id as attentionUserId,c.type,c.user_id as userId, c.user_nick_name as userName,c.reply as reply, c.reply_status as replyStatus
         FROM hk_user_report e
         join hk_report_job_schedule a on e.id = a.user_report_id and a.deleted = 0
         left join hk_report_attention c on a.id = c.job_id and c.type = 0 and c.deleted=0 and c.user_id = #{userId}

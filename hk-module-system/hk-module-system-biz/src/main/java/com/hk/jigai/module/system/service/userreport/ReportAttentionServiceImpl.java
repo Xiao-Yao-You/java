@@ -2,11 +2,11 @@ package com.hk.jigai.module.system.service.userreport;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hk.jigai.framework.common.util.collection.CollectionUtils;
-import com.hk.jigai.module.system.dal.dataobject.userreport.AttentionOtherInfoDO;
-import com.hk.jigai.module.system.dal.dataobject.userreport.ReportJobScheduleDO;
-import com.hk.jigai.module.system.dal.dataobject.userreport.UserReportDO;
+import com.hk.jigai.framework.security.core.LoginUser;
+import com.hk.jigai.module.system.dal.dataobject.userreport.*;
 import com.hk.jigai.module.system.dal.mysql.dept.DeptMapper;
 import com.hk.jigai.module.system.dal.mysql.userreport.ReportJobScheduleMapper;
+import com.hk.jigai.module.system.dal.mysql.userreport.ReportTransferRecordMapper;
 import com.hk.jigai.module.system.dal.mysql.userreport.UserReportMapper;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
@@ -16,13 +16,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import com.hk.jigai.module.system.controller.admin.userreport.vo.*;
-import com.hk.jigai.module.system.dal.dataobject.userreport.ReportAttentionDO;
 import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.common.util.object.BeanUtils;
 import com.hk.jigai.module.system.dal.mysql.userreport.ReportAttentionMapper;
 import static com.hk.jigai.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
-import static com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils.getLoginUserNickname;
+import static com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils.*;
+import static com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils.getLoginUser;
 import static com.hk.jigai.module.system.enums.ErrorCodeConstants.*;
 
 /**
@@ -42,6 +41,8 @@ public class ReportAttentionServiceImpl implements ReportAttentionService {
     private UserReportMapper userReportMapper;
     @Resource
     private DeptMapper deptMapper;
+    @Resource
+    private ReportTransferRecordMapper reportTransferRecordMapper;
 
     @Override
     public void updateReportAttention(ReportAttentionSaveReqVO updateReqVO) {
@@ -76,6 +77,10 @@ public class ReportAttentionServiceImpl implements ReportAttentionService {
         return reportAttentionMapper.selectPage(pageReqVO);
     }
 
+    @Override
+    public List<ReportAttentionDO> queryFollowUndo() {
+        return reportAttentionMapper.selectList();
+    }
 
     @Override
     public Long createAttention(CreateAttentionReqVO request) {
@@ -103,6 +108,8 @@ public class ReportAttentionServiceImpl implements ReportAttentionService {
         reportAttentionDO.setDeptName(attentionOtherInfoDO.getDeptName());
         reportAttentionDO.setReplyUserId(attentionOtherInfoDO.getUserId());
         reportAttentionDO.setReplyUserNickName(attentionOtherInfoDO.getUserNickName());
+        reportAttentionDO.setReportUserId(attentionOtherInfoDO.getUserId());
+        reportAttentionDO.setReportUserNickName(attentionOtherInfoDO.getUserNickName());
         reportAttentionDO.setUserId(loginUserId);
         reportAttentionDO.setUserNickName(getLoginUserNickname());
         reportAttentionDO.setType(request.getType());
@@ -113,12 +120,22 @@ public class ReportAttentionServiceImpl implements ReportAttentionService {
     }
 
     @Override
+    @Transactional
     public void transfer(ReportAttentionTransferReqVO updateReqVO) {
         // 校验存在
         validateReportAttentionExists(updateReqVO.getId());
         // 更新
         ReportAttentionDO updateObj = BeanUtils.toBean(updateReqVO, ReportAttentionDO.class);
         reportAttentionMapper.updateById(updateObj);
+        ReportTransferRecordDO reportTransferRecordDO = new ReportTransferRecordDO();
+        reportTransferRecordDO.setTransferRemark(updateReqVO.getTransferRemark());
+        reportTransferRecordDO.setTransferTime(LocalDateTime.now());
+        reportTransferRecordDO.setReportAttentionId(updateReqVO.getId());
+        reportTransferRecordDO.setOperatorNickName(getLoginUserNickname());
+        reportTransferRecordDO.setOperatorUserId(getLoginUserId());
+        reportTransferRecordDO.setReplyUserId(updateReqVO.getReplyUserId());
+        reportTransferRecordDO.setReplyUserNickName(updateReqVO.getReplyUserNickName());
+        reportTransferRecordMapper.insert(reportTransferRecordDO);
     }
 
     @Override
@@ -153,7 +170,10 @@ public class ReportAttentionServiceImpl implements ReportAttentionService {
         }
         ReportJobScheduleDO reportJobScheduleDO = new ReportJobScheduleDO();
         reportJobScheduleDO.setUserReportId(userReportDOS.getId());
-        reportJobScheduleDO.setContent(reportAttentionDO.getContent());
+        reportJobScheduleDO.setContent(updateReqVO.getContent());
+        reportJobScheduleDO.setSituation(updateReqVO.getSituation());
+        reportJobScheduleDO.setConnectContent(reportAttentionDO.getContent());
+        reportJobScheduleDO.setConnectId(updateReqVO.getId());
         reportJobScheduleMapper.insert(reportJobScheduleDO);
 
         //3.更新
@@ -163,5 +183,13 @@ public class ReportAttentionServiceImpl implements ReportAttentionService {
         reportAttentionMapper.updateById(updateObj);
         //4.返回
         return reportJobScheduleDO.getId();
+    }
+
+    @Override
+    public List<ReportTransferRecordDO> queryTransferList(Long id) {
+        return reportTransferRecordMapper.selectList(new QueryWrapper<ReportTransferRecordDO>().lambda()
+                .eq(ReportTransferRecordDO::getReportAttentionId, id)
+                .orderByDesc(ReportTransferRecordDO::getId)
+        );
     }
 }

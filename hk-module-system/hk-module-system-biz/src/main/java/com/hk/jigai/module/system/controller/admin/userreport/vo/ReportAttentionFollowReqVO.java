@@ -15,4 +15,7 @@ public class ReportAttentionFollowReqVO {
 
     private String replyStatus;
 
+    @Schema(description = "新的进度工作内容")
+    private String content;
+
 }

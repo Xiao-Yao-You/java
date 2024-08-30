@@ -1,5 +1,6 @@
 package com.hk.jigai.module.system.controller.admin.userreport;
 
+import com.hk.jigai.module.system.dal.dataobject.userreport.ReportTransferRecordDO;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -112,6 +113,14 @@ public class ReportAttentionController {
         return success(BeanUtils.toBean(pageResult, ReportAttentionRespVO.class));
     }
 
+    @GetMapping("/queryFollowUndo")
+    @Operation(summary = "跟进列表未跟进的")
+    @PreAuthorize("@ss.hasPermission('hk:report-follow:query')")
+    public CommonResult<List<ReportAttentionRespVO>> queryFollowUndo() {
+        List<ReportAttentionDO> list = reportAttentionService.queryFollowUndo();
+        return success(BeanUtils.toBean(list, ReportAttentionRespVO.class));
+    }
+
     @PutMapping("/transfer")
     @Operation(summary = "转交")
     @PreAuthorize("@ss.hasPermission('hk:report-transfer:update')")
@@ -125,5 +134,13 @@ public class ReportAttentionController {
     @PreAuthorize("@ss.hasPermission('hk:report-follow:update')")
     public CommonResult<Long> follow(@Valid @RequestBody ReportAttentionFollowReqVO updateReqVO) {
         return success(reportAttentionService.follow(updateReqVO));
+    }
+
+    @GetMapping("/queryTransferList")
+    @Operation(summary = "查询关注的转交记录")
+    @PreAuthorize("@ss.hasPermission('hk:hk_report_transfer_record:update')")
+    public CommonResult<List<ReportTransferRecordRespVO>> queryTransferList(@RequestParam("id") Long id) {
+        List<ReportTransferRecordDO> list = reportAttentionService.queryTransferList(id);
+        return success(BeanUtils.toBean(list, ReportTransferRecordRespVO.class));
     }
 }
