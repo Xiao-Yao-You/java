@@ -97,10 +97,13 @@ public class UserReportServiceImpl implements UserReportService {
         validateUserReportExists(updateReqVO.getId());
         UserReportDO updateObj = BeanUtils.toBean(updateReqVO, UserReportDO.class);
         //根据汇报日期校验当天是否已经提交过汇报
-        List<UserReportDO> userReportDOS = userReportMapper.selectList(new QueryWrapper<UserReportDO>().lambda()
+//        List<UserReportDO> userReportDOS = userReportMapper.selectList(new QueryWrapper<UserReportDO>().lambda()
+//                .eq(UserReportDO::getDateReport, updateReqVO.getDateReport())
+//                .eq(UserReportDO::getDeptId, updateObj.getDeptId()));
+        UserReportDO userReportDOS = userReportMapper.selectOne(new QueryWrapper<UserReportDO>().lambda()
                 .eq(UserReportDO::getDateReport, updateReqVO.getDateReport())
                 .eq(UserReportDO::getDeptId, updateObj.getDeptId()));
-        if (CollectionUtil.isNotEmpty(userReportDOS)) {
+        if (userReportDOS != null && updateReqVO.getId() != userReportDOS.getId()) {
             throw exception(USER_REPORT_EXISTS);
         }
         //设置汇报类型，当天为正常0，往期为补交1
@@ -172,15 +175,15 @@ public class UserReportServiceImpl implements UserReportService {
         //先查询汇报给当前人的
         List<StatisticsRespVO> list = userReportMapper.statistics(reqVO);
         //如果未查到汇报给自己的，显示自己的汇报数据
-        if(CollectionUtils.isAnyEmpty(list)){
+        if (CollectionUtils.isAnyEmpty(list)) {
             list = userReportMapper.statisticsSelf(reqVO);
         }
         return list;
     }
 
     @Override
-    public SummaryRespVO summary(StatisticsReqVO reqVO){
-        reqVO.setOffset((reqVO.getPageNo()-1) * reqVO.getPageSize());
+    public SummaryRespVO summary(StatisticsReqVO reqVO) {
+        reqVO.setOffset((reqVO.getPageNo() - 1) * reqVO.getPageSize());
         SummaryRespVO result = new SummaryRespVO();
         reqVO.setUserId(String.valueOf(getLoginUserId()));
         //1.查询出漏交人员姓名
@@ -198,7 +201,6 @@ public class UserReportServiceImpl implements UserReportService {
     public List<AttentionAlertRespVO> queryAttentionList() {
         return userReportMapper.queryAttentionList(getLoginUserId());
     }
-
 
 
 }
