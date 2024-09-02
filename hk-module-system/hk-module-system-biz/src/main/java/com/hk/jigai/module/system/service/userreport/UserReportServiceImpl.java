@@ -203,6 +203,7 @@ public class UserReportServiceImpl implements UserReportService {
 
     @Override
     public ReportJobScheduleDO getScheduleInfo(Long id) {
-        return reportJobScheduleMapper.selectById(id);
+        return reportJobScheduleMapper.selectOne(new QueryWrapper<ReportJobScheduleDO>()
+                .lambda().eq(ReportJobScheduleDO::getConnectId, id));
     }
 }
