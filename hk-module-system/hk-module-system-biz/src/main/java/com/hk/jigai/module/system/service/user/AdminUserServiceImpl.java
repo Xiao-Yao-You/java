@@ -361,15 +361,14 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     /**
      * 获得部门条件：查询指定部门的子部门编号们，包括自身
-     * @param deptIdJson 部门编号
+     * @param deptIdArray 部门编号
      * @return 部门编号集合
      */
-    private Set<Long> getDeptCondition(String deptIdJson, Long deptId) {
-        Set<Long> deptIdSet = null;
-        if(StringUtils.isNotBlank(deptIdJson)){
-            List<Long> deptIdList = JsonUtils.parseArray(deptIdJson, Long.class);
-            if(!CollectionUtils.isAnyEmpty(deptIdList)){
-                deptIdSet = new HashSet<>(deptIdList);
+    private Set<Long> getDeptCondition(Long[] deptIdArray, Long deptId) {
+        Set<Long> deptIdSet = new HashSet<>();
+        if(deptIdArray != null && deptIdArray.length>0){
+            for (Long id : deptIdArray) { // 遍历Long数组中的每个元素
+                deptIdSet.add(id);
             }
         }
         if (CollectionUtils.isAnyEmpty(deptIdSet) && deptId ==null) {

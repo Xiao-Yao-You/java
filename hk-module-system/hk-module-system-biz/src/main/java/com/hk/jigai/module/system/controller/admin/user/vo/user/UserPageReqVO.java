@@ -36,7 +36,7 @@ public class UserPageReqVO extends PageParam {
     private LocalDateTime[] createTime;
 
     @Schema(description = "部门编号，同时筛选子部门")
-    private String deptIds;
+    private Long[] deptIds;
 
     @Schema(description = "部门编号，同时筛选子部门")
     private Long deptId;
