@@ -31,7 +31,7 @@ public interface UserReportMapper extends BaseMapperX<UserReportDO> {
                 .betweenIfPresent(UserReportDO::getDateReport, reqVO.getDateReport())
                 .likeIfPresent(UserReportDO::getUserNickName, reqVO.getUserNickName())
                 .and(ss -> ss.eq(UserReportDO::getUserId,  getLoginUserId())
-                        .like(UserReportDO::getReportObject, userId)
+                        .or().like(UserReportDO::getReportObject, userId)
                         .or().likeLeft(UserReportDO::getReportObject, userId + "]")
                         .or().likeRight(UserReportDO::getReportObject, "[" + userId)
                         .or().eq(UserReportDO::getReportObject, "[" + userId + "]"))
