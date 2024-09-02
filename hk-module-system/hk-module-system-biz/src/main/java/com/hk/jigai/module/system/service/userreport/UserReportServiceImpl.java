@@ -201,5 +201,8 @@ public class UserReportServiceImpl implements UserReportService {
         return userReportMapper.queryAttentionList(getLoginUserId());
     }
 
-
+    @Override
+    public ReportJobScheduleDO getScheduleInfo(Long id) {
+        return reportJobScheduleMapper.selectById(id);
+    }
 }

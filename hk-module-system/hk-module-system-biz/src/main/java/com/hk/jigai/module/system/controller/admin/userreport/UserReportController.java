@@ -1,8 +1,11 @@
 package com.hk.jigai.module.system.controller.admin.userreport;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.hk.jigai.module.system.controller.admin.reportjobschedule.vo.ReportJobScheduleRespVO;
 import com.hk.jigai.module.system.controller.admin.userreport.vo.*;
 import com.hk.jigai.module.system.dal.dataobject.user.AdminUserDO;
+import com.hk.jigai.module.system.dal.dataobject.userreport.ReportAttentionDO;
+import com.hk.jigai.module.system.dal.dataobject.userreport.ReportJobScheduleDO;
 import com.hk.jigai.module.system.dal.dataobject.userreport.UserReportDO;
 import com.hk.jigai.module.system.service.user.AdminUserService;
 import com.hk.jigai.module.system.service.userreport.UserReportService;
@@ -129,13 +132,18 @@ public class UserReportController {
             dateArr.add(currentStart);
             dateArr.add(currentEnd);
             reqVO.setDateReport(dateArr);
-//            LocalDate[] dates = new LocalDate[2];
-//            dates[0] = LocalDate.now();
-//            dates[1] = LocalDate.now();
-//            reqVO.setDateReport(dates);
         }
 
         return success(userReportService.summary(reqVO));
+    }
+
+    @GetMapping("/getScheduleInfo")
+    @Operation(summary = "获得关注的信息")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('hk:report_job_schedule:query')")
+    public CommonResult<ReportJobScheduleRespVO> getScheduleInfo(@RequestParam("id") Long id) {
+        ReportJobScheduleDO reportJobSchedule = userReportService.getScheduleInfo(id);
+        return success(BeanUtils.toBean(reportJobSchedule, ReportJobScheduleRespVO.class));
     }
 
     @GetMapping("/queryAttentionList")
