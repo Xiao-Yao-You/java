@@ -152,6 +152,7 @@ public class BaseInfoJob implements JobHandler {
             postMapper.insertBatch(postList);
         }
         //4.人员处理
+
         //4.1 插入人员  todo 根据员工no先查后插,如果已经存在则简单更新，如果不存在插入
         userMapper.insertBatch(CollectionUtils.convertList(baseInfoList,
                 baseInfo -> new AdminUserDO().setId(baseInfo.getId()).setStatus(0).setPassword(passwordEncoder.encode(JobConstant.FIRST_PASSWORD))

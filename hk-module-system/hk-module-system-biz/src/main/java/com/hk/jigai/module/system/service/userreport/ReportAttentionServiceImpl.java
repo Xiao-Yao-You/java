@@ -177,7 +177,9 @@ public class ReportAttentionServiceImpl implements ReportAttentionService {
         reportJobScheduleMapper.insert(reportJobScheduleDO);
 
         //3.更新
-        ReportAttentionDO updateObj = BeanUtils.toBean(updateReqVO, ReportAttentionDO.class);
+        ReportAttentionDO updateObj = new ReportAttentionDO();
+        updateObj.setId(updateReqVO.getId());
+        updateObj.setSituation(updateReqVO.getSituation());
         updateObj.setReplyStatus("1");
         updateObj.setJobScheduleId(reportJobScheduleDO.getId());
         reportAttentionMapper.updateById(updateObj);

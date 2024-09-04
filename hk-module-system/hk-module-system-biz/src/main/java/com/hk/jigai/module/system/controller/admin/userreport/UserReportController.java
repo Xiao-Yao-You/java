@@ -133,7 +133,6 @@ public class UserReportController {
             dateArr.add(currentEnd);
             reqVO.setDateReport(dateArr);
         }
-
         return success(userReportService.summary(reqVO));
     }
 
