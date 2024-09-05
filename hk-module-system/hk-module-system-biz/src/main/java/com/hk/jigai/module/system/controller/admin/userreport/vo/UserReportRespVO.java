@@ -1,5 +1,6 @@
 package com.hk.jigai.module.system.controller.admin.userreport.vo;
 
+import com.hk.jigai.module.system.dal.dataobject.userreport.ReportAttentionDO;
 import com.hk.jigai.module.system.dal.dataobject.userreport.ReportJobPlanDO;
 import com.hk.jigai.module.system.dal.dataobject.userreport.ReportJobScheduleDO;
 import com.hk.jigai.module.system.dal.dataobject.user.AdminUserDO;
@@ -74,4 +75,7 @@ public class UserReportRespVO {
 
     @Schema(description = "工作计划集合")
     private List<ReportJobPlanDO> reportJobPlanDOList;
+
+    @Schema(description = "工作进度关注集合")
+    private List<ReportAttentionDO> reportAttentionList;
 }

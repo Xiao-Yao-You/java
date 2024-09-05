@@ -33,5 +33,6 @@ public interface DeptMapper extends BaseMapperX<DeptDO> {
 
     void delete();
 
+    Long queryMaxId();
 
 }

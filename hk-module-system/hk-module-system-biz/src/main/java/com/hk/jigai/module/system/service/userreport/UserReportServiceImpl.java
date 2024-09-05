@@ -44,9 +44,9 @@ public class UserReportServiceImpl implements UserReportService {
     @Resource
     private ReportJobPlanMapper reportJobPlanMapper;
     @Resource
-    private DeptMapper deptMapper;
-    @Resource
     private ReportAttentionMapper reportAttentionMapper;
+    @Resource
+    private DeptMapper deptMapper;
 
     @Override
     @Transactional
@@ -156,8 +156,17 @@ public class UserReportServiceImpl implements UserReportService {
     @Override
     public UserReportDO getUserReport(Long id) {
         UserReportDO userReportDO = userReportMapper.selectById(id);
-        userReportDO.setReportJobScheduleDOList(reportJobScheduleMapper.selectList(new QueryWrapper<ReportJobScheduleDO>()
-                .lambda().eq(ReportJobScheduleDO::getUserReportId, id)));
+        List<ReportJobScheduleDO> reportJobScheduleList = reportJobScheduleMapper.selectList(new QueryWrapper<ReportJobScheduleDO>()
+                .lambda().eq(ReportJobScheduleDO::getUserReportId, id));
+        userReportDO.setReportJobScheduleDOList(reportJobScheduleList);
+        if(!CollectionUtils.isAnyEmpty(reportJobScheduleList)){
+            List<Long> jobIdList = new ArrayList<>();
+            for(ReportJobScheduleDO reportJobScheduleDO : reportJobScheduleList){
+                jobIdList.add(reportJobScheduleDO.getId());
+            }
+            reportAttentionMapper.selectList(new QueryWrapper<ReportAttentionDO>()
+                    .lambda().eq(ReportAttentionDO::getUserId, getLoginUserId()).in(ReportAttentionDO::getJobId,jobIdList));
+        }
         userReportDO.setReportJobPlanDOList(reportJobPlanMapper.selectList(new QueryWrapper<ReportJobPlanDO>()
                 .lambda().eq(ReportJobPlanDO::getUserReportId, id)));
         return userReportDO;

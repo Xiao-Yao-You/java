@@ -80,4 +80,7 @@ public class UserReportDO extends BaseDO {
     @TableField(exist = false)
     private List<ReportJobPlanDO> reportJobPlanDOList;
 
+    @TableField(exist = false)
+    private List<ReportAttentionDO> reportAttentionList;
+
 }

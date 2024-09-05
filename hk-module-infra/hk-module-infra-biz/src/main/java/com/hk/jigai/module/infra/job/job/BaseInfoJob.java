@@ -70,7 +70,7 @@ public class BaseInfoJob implements JobHandler {
 
     @Override
     public String execute(String param) throws Exception {
-        deptid = 500;
+        deptid = deptMapper.queryMaxId().intValue() + 1;
         postId = 500;
         userId = 500;
         userDeptId = 500;
