@@ -52,4 +52,10 @@ public class ReportJobScheduleDO extends BaseDO {
      */
     private Long connectId;
 
+    /**
+     * 关注主键
+     */
+    @TableField(exist = false)
+    private Long attentionId;
+
 }

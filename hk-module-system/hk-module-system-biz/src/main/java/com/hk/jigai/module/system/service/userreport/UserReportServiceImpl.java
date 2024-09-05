@@ -164,8 +164,19 @@ public class UserReportServiceImpl implements UserReportService {
             for(ReportJobScheduleDO reportJobScheduleDO : reportJobScheduleList){
                 jobIdList.add(reportJobScheduleDO.getId());
             }
-            reportAttentionMapper.selectList(new QueryWrapper<ReportAttentionDO>()
+            List<ReportAttentionDO> attentionList = reportAttentionMapper.selectList(new QueryWrapper<ReportAttentionDO>()
                     .lambda().eq(ReportAttentionDO::getUserId, getLoginUserId()).in(ReportAttentionDO::getJobId,jobIdList));
+
+            if(!CollectionUtils.isAnyEmpty(attentionList)){
+                for(ReportAttentionDO reportAttentionDO : attentionList){
+                    for(ReportJobScheduleDO reportJobScheduleDO : reportJobScheduleList){
+                        if(reportJobScheduleDO.getId().equals(reportAttentionDO.getJobId())){
+                            reportJobScheduleDO.setAttentionId(reportAttentionDO.getId());
+                            continue;
+                        }
+                    }
+                }
+            }
         }
         userReportDO.setReportJobPlanDOList(reportJobPlanMapper.selectList(new QueryWrapper<ReportJobPlanDO>()
                 .lambda().eq(ReportJobPlanDO::getUserReportId, id)));

@@ -75,7 +75,4 @@ public class UserReportRespVO {
 
     @Schema(description = "工作计划集合")
     private List<ReportJobPlanDO> reportJobPlanDOList;
-
-    @Schema(description = "工作进度关注集合")
-    private List<ReportAttentionDO> reportAttentionList;
 }
