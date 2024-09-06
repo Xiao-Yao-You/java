@@ -23,33 +23,11 @@ public interface ReportObjectService {
     void createReportObject(@Valid List<ReportObjectSaveReqVO> createReqVO);
 
     /**
-     * 更新汇报对象
-     *
-     * @param updateReqVO 更新信息
-     */
-    void updateReportObject(@Valid ReportObjectSaveReqVO updateReqVO);
-
-    /**
-     * 删除汇报对象
-     *
-     * @param id 编号
-     */
-    void deleteReportObject(Long id);
-
-    /**
-     * 获得汇报对象
-     *
-     * @param id 编号
-     * @return 汇报对象
-     */
-    ReportObjectDO getReportObject(Long id);
-
-    /**
      * 获得汇报对象分页
      *
      * @param pageReqVO 分页查询
      * @return 汇报对象分页
      */
-    PageResult<ReportObjectDO> getReportObjectPage(ReportObjectPageReqVO pageReqVO);
+    List<ReportObjectDO> getReportObjectPage(ReportObjectPageReqVO pageReqVO);
 
 }

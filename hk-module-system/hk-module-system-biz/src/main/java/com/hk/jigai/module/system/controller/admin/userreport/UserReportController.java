@@ -122,16 +122,9 @@ public class UserReportController {
     @PreAuthorize("@ss.hasPermission('hk:user-summary:query')")
     public CommonResult<SummaryRespVO> summary(@Valid StatisticsReqVO reqVO) {
         //判断查询时间是否为空，若为空则赋值当天的日期
-        if (CollectionUtil.isEmpty(reqVO.getDateReport())) {
-            Date current = new Date();
-            SimpleDateFormat startDateFormat = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
-            SimpleDateFormat endDateFormat = new SimpleDateFormat("yyyy-MM-dd 23:59:59");
-            String currentStart = startDateFormat.format(current);
-            String currentEnd = endDateFormat.format(current);
-            List<String> dateArr = new ArrayList<>();
-            dateArr.add(currentStart);
-            dateArr.add(currentEnd);
-            reqVO.setDateReport(dateArr);
+        if (reqVO.getDateReport()==null || reqVO.getDateReport().length<2) {
+            LocalDate[] dateReport = {LocalDate.now(),LocalDate.now()};
+            reqVO.setDateReport(dateReport);
         }
         return success(userReportService.summary(reqVO));
     }

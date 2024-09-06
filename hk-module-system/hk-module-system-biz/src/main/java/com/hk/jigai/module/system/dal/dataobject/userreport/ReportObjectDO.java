@@ -32,7 +32,7 @@ public class ReportObjectDO extends BaseDO {
     /**
      * 被汇报对象用户id
      */
-    private Long uesrId;
+    private Long userId;
 
     /**
      * 被汇报用户昵称

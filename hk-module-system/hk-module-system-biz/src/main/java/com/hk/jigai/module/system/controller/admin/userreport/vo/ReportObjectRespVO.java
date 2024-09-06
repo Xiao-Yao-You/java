@@ -21,7 +21,7 @@ public class ReportObjectRespVO {
 
     @Schema(description = "汇报对象用户id", requiredMode = Schema.RequiredMode.REQUIRED, example = "21513")
     @ExcelProperty("汇报对象用户id")
-    private Long uesrId;
+    private Long userId;
 
     @Schema(description = "被汇报用户name", example = "12702")
     @ExcelProperty("被汇报用户name")

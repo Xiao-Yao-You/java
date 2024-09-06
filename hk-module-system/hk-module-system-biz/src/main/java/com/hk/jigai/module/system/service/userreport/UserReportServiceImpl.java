@@ -52,14 +52,17 @@ public class UserReportServiceImpl implements UserReportService {
     @Transactional
     public Long createUserReport(UserReportSaveReqVO createReqVO) {
         UserReportDO userReport = BeanUtils.toBean(createReqVO, UserReportDO.class);
-        //根据汇报日期校验当天是否已经提交过汇报
-//        List<UserReportDO> userReportDOS = userReportMapper.selectList(new QueryWrapper<UserReportDO>().lambda()
-//                .eq(UserReportDO::getDateReport, createReqVO.getDateReport())
-//                .eq(UserReportDO::getDeptId, userReport.getDeptId())
-//                .eq(UserReportDO::getUserId, getLoginUserId()));
-//        if (CollectionUtil.isNotEmpty(userReportDOS)) {
-//            throw exception(USER_REPORT_EXISTS);
-//        }
+        //根据汇报日期校验当天是否已经提交过汇报给该领导
+        List<UserReportDO> userReportDOS = userReportMapper.selectList(new QueryWrapper<UserReportDO>().lambda()
+                .eq(UserReportDO::getDateReport, createReqVO.getDateReport())
+                .eq(UserReportDO::getUserId, getLoginUserId()));
+        if (CollectionUtil.isNotEmpty(userReportDOS)) {
+            for(UserReportDO userReportDO : userReportDOS){
+                if(userReportDO.getReportObject().contains(getLoginUserId())){
+                    throw exception(USER_REPORT_EXISTS);
+                }
+            }
+        }
         //设置汇报类型，当天为正常0，往期为补交1
         userReport.setCommitTime(LocalDateTime.now());
         if (userReport.getDateReport().equals(userReport.getCommitTime().toLocalDate())) {
@@ -97,14 +100,17 @@ public class UserReportServiceImpl implements UserReportService {
         // 校验存在
         validateUserReportExists(updateReqVO.getId());
         UserReportDO updateObj = BeanUtils.toBean(updateReqVO, UserReportDO.class);
-        //根据汇报日期校验当天是否已经提交过汇报
-//        UserReportDO userReportDOS = userReportMapper.selectOne(new QueryWrapper<UserReportDO>().lambda()
-//                .eq(UserReportDO::getDateReport, updateReqVO.getDateReport())
-//                .eq(UserReportDO::getDeptId, updateObj.getDeptId())
-//                .eq(UserReportDO::getUserId, getLoginUserId()));
-//        if (userReportDOS != null && updateReqVO.getId() != userReportDOS.getId()) {
-//            throw exception(USER_REPORT_EXISTS);
-//        }
+        //根据汇报日期校验当天是否已经提交过汇报给该领导
+        List<UserReportDO> userReportDOS = userReportMapper.selectList(new QueryWrapper<UserReportDO>().lambda()
+                .eq(UserReportDO::getDateReport, updateReqVO.getDateReport())
+                .eq(UserReportDO::getUserId, getLoginUserId()));
+        if (CollectionUtil.isNotEmpty(userReportDOS)) {
+            for(UserReportDO userReportDO : userReportDOS){
+                if(userReportDO.getReportObject().contains(getLoginUserId()) && updateReqVO.getId() != userReportDO.getId()){
+                    throw exception(USER_REPORT_EXISTS);
+                }
+            }
+        }
         //设置汇报类型，当天为正常0，往期为补交1
         updateObj.setCommitTime(LocalDateTime.now());
         if (updateObj.getDateReport().equals(updateObj.getCommitTime().toLocalDate())) {

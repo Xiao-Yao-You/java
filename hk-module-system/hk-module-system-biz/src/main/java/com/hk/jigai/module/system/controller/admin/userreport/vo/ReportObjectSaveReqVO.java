@@ -14,7 +14,7 @@ public class ReportObjectSaveReqVO {
 
     @Schema(description = "被汇报用户id", requiredMode = Schema.RequiredMode.REQUIRED, example = "21513")
     @NotNull(message = "被汇报用户id不能为空")
-    private Long uesrId;
+    private Long userId;
 
     @Schema(description = "被汇报用户name", example = "12702")
     private String userNickName;

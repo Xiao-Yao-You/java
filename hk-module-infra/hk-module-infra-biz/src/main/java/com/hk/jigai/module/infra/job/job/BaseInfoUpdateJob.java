@@ -56,22 +56,21 @@ public class BaseInfoUpdateJob implements JobHandler {
     @Resource
     private BaseInfoService baseInfoService;
 
-    private static int deptid;
-    private static int postId;
-    private static int userId;
-    private static int userDeptId;
-    private static int userPostId;
-
-    private static Map<String, DeptDO> deptDBAllMap = new HashMap<>();
-    private static Map<String, PostDO> postDBAllMap = new HashMap<>();
     @Override
     public String execute(String param) throws Exception {
+        int deptid;
+        int postId;
+        int userId;
+        int userDeptId;
+        int userPostId;
+        Map<String, DeptDO> deptDBAllMap = new HashMap<>();
+        Map<String, PostDO> postDBAllMap = new HashMap<>();
+        TenantContextHolder.setTenantId(new Long(JobConstant.TENANT_ID));
         deptid = deptMapper.queryMaxId().intValue() + 1;
         postId = postMapper.queryMaxId().intValue() + 1;
         userId = userMapper.queryMaxId().intValue() + 1;
-
-        TenantContextHolder.setTenantId(new Long(JobConstant.TENANT_ID));
-
+        userDeptId = userDeptMapper.queryMaxId().intValue() + 1;
+        userPostId = userPostMapper.queryMaxId().intValue() + 1;
         //1.恒科信改，信息获取接口调用
         List<BaseInfoVO> baseInfoList = baseInfoService.callPerson("http://172.21.27.12:9877/person", HttpMethod.POST);
         if(CollectionUtils.isAnyEmpty(baseInfoList)){
@@ -108,7 +107,35 @@ public class BaseInfoUpdateJob implements JobHandler {
             String deptFullName = "/" + baseInfo.getDep_fullName();
             DeptDO currentDept = deptDBAllMap.get(deptFullName);
             if(currentDept == null){
-                currentDept = buildDapartment(deptFullName);
+                String[] deptArray = deptFullName.split(JobConstant.SPLIT_CHAR);
+                if(deptArray != null && deptArray.length > 0){
+                    Long parentId = new Long(JobConstant.ROOT_DEPT_ID);
+                    StringBuffer deptFullNameBuffer = new StringBuffer("");
+                    for(String deptName : deptArray) {
+                        if(StringUtils.isNotEmpty(deptName)){
+                            deptFullNameBuffer.append("/" + deptName);
+                            DeptDO queryDept = deptDBAllMap.get(deptFullNameBuffer.toString());
+                            if(queryDept == null){
+                                Long newId = new Long(deptid++);
+                                DeptDO deptDO = new DeptDO();
+                                deptDO.setId(newId);
+                                deptDO.setName(deptName);
+                                deptDO.setFullName(deptFullNameBuffer.toString());
+                                deptDO.setParentId(parentId);
+                                deptDO.setSort(new Integer(String.valueOf(newId)));
+                                deptDO.setStatus(new Integer(0));
+                                deptMapper.insert(deptDO);
+                                deptDBAllMap.put(deptFullNameBuffer.toString(),deptDO);
+                                parentId = newId;
+                                continue;
+                            }else{
+                                parentId = queryDept.getId();
+                                continue;
+                            }
+                        }
+                    }
+                }
+                currentDept = deptDBAllMap.get(deptFullName);
             }
             String postName = baseInfo.getPersonJob();
             PostDO currentPost = postDBAllMap.get(postName);
@@ -172,7 +199,7 @@ public class BaseInfoUpdateJob implements JobHandler {
             UserPostDO userPost = userPostMapper.selectOne(new QueryWrapper<UserPostDO>()
                     .lambda().eq(UserPostDO::getUserId, adminUserDO.getId()).eq(UserPostDO::getPostId, currentPost.getId()));
             if(userPost == null){
-                userDeptMapper.deleteByUserId(adminUserDO.getId());
+                userPostMapper.deleteByUserId( adminUserDO.getId());
                 userPost = new UserPostDO();
                 userPost.setId(new Long(userPostId));
                 userPost.setUserId(adminUserDO.getId());
@@ -183,7 +210,9 @@ public class BaseInfoUpdateJob implements JobHandler {
             personNO.add(baseInfo.getPersonNO());
         }
         //处理删除的用户
-        List<AdminUserDO> invalidUser = userMapper.selectList(new QueryWrapper<AdminUserDO>().lambda().notIn(AdminUserDO::getUsername,personNO));
+        List<AdminUserDO> invalidUser = userMapper.selectList(new QueryWrapper<AdminUserDO>().lambda()
+                .notIn(AdminUserDO::getUsername,personNO)
+                .between(AdminUserDO::getId,500,999999999));
         if(!CollectionUtils.isAnyEmpty(invalidUser)){
             List<Long> userIdList = new ArrayList<>();
             for(AdminUserDO userDO : invalidUser){
@@ -191,55 +220,8 @@ public class BaseInfoUpdateJob implements JobHandler {
             }
             userDeptMapper.delete(new QueryWrapper<UserDeptDO>().lambda().in(UserDeptDO::getUserId,userIdList));
             userPostMapper.delete(new QueryWrapper<UserPostDO>().lambda().in(UserPostDO::getUserId,userIdList));
-            userMapper.delete(new QueryWrapper<AdminUserDO>().lambda().notIn(AdminUserDO::getUsername,personNO).between(AdminUserDO::getId,500,999999999));
+            userMapper.delete(new QueryWrapper<AdminUserDO>().lambda().notIn(AdminUserDO::getUsername,personNO));
         }
         return "BaseInfoUpdateJob 执行完成";
     }
-
-    private DeptDO buildDapartment(String deptFullName){
-        String[] deptArray = deptFullName.split(JobConstant.SPLIT_CHAR);
-        if(deptArray != null && deptArray.length > 0){
-            Long parentId = new Long(JobConstant.ROOT_DEPT_ID);
-            StringBuffer deptFullNameBuffer = new StringBuffer("");
-            for(String deptName : deptArray) {
-                deptFullNameBuffer.append("/" + deptName);
-                DeptDO queryDept = deptDBAllMap.get(deptFullNameBuffer.toString());
-                if(queryDept == null){
-                    Long newId = new Long(deptid++);
-                    DeptDO deptDO = new DeptDO();
-                    deptDO.setId(newId);
-                    deptDO.setName(deptName);
-                    deptDO.setFullName(deptFullNameBuffer.toString());
-                    deptDO.setParentId(parentId);
-                    deptDO.setSort(new Integer(String.valueOf(newId)));
-                    deptDO.setStatus(new Integer(0));
-                    deptDBAllMap.put(deptFullNameBuffer.toString(),deptDO);
-                    deptMapper.insert(deptDO);
-                    parentId = newId;
-                    continue;
-                }else{
-                    parentId = queryDept.getId();
-                    continue;
-                }
-            }
-        }
-        return deptDBAllMap.get(deptFullName);
-    }
-
-    //    public static void main(String[] args) {
-//        DeptDTO root = new DeptDTO(new Long(0),"恒科信改",null);
-//        String deptDesc = "民用丝部/内贸部/差别化销售部/恒科差别化产品二部";
-//        Long newId = buildDapartmentTree(root, deptDesc);
-//        System.out.println(newId);
-//        System.out.println(root.getChildren().size());
-//        String deptDesc2 = "民用丝部2/内贸部/差别化销售部2/恒科差别化产品二部2";
-//        Long newId2 = buildDapartmentTree(root, deptDesc2);
-//        System.out.println(newId2);
-//        System.out.println(root.getChildren().size());
-//        String deptDesc3 = "民用丝部/内贸部/差别化销售部2/恒科差别化产品二部2";
-//        Long newId3 = buildDapartmentTree(root, deptDesc3,);
-//        System.out.println(newId3);
-//        System.out.println(root.getChildren().size());
-//    }
-
 }

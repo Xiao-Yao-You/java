@@ -15,7 +15,7 @@ import static com.hk.jigai.framework.common.util.date.DateUtils.FORMAT_YEAR_MONT
 @ToString(callSuper = true)
 public class ReportObjectPageReqVO extends PageParam {
     @Schema(description = "被汇报对象用户id", example = "21513")
-    private Long uesrId;
+    private Long userId;
 
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

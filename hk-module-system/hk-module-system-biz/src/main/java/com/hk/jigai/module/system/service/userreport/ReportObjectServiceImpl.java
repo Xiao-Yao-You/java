@@ -1,5 +1,9 @@
 package com.hk.jigai.module.system.service.userreport;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hk.jigai.framework.mybatis.core.query.LambdaQueryWrapperX;
+import com.hk.jigai.framework.mybatis.core.query.QueryWrapperX;
+import com.hk.jigai.module.system.dal.dataobject.userreport.ReportTransferRecordDO;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -14,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.hk.jigai.framework.common.exception.util.ServiceExceptionUtil.exception;
+import static com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
+import static com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils.getLoginUserNickname;
 import static com.hk.jigai.module.system.enums.ErrorCodeConstants.*;
 
 /**
@@ -30,45 +36,22 @@ public class ReportObjectServiceImpl implements ReportObjectService {
 
     @Override
     public void createReportObject(List<ReportObjectSaveReqVO> createReqVO) {
+        reportObjectMapper.delete(new QueryWrapper<ReportObjectDO>().lambda()
+                .eq(ReportObjectDO::getUserId, getLoginUserId()));
         // 插入
         List<ReportObjectDO> reportObject = new ArrayList<>();
         for(ReportObjectSaveReqVO reportObjectSaveReqVO : createReqVO){
+            reportObjectSaveReqVO.setUserId(getLoginUserId());
+            reportObjectSaveReqVO.setUserNickName(getLoginUserNickname());
             reportObject.add(BeanUtils.toBean(reportObjectSaveReqVO, ReportObjectDO.class));
         }
         reportObjectMapper.insertBatch(reportObject);
     }
 
     @Override
-    public void updateReportObject(ReportObjectSaveReqVO updateReqVO) {
-        // 校验存在
-        validateReportObjectExists(updateReqVO.getId());
-        // 更新
-        ReportObjectDO updateObj = BeanUtils.toBean(updateReqVO, ReportObjectDO.class);
-        reportObjectMapper.updateById(updateObj);
-    }
-
-    @Override
-    public void deleteReportObject(Long id) {
-        // 校验存在
-        validateReportObjectExists(id);
-        // 删除
-        reportObjectMapper.deleteById(id);
-    }
-
-    private void validateReportObjectExists(Long id) {
-        if (reportObjectMapper.selectById(id) == null) {
-            throw exception(REPORT_OBJECT_NOT_EXISTS);
-        }
-    }
-
-    @Override
-    public ReportObjectDO getReportObject(Long id) {
-        return reportObjectMapper.selectById(id);
-    }
-
-    @Override
-    public PageResult<ReportObjectDO> getReportObjectPage(ReportObjectPageReqVO pageReqVO) {
-        return reportObjectMapper.selectPage(pageReqVO);
+    public List<ReportObjectDO> getReportObjectPage(ReportObjectPageReqVO pageReqVO) {
+        return reportObjectMapper.selectList(new QueryWrapper<ReportObjectDO>().lambda()
+                .eq(ReportObjectDO::getUserId, getLoginUserId()));
     }
 
 }
