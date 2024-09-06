@@ -266,4 +266,8 @@
     </resultMap>
 
 
+    <select id="queryMaxId" resultType="Long">
+        select id from system_users order by id desc limit 1
+    </select>
+
 </mapper>

@@ -23,4 +23,5 @@ public interface UserDeptMapper extends BaseMapperX<UserDeptDO> {
     default List<UserDeptDO> selectListByDeptIds(Collection<Long> deptIds) {
         return selectList(UserDeptDO::getDeptId, deptIds);
     }
+    Long queryMaxId();
 }

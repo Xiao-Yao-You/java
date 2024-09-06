@@ -188,4 +188,7 @@ public interface ErrorCodeConstants {
     ErrorCode USER_REPORT_NOT_OPERATE = new ErrorCode(1_002_032_005, "当前用户无权限操作");
     ErrorCode USER_REPORT_INFO_NOT_EXISTS = new ErrorCode(1_002_032_006, "信息不存在");
     ErrorCode REPORT_ATTENTION_NOT_EXISTS = new ErrorCode(1_002_032_007, "关注信息不存在");
+    ErrorCode REPORT_OBJECT_NOT_EXISTS = new ErrorCode(1_002_032_008, "汇报对象不存在");
+
+
 }

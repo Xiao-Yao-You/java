@@ -70,7 +70,7 @@ public class BaseInfoJob implements JobHandler {
 
     @Override
     public String execute(String param) throws Exception {
-        deptid = deptMapper.queryMaxId().intValue() + 1;
+        deptid = 500;
         postId = 500;
         userId = 500;
         userDeptId = 500;
@@ -138,7 +138,7 @@ public class BaseInfoJob implements JobHandler {
                 userPostDOS.add(userPostDO);
 
                 Set<Long> userPostSet = new HashSet<>();
-                userPostSet.add(userPostDO.getId());
+                userPostSet.add(newUserPostId);
                 baseInfo.setUserPostSet(userPostSet);
             }
             userId++;

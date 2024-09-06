@@ -35,4 +35,5 @@ public interface PostMapper extends BaseMapperX<PostDO> {
         return selectOne(PostDO::getCode, code);
     }
 
+    Long queryMaxId();
 }

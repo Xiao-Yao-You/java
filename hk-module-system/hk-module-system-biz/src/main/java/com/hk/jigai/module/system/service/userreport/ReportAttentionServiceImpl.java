@@ -3,6 +3,7 @@ package com.hk.jigai.module.system.service.userreport;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hk.jigai.framework.common.util.collection.CollectionUtils;
 import com.hk.jigai.framework.security.core.LoginUser;
+import com.hk.jigai.module.system.dal.dataobject.dept.UserDeptDO;
 import com.hk.jigai.module.system.dal.dataobject.userreport.*;
 import com.hk.jigai.module.system.dal.mysql.dept.DeptMapper;
 import com.hk.jigai.module.system.dal.mysql.userreport.ReportJobScheduleMapper;
@@ -21,7 +22,6 @@ import com.hk.jigai.framework.common.util.object.BeanUtils;
 import com.hk.jigai.module.system.dal.mysql.userreport.ReportAttentionMapper;
 import static com.hk.jigai.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils.*;
-import static com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils.getLoginUser;
 import static com.hk.jigai.module.system.enums.ErrorCodeConstants.*;
 
 /**
@@ -69,6 +69,8 @@ public class ReportAttentionServiceImpl implements ReportAttentionService {
 
     @Override
     public ReportAttentionDO getReportAttention(Long id) {
+        // 校验存在
+        validateReportAttentionExists(id);
         return reportAttentionMapper.selectById(id);
     }
 
@@ -122,8 +124,16 @@ public class ReportAttentionServiceImpl implements ReportAttentionService {
     @Override
     @Transactional
     public void transfer(ReportAttentionTransferReqVO updateReqVO) {
-        // 校验存在
-        validateReportAttentionExists(updateReqVO.getId());
+        //1.校验存在
+        ReportAttentionDO reportAttentionDO = reportAttentionMapper.selectById(updateReqVO.getId());
+        if (reportAttentionDO == null) {
+            throw exception(REPORT_ATTENTION_NOT_EXISTS);
+        }
+        ReportAttentionDO checkReportAttentionDO = reportAttentionMapper.selectOne(new QueryWrapper<ReportAttentionDO>()
+                .lambda().eq(ReportAttentionDO::getReplyUserId, getLoginUserId()).eq(ReportAttentionDO::getId,updateReqVO.getId()));
+        if (checkReportAttentionDO == null) {
+            throw exception(USER_REPORT_NOT_OPERATE);
+        }
         // 更新
         ReportAttentionDO updateObj = BeanUtils.toBean(updateReqVO, ReportAttentionDO.class);
         reportAttentionMapper.updateById(updateObj);
@@ -145,6 +155,11 @@ public class ReportAttentionServiceImpl implements ReportAttentionService {
         ReportAttentionDO reportAttentionDO = reportAttentionMapper.selectById(updateReqVO.getId());
         if (reportAttentionDO == null) {
             throw exception(REPORT_ATTENTION_NOT_EXISTS);
+        }
+        ReportAttentionDO checkReportAttentionDO = reportAttentionMapper.selectOne(new QueryWrapper<ReportAttentionDO>()
+                .lambda().eq(ReportAttentionDO::getReplyUserId, getLoginUserId()).eq(ReportAttentionDO::getId,updateReqVO.getId()));
+        if (checkReportAttentionDO == null) {
+            throw exception(USER_REPORT_NOT_OPERATE);
         }
         //2.创建汇报以及进度
         //2.1根据汇报日期校验当天是否已经提交过汇报
@@ -189,6 +204,9 @@ public class ReportAttentionServiceImpl implements ReportAttentionService {
 
     @Override
     public List<ReportTransferRecordDO> queryTransferList(Long id) {
+        // 校验存在
+        validateReportAttentionExists(id);
+
         return reportTransferRecordMapper.selectList(new QueryWrapper<ReportTransferRecordDO>().lambda()
                 .eq(ReportTransferRecordDO::getReportAttentionId, id)
                 .orderByDesc(ReportTransferRecordDO::getId)

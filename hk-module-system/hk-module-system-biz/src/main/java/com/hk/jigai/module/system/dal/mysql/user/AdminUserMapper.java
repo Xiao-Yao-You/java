@@ -30,5 +30,5 @@ public interface AdminUserMapper extends BaseMapperX<AdminUserDO> {
 
     Integer selectCount2();
 
-
+    Long queryMaxId();
 }
