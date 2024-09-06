@@ -53,13 +53,13 @@ public class UserReportServiceImpl implements UserReportService {
     public Long createUserReport(UserReportSaveReqVO createReqVO) {
         UserReportDO userReport = BeanUtils.toBean(createReqVO, UserReportDO.class);
         //根据汇报日期校验当天是否已经提交过汇报
-        List<UserReportDO> userReportDOS = userReportMapper.selectList(new QueryWrapper<UserReportDO>().lambda()
-                .eq(UserReportDO::getDateReport, createReqVO.getDateReport())
-                .eq(UserReportDO::getDeptId, userReport.getDeptId())
-                .eq(UserReportDO::getUserId, getLoginUserId()));
-        if (CollectionUtil.isNotEmpty(userReportDOS)) {
-            throw exception(USER_REPORT_EXISTS);
-        }
+//        List<UserReportDO> userReportDOS = userReportMapper.selectList(new QueryWrapper<UserReportDO>().lambda()
+//                .eq(UserReportDO::getDateReport, createReqVO.getDateReport())
+//                .eq(UserReportDO::getDeptId, userReport.getDeptId())
+//                .eq(UserReportDO::getUserId, getLoginUserId()));
+//        if (CollectionUtil.isNotEmpty(userReportDOS)) {
+//            throw exception(USER_REPORT_EXISTS);
+//        }
         //设置汇报类型，当天为正常0，往期为补交1
         userReport.setCommitTime(LocalDateTime.now());
         if (userReport.getDateReport().equals(userReport.getCommitTime().toLocalDate())) {
@@ -98,13 +98,13 @@ public class UserReportServiceImpl implements UserReportService {
         validateUserReportExists(updateReqVO.getId());
         UserReportDO updateObj = BeanUtils.toBean(updateReqVO, UserReportDO.class);
         //根据汇报日期校验当天是否已经提交过汇报
-        UserReportDO userReportDOS = userReportMapper.selectOne(new QueryWrapper<UserReportDO>().lambda()
-                .eq(UserReportDO::getDateReport, updateReqVO.getDateReport())
-                .eq(UserReportDO::getDeptId, updateObj.getDeptId())
-                .eq(UserReportDO::getUserId, getLoginUserId()));
-        if (userReportDOS != null && updateReqVO.getId() != userReportDOS.getId()) {
-            throw exception(USER_REPORT_EXISTS);
-        }
+//        UserReportDO userReportDOS = userReportMapper.selectOne(new QueryWrapper<UserReportDO>().lambda()
+//                .eq(UserReportDO::getDateReport, updateReqVO.getDateReport())
+//                .eq(UserReportDO::getDeptId, updateObj.getDeptId())
+//                .eq(UserReportDO::getUserId, getLoginUserId()));
+//        if (userReportDOS != null && updateReqVO.getId() != userReportDOS.getId()) {
+//            throw exception(USER_REPORT_EXISTS);
+//        }
         //设置汇报类型，当天为正常0，往期为补交1
         updateObj.setCommitTime(LocalDateTime.now());
         if (updateObj.getDateReport().equals(updateObj.getCommitTime().toLocalDate())) {
@@ -159,18 +159,18 @@ public class UserReportServiceImpl implements UserReportService {
         List<ReportJobScheduleDO> reportJobScheduleList = reportJobScheduleMapper.selectList(new QueryWrapper<ReportJobScheduleDO>()
                 .lambda().eq(ReportJobScheduleDO::getUserReportId, id));
         userReportDO.setReportJobScheduleDOList(reportJobScheduleList);
-        if(!CollectionUtils.isAnyEmpty(reportJobScheduleList)){
+        if (!CollectionUtils.isAnyEmpty(reportJobScheduleList)) {
             List<Long> jobIdList = new ArrayList<>();
-            for(ReportJobScheduleDO reportJobScheduleDO : reportJobScheduleList){
+            for (ReportJobScheduleDO reportJobScheduleDO : reportJobScheduleList) {
                 jobIdList.add(reportJobScheduleDO.getId());
             }
             List<ReportAttentionDO> attentionList = reportAttentionMapper.selectList(new QueryWrapper<ReportAttentionDO>()
-                    .lambda().eq(ReportAttentionDO::getUserId, getLoginUserId()).in(ReportAttentionDO::getJobId,jobIdList));
+                    .lambda().eq(ReportAttentionDO::getUserId, getLoginUserId()).in(ReportAttentionDO::getJobId, jobIdList));
 
-            if(!CollectionUtils.isAnyEmpty(attentionList)){
-                for(ReportAttentionDO reportAttentionDO : attentionList){
-                    for(ReportJobScheduleDO reportJobScheduleDO : reportJobScheduleList){
-                        if(reportJobScheduleDO.getId().equals(reportAttentionDO.getJobId())){
+            if (!CollectionUtils.isAnyEmpty(attentionList)) {
+                for (ReportAttentionDO reportAttentionDO : attentionList) {
+                    for (ReportJobScheduleDO reportJobScheduleDO : reportJobScheduleList) {
+                        if (reportJobScheduleDO.getId().equals(reportAttentionDO.getJobId())) {
                             reportJobScheduleDO.setAttentionId(reportAttentionDO.getId());
                             continue;
                         }
