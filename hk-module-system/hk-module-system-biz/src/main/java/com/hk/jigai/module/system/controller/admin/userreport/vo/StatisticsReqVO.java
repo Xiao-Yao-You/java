@@ -6,6 +6,7 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;;
 import static com.hk.jigai.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY;
 
@@ -14,8 +15,7 @@ import static com.hk.jigai.framework.common.util.date.DateUtils.FORMAT_YEAR_MONT
 @Data
 public class StatisticsReqVO extends PageParam {
     @Schema(description = "汇报日期")
-    @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY)
-    private LocalDate[] dateReport;
+    private List<String> dateReport;
 
     private String userId;
 

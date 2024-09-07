@@ -220,7 +220,7 @@ public class BaseInfoUpdateJob implements JobHandler {
             }
             userDeptMapper.delete(new QueryWrapper<UserDeptDO>().lambda().in(UserDeptDO::getUserId,userIdList));
             userPostMapper.delete(new QueryWrapper<UserPostDO>().lambda().in(UserPostDO::getUserId,userIdList));
-            userMapper.delete(new QueryWrapper<AdminUserDO>().lambda().notIn(AdminUserDO::getUsername,personNO));
+            userMapper.delete(new QueryWrapper<AdminUserDO>().lambda().in(AdminUserDO::getId,userIdList));
         }
         return "BaseInfoUpdateJob 执行完成";
     }
