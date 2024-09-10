@@ -76,7 +76,6 @@ public class UserBookMeetingServiceImpl implements UserBookMeetingService {
     private RoleMapper roleMapper;
 
     @Override
-    @Transactional
     public Long createUserBookMeeting(UserBookMeetingSaveReqVO createReqVO) {
         //校验该时间段是可以预定的
         MeetingRoomBookRecordReqVO req = new MeetingRoomBookRecordReqVO();
@@ -135,16 +134,15 @@ public class UserBookMeetingServiceImpl implements UserBookMeetingService {
         int hour = (startTime.intValue()-1 )/2 ;
         LocalDate dateMeeting = createReqVO.getDateMeeting();
         LocalDateTime meetingTime = LocalDateTime.of(dateMeeting.getYear(),dateMeeting.getMonth(),dateMeeting.getDayOfMonth(),hour,(a==1)?30:0);
-        meetingReminderService.scheduleReminder(new Long(userBookMeeting.getId()), meetingTime);
         if(Duration.between(LocalDateTime.now(),meetingTime).toMinutes()>15){
             meetingReminderService.sendReminder(new Long(userBookMeeting.getId()));
         }
+        meetingReminderService.scheduleReminder(new Long(userBookMeeting.getId()), meetingTime);
         // 返回
         return userBookMeeting.getId();
     }
 
     @Override
-    @Transactional
     public void updateUserBookMeeting(UserBookMeetingSaveReqVO updateReqVO) {
         // 校验存在
         validateUserBookMeetingExists(updateReqVO.getId());
@@ -183,7 +181,6 @@ public class UserBookMeetingServiceImpl implements UserBookMeetingService {
     }
 
     @Override
-    @Transactional
     public void deleteUserBookMeeting(Long id) {
         // 校验存在
         validateUserBookMeetingExists(id);

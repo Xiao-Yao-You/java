@@ -111,7 +111,6 @@ public class MeetingReminderServiceImpl implements MeetingReminderService{
     @Override
     public void sendReminder(Long meetingId) {
         try{
-            //https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Template_Message_Interface.html
             UserBookMeetingDO userBookMeetingDO = userBookMeetingMapper.selectById(meetingId);
             MeetingRoomInfoDO meetingRoomInfoDO = meetingRoomInfoMapper.selectById(userBookMeetingDO.getMeetingRoomId());
             if(userBookMeetingDO != null){
@@ -147,7 +146,7 @@ public class MeetingReminderServiceImpl implements MeetingReminderService{
                             requestBody.put("touser",openid);
                             requestBody.put("template_id","gqKg0G5-01cuXzj7Ldk-vnX7fFaOhudOdP6KZ0YNCO4");
                             Map miniprogram = new HashMap();
-                            miniprogram.put("appid","wx49590d619c10f743");
+                            miniprogram.put("appid",openid);
                             miniprogram.put("pagepath","pages/meeting/meet-detail/index?id=" + meetingId);
                             requestBody.put("miniprogram",miniprogram);
                             Map data = new HashMap();
