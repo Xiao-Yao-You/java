@@ -117,15 +117,16 @@ public class MeetingReminderServiceImpl implements MeetingReminderService{
                 //1.先重新获取accessToken
                 String authToken = (String)redisTemplate.opsForValue().get(RedisKeyConstants.WECHAT_AUTHTOKEN);
                 if(!StringUtils.isNotBlank(authToken)){
+                    log.info("请求查询token！");
                     Map authMap = restTemplate.exchange("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wx145112d98bdbfbfe&secret=3d82310d78a1a2e54b2232ca97bbfdb7", HttpMethod.POST, null,
                             new ParameterizedTypeReference<HashMap>() {}).getBody();
                     if(authMap != null && authMap.get("access_token") != null) {
                         authToken = (String) authMap.get("access_token");
                     }
                 }
-
+                log.info("token:" + authToken);
                 if(StringUtils.isNotBlank(authToken)){
-                    redisTemplate.opsForValue().set(RedisKeyConstants.WECHAT_AUTHTOKEN,authToken,7000,TimeUnit.SECONDS);
+                    redisTemplate.opsForValue().set(RedisKeyConstants.WECHAT_AUTHTOKEN,authToken,1000,TimeUnit.SECONDS);
                     //2.发送诶新消息
                     //2.1 查询该会议下，所有参与人的openid
                     List<String> openidList = meetingPersonAttendRecordMapper.selectOpenidByMeetingId(meetingId);
@@ -174,6 +175,10 @@ public class MeetingReminderServiceImpl implements MeetingReminderService{
                             Integer successode = new Integer("0");
                             if(result == null || !successode.equals((Integer)result.get("errcode"))){
                                 log.info("发送会议消息异常" + (Integer)result.get("errcode") + ":" +(String)result.get("errmsg"));
+                                Integer tokenExpired = new Integer("42001");
+                                if(tokenExpired.equals((Integer)result.get("errcode"))){
+                                    redisTemplate.delete(RedisKeyConstants.WECHAT_AUTHTOKEN);
+                                }
                             }
                         }
                     }
