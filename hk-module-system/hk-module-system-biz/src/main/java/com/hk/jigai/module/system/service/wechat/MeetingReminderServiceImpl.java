@@ -117,20 +117,24 @@ public class MeetingReminderServiceImpl implements MeetingReminderService{
                 //1.先重新获取accessToken
                 String authToken = (String)redisTemplate.opsForValue().get(RedisKeyConstants.WECHAT_AUTHTOKEN);
                 if(!StringUtils.isNotBlank(authToken)){
+                    log.info("请求查询token！");
                     Map authMap = restTemplate.exchange("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wx145112d98bdbfbfe&secret=3d82310d78a1a2e54b2232ca97bbfdb7", HttpMethod.POST, null,
                             new ParameterizedTypeReference<HashMap>() {}).getBody();
                     if(authMap != null && authMap.get("access_token") != null) {
                         authToken = (String) authMap.get("access_token");
                     }
                 }
-
+                log.info("token:" + authToken);
                 if(StringUtils.isNotBlank(authToken)){
-                    redisTemplate.opsForValue().set(RedisKeyConstants.WECHAT_AUTHTOKEN,authToken,7000,TimeUnit.SECONDS);
+                    redisTemplate.opsForValue().set(RedisKeyConstants.WECHAT_AUTHTOKEN,authToken,1000,TimeUnit.SECONDS);
                     //2.发送诶新消息
                     //2.1 查询该会议下，所有参与人的openid
                     List<String> openidList = meetingPersonAttendRecordMapper.selectOpenidByMeetingId(meetingId);
                     String launchOpenid = adminUserMapper.selectById(userBookMeetingDO.getUserId()).getOpenid();
                     if(StringUtils.isNotBlank(launchOpenid)){
+                        if(openidList == null){
+                            openidList = new ArrayList<>();
+                        }
                         openidList.add(launchOpenid);
                     }
                     Set<String> openidSet = new HashSet<String>(openidList);
@@ -138,6 +142,7 @@ public class MeetingReminderServiceImpl implements MeetingReminderService{
                         HttpHeaders headers = new HttpHeaders();
                         headers.setContentType(MediaType.APPLICATION_JSON);
                         for(String openid : openidSet){
+                            log.info("向微信用户:" + openid + ",发送提醒！");
                             Integer startTime = userBookMeetingDO.getStartTime();
                             int a = (startTime.intValue()-1 )%2 ;
                             int hour = (startTime.intValue()-1 )/2 ;
@@ -146,7 +151,7 @@ public class MeetingReminderServiceImpl implements MeetingReminderService{
                             requestBody.put("touser",openid);
                             requestBody.put("template_id","gqKg0G5-01cuXzj7Ldk-vnX7fFaOhudOdP6KZ0YNCO4");
                             Map miniprogram = new HashMap();
-                            miniprogram.put("appid",openid);
+                            miniprogram.put("appid","wx49590d619c10f743");
                             miniprogram.put("pagepath","pages/meeting/meet-detail/index?id=" + meetingId);
                             requestBody.put("miniprogram",miniprogram);
                             Map data = new HashMap();
@@ -167,8 +172,13 @@ public class MeetingReminderServiceImpl implements MeetingReminderService{
                             HttpEntity<HashMap> requestEntity = new HttpEntity(requestBody, headers);
                             HashMap result = restTemplate.exchange("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token="+authToken, HttpMethod.POST, requestEntity,
                                     new ParameterizedTypeReference<HashMap>() {}).getBody();
-                            if(result == null || !"0".equals((String)result.get("errcode"))){
-                                log.info("发送会议消息异常" + (String)result.get("errcode") + ":" +(String)result.get("errmsg"));
+                            Integer successode = new Integer("0");
+                            if(result == null || !successode.equals((Integer)result.get("errcode"))){
+                                log.info("发送会议消息异常" + (Integer)result.get("errcode") + ":" +(String)result.get("errmsg"));
+                                Integer tokenExpired = new Integer("42001");
+                                if(tokenExpired.equals((Integer)result.get("errcode"))){
+                                    redisTemplate.delete(RedisKeyConstants.WECHAT_AUTHTOKEN);
+                                }
                             }
                         }
                     }
