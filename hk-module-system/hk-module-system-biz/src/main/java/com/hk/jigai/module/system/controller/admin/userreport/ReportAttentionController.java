@@ -116,8 +116,8 @@ public class ReportAttentionController {
     @GetMapping("/queryFollowUndo")
     @Operation(summary = "跟进列表未跟进的")
     @PreAuthorize("@ss.hasPermission('hk:report-follow:query')")
-    public CommonResult<List<ReportAttentionRespVO>> queryFollowUndo() {
-        List<ReportAttentionDO> list = reportAttentionService.queryFollowUndo();
+    public CommonResult<List<ReportAttentionRespVO>> queryFollowUndo(Long id) {
+        List<ReportAttentionDO> list = reportAttentionService.queryFollowUndo(id);
         return success(BeanUtils.toBean(list, ReportAttentionRespVO.class));
     }
 

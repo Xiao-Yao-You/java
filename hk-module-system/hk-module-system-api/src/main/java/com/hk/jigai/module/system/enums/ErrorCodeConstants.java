@@ -189,6 +189,6 @@ public interface ErrorCodeConstants {
     ErrorCode USER_REPORT_INFO_NOT_EXISTS = new ErrorCode(1_002_032_006, "信息不存在");
     ErrorCode REPORT_ATTENTION_NOT_EXISTS = new ErrorCode(1_002_032_007, "关注信息不存在");
     ErrorCode REPORT_OBJECT_NOT_EXISTS = new ErrorCode(1_002_032_008, "汇报对象不存在");
-
+    ErrorCode REPORT_ATTENTION_ALREADY_REPLOY = new ErrorCode(1_002_032_009, "已跟进不能取消关注！");
 
 }

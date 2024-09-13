@@ -76,12 +76,25 @@ public class UserReportServiceImpl implements UserReportService {
         // 处理子表数据
         List<ReportJobScheduleDO> reportJobScheduleDOList = createReqVO.getReportJobScheduleDOList();
         List<ReportJobPlanDO> reportJobPlanDOList = createReqVO.getReportJobPlanDOList();
+
+        List<ReportAttentionDO> attentionDOList = new ArrayList<>();
         if (CollectionUtil.isNotEmpty(reportJobScheduleDOList)) {
             reportJobScheduleDOList.stream().forEach(p -> {
                 p.setUserReportId(userReport.getId());
+                if(p.getConnectId() != null){
+                    ReportAttentionDO reportAttentionDO = new ReportAttentionDO();
+                    reportAttentionDO.setId(p.getConnectId());
+                    reportAttentionDO.setJobScheduleId(p.getId());
+                    reportAttentionDO.setSituation(p.getSituation());
+                    reportAttentionDO.setReplyStatus("1");
+                    attentionDOList.add(reportAttentionDO);
+                }
             });
             // 处理进度表数据
             reportJobScheduleMapper.insertBatch(reportJobScheduleDOList);
+            if(!CollectionUtils.isAnyEmpty(attentionDOList)){
+                reportAttentionMapper.updateBatch(attentionDOList);
+            }
         }
         if (CollectionUtil.isNotEmpty(reportJobPlanDOList)) {
             reportJobPlanDOList.stream().forEach(p -> {
@@ -119,27 +132,69 @@ public class UserReportServiceImpl implements UserReportService {
             updateObj.setType("1");
         }
 
-        //更新对应的工作进度和计划
-        reportJobScheduleMapper.delete(new QueryWrapper<ReportJobScheduleDO>().lambda().eq(ReportJobScheduleDO::getUserReportId, updateObj.getId()));
-        reportJobPlanMapper.delete(new QueryWrapper<ReportJobPlanDO>().lambda().eq(ReportJobPlanDO::getUserReportId, updateObj.getId()));
         // 处理子表数据
+        //有关联，则需要更新
         List<ReportJobScheduleDO> reportJobScheduleDOList = updateObj.getReportJobScheduleDOList();
-        List<ReportJobPlanDO> reportJobPlanDOList = updateObj.getReportJobPlanDOList();
+        Set<Long> scheduleUpdateId = new HashSet<>();
+        List<ReportAttentionDO> attentionDOList = new ArrayList<>();
         if (CollectionUtil.isNotEmpty(reportJobScheduleDOList)) {
-            reportJobScheduleDOList.stream().forEach(p -> {
-                p.setUserReportId(updateObj.getId());
-                p.setId(null);
-            });
-            // 处理进度表数据
-            reportJobScheduleMapper.insertBatch(reportJobScheduleDOList);
+            for(ReportJobScheduleDO reportJobScheduleDO : reportJobScheduleDOList){
+                reportJobScheduleDO.setUserReportId(updateObj.getId());
+                if(reportJobScheduleDO.getId() != null){
+                    scheduleUpdateId.add(reportJobScheduleDO.getId());
+                }
+                if(reportJobScheduleDO.getConnectId() != null){
+                    ReportAttentionDO reportAttentionDO = new ReportAttentionDO();
+                    reportAttentionDO.setId(reportJobScheduleDO.getConnectId());
+                    reportAttentionDO.setJobScheduleId(reportJobScheduleDO.getId());
+                    reportAttentionDO.setSituation(reportJobScheduleDO.getSituation());
+                    reportAttentionDO.setReplyStatus("1");
+                    attentionDOList.add(reportAttentionDO);
+                }else{
+                    reportJobScheduleDO.setConnectId(null);
+                }
+            }
         }
+        if(CollectionUtils.isAnyEmpty(scheduleUpdateId)){
+            reportJobScheduleMapper.delete(new QueryWrapper<ReportJobScheduleDO>().lambda()
+                    .eq(ReportJobScheduleDO::getUserReportId, updateObj.getId()));
+        }else{
+            reportJobScheduleMapper.delete(new QueryWrapper<ReportJobScheduleDO>().lambda()
+                    .eq(ReportJobScheduleDO::getUserReportId, updateObj.getId())
+                    .notIn(ReportJobScheduleDO::getId, scheduleUpdateId));
+            Map map = new HashMap();
+            map.put("jobIds", scheduleUpdateId);
+            reportAttentionMapper.updateNotFollow(map);
+        }
+        if(!CollectionUtils.isAnyEmpty(reportJobScheduleDOList)){
+            reportJobScheduleMapper.insertOrUpdateBatch(reportJobScheduleDOList);
+        }
+
+        if(!CollectionUtils.isAnyEmpty(attentionDOList)){
+            reportAttentionMapper.updateBatch(attentionDOList);
+        }
+        //处理plan
+        List<ReportJobPlanDO> reportJobPlanDOList = updateObj.getReportJobPlanDOList();
+        Set<Long> planUpdateId = new HashSet<>();
         if (CollectionUtil.isNotEmpty(reportJobPlanDOList)) {
-            reportJobPlanDOList.stream().forEach(p -> {
-                p.setUserReportId(updateObj.getId());
-                p.setId(null);
-            });
-            // 处理计划表数据
-            reportJobPlanMapper.insertBatch(reportJobPlanDOList);
+            for(ReportJobPlanDO reportJobPlanDO : reportJobPlanDOList){
+                reportJobPlanDO.setUserReportId(updateObj.getId());
+                if(reportJobPlanDO.getId() != null){
+                    planUpdateId.add(reportJobPlanDO.getId());
+                }
+            }
+        }
+        if(CollectionUtils.isAnyEmpty(planUpdateId)){
+            reportJobPlanMapper.delete(new QueryWrapper<ReportJobPlanDO>().lambda()
+                    .eq(ReportJobPlanDO::getUserReportId, updateObj.getId()));
+        }else{
+            reportJobPlanMapper.delete(new QueryWrapper<ReportJobPlanDO>().lambda()
+                    .eq(ReportJobPlanDO::getUserReportId, updateObj.getId())
+                    .notIn(ReportJobPlanDO::getId, planUpdateId));
+        }
+
+        if(!CollectionUtils.isAnyEmpty(reportJobPlanDOList)) {
+            reportJobPlanMapper.insertOrUpdateBatch(reportJobPlanDOList);
         }
         // 更新
         userReportMapper.updateById(updateObj);
@@ -171,7 +226,7 @@ public class UserReportServiceImpl implements UserReportService {
                 jobIdList.add(reportJobScheduleDO.getId());
             }
             List<ReportAttentionDO> attentionList = reportAttentionMapper.selectList(new QueryWrapper<ReportAttentionDO>()
-                    .lambda().eq(ReportAttentionDO::getUserId, getLoginUserId()).in(ReportAttentionDO::getJobId, jobIdList));
+                    .lambda().in(ReportAttentionDO::getJobId, jobIdList));
 
             if (!CollectionUtils.isAnyEmpty(attentionList)) {
                 for (ReportAttentionDO reportAttentionDO : attentionList) {

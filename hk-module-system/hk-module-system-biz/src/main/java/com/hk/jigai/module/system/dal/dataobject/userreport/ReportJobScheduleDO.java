@@ -50,6 +50,7 @@ public class ReportJobScheduleDO extends BaseDO {
     /**
      * 关联待跟进的事项id
      */
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private Long connectId;
 
     /**

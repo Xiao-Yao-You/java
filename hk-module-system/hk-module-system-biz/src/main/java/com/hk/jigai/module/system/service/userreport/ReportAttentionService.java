@@ -53,7 +53,7 @@ public interface ReportAttentionService {
      * 查询当前登录人未跟进的跟进列表
      * @return
      */
-    List<ReportAttentionDO> queryFollowUndo();
+    List<ReportAttentionDO> queryFollowUndo(Long id);
 
     /**
      * 关注操作

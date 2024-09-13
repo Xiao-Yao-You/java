@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hk.jigai.module.system.dal.mysql.userreport.ReportAttentionMapper">
+
+    <update id="updateNotFollow" parameterType="map">
+        update hk_report_attention
+        set reply_status = '0',
+            situation = '',
+            job_schedule_id = null
+        where job_schedule_id in
+        <foreach item="item" index="index" collection="jobIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+</mapper>

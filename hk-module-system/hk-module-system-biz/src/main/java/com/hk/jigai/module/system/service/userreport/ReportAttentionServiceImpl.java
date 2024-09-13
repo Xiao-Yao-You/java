@@ -22,6 +22,7 @@ import com.hk.jigai.framework.common.util.object.BeanUtils;
 import com.hk.jigai.module.system.dal.mysql.userreport.ReportAttentionMapper;
 import static com.hk.jigai.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils.*;
+import static com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
 import static com.hk.jigai.module.system.enums.ErrorCodeConstants.*;
 
 /**
@@ -56,7 +57,12 @@ public class ReportAttentionServiceImpl implements ReportAttentionService {
     @Override
     public void deleteReportAttention(Long id) {
         // 校验存在
-        validateReportAttentionExists(id);
+        ReportAttentionDO reportAttentionDO = reportAttentionMapper.selectById(id);
+        if (reportAttentionDO == null) {
+            throw exception(REPORT_ATTENTION_NOT_EXISTS);
+        } else if("1".equals(reportAttentionDO.getReplyStatus())){
+            throw exception(REPORT_ATTENTION_ALREADY_REPLOY);
+        }
         // 删除
         reportAttentionMapper.deleteById(id);
     }
@@ -80,8 +86,19 @@ public class ReportAttentionServiceImpl implements ReportAttentionService {
     }
 
     @Override
-    public List<ReportAttentionDO> queryFollowUndo() {
-        return reportAttentionMapper.selectList();
+    public List<ReportAttentionDO> queryFollowUndo(Long id) {
+        List<ReportAttentionDO> result = new ArrayList();
+        if(id != null){
+            ReportAttentionDO reportAttentionDO = reportAttentionMapper.selectById(id);
+            if (reportAttentionDO != null && "1".equals(reportAttentionDO.getReplyStatus()) && getLoginUserId().equals(reportAttentionDO.getReplyUserId())) {
+                result.add(reportAttentionDO);
+            }
+        }
+        List<ReportAttentionDO> list = reportAttentionMapper.selectList();
+        if(!CollectionUtils.isAnyEmpty(list)){
+            result.addAll(list);
+        }
+        return result;
     }
 
     @Override
@@ -99,6 +116,12 @@ public class ReportAttentionServiceImpl implements ReportAttentionService {
         Long loginUserId = getLoginUserId();
         if(CollectionUtils.isAnyEmpty(attentionOtherInfoDO.getReportObject()) || !attentionOtherInfoDO.getReportObject().contains(loginUserId)){
             throw exception(USER_REPORT_NOT_OPERATE);
+        }
+        //判断当前用户是否已经关注
+        ReportAttentionDO alreadyAttentionDO = reportAttentionMapper.selectOne(new QueryWrapper<ReportAttentionDO>()
+                        .lambda().eq(ReportAttentionDO::getReplyUserId, getLoginUserId()).eq(ReportAttentionDO::getJobId,request.getJobId()));
+        if(alreadyAttentionDO != null){
+            throw exception(REPORT_ATTENTION_ALREADY_REPLOY);
         }
         //2.补充一些字段
         ReportAttentionDO reportAttentionDO = new ReportAttentionDO();

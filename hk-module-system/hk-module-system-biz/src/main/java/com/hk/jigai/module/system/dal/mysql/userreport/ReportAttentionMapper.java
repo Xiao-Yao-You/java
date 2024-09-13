@@ -48,4 +48,6 @@ public interface ReportAttentionMapper extends BaseMapperX<ReportAttentionDO> {
                 .orderByDesc(ReportAttentionDO::getId));
     }
 
+    void updateNotFollow(Map map);
+
 }
