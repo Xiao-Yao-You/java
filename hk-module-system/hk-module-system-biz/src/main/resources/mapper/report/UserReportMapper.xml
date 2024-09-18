@@ -60,6 +60,12 @@
                           left join hk_user_report c
                                     on a.report_user_id = c.user_id  and c.type != '2'
                                     and c.date_report between #{dateReport[${0}]} and #{dateReport[${1}]}
+                                    and	 (
+                                           c.report_object like CONCAT('%,' , #{userId} , ',%')
+                                        or c.report_object like CONCAT('%,' , #{userId} , ']')
+                                        or c.report_object like CONCAT('[' , #{userId} , ',%')
+                                        or c.report_object = CONCAT('[' , #{userId} , ']')
+                                    )
                  where a.user_id=#{userId}
                  group by a.report_user_nick_name, c.user_id
                  having (num< DATEDIFF(#{dateReport[${0}]}, #{dateReport[${1}]}))
