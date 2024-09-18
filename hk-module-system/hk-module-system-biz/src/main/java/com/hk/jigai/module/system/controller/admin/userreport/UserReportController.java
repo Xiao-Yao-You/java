@@ -151,4 +151,13 @@ public class UserReportController {
     public CommonResult<List<AttentionAlertRespVO>> queryAttentionList() {
         return success(userReportService.queryAttentionList());
     }
+
+
+    @GetMapping("/queryOtherInfo")
+    @Operation(summary = "已被关注的下拉")
+    @PreAuthorize("@ss.hasPermission('hk:user-report:query')")
+    public CommonResult<OtherInfoRespVO> queryOtherInfo() {
+        return success(userReportService.queryOtherInfo());
+    }
+
 }

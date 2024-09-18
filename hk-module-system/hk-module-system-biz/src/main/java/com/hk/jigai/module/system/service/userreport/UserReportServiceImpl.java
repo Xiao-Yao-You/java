@@ -17,6 +17,7 @@ import javax.annotation.Resource;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -286,5 +287,34 @@ public class UserReportServiceImpl implements UserReportService {
     public ReportJobScheduleDO getScheduleInfo(Long id) {
         return reportJobScheduleMapper.selectOne(new QueryWrapper<ReportJobScheduleDO>()
                 .lambda().eq(ReportJobScheduleDO::getConnectId, id));
+    }
+
+    @Override
+    public OtherInfoRespVO queryOtherInfo() {
+        OtherInfoRespVO response = new OtherInfoRespVO();
+        StatisticsReqVO reqVO = new StatisticsReqVO();
+        reqVO.setOffset((reqVO.getPageNo() - 1) * reqVO.getPageSize());
+        reqVO.setUserId(String.valueOf(getLoginUserId()));
+        Date current = new Date();
+        SimpleDateFormat startDateFormat = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
+        SimpleDateFormat endDateFormat = new SimpleDateFormat("yyyy-MM-dd 23:59:59");
+        String currentStart = startDateFormat.format(current);
+        String currentEnd = endDateFormat.format(current);
+        List<String> dateArr = new ArrayList<>();
+        dateArr.add(currentStart);
+        dateArr.add(currentEnd);
+        reqVO.setDateReport(dateArr);
+        //1.查询汇报记录 当天，当前登录人
+        Integer count = userReportMapper.selectCount1(reqVO);
+        if(count.compareTo(new Integer("0"))>0){
+            response.setSummaryFlag(true);
+        }
+
+        //2.
+        List<ReportAttentionDO> list = reportAttentionMapper.selectList();
+        if(!CollectionUtils.isAnyEmpty(list)){
+            response.setNeedFollow(list.size());
+        }
+        return response;
     }
 }

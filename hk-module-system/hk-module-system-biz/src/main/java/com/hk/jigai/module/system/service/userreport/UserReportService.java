@@ -82,4 +82,10 @@ public interface UserReportService {
      */
     ReportJobScheduleDO getScheduleInfo(Long id);
 
+    /**
+     * 其他信息
+     * @return
+     */
+    OtherInfoRespVO queryOtherInfo();
+
 }
