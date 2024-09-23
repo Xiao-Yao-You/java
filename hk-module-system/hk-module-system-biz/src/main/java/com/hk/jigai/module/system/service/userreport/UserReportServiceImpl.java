@@ -58,8 +58,10 @@ public class UserReportServiceImpl implements UserReportService {
                 .eq(UserReportDO::getDateReport, createReqVO.getDateReport())
                 .eq(UserReportDO::getUserId, getLoginUserId()));
         if (CollectionUtil.isNotEmpty(userReportDOS)) {
+            Set<Long> currentReportObject = userReport.getReportObject();
             for(UserReportDO userReportDO : userReportDOS){
-                if(userReportDO.getReportObject().contains(getLoginUserId())){
+                //有交集
+                if(!Collections.disjoint(userReportDO.getReportObject(), currentReportObject)){
                     throw exception(USER_REPORT_EXISTS);
                 }
             }
@@ -119,8 +121,10 @@ public class UserReportServiceImpl implements UserReportService {
                 .eq(UserReportDO::getDateReport, updateReqVO.getDateReport())
                 .eq(UserReportDO::getUserId, getLoginUserId()));
         if (CollectionUtil.isNotEmpty(userReportDOS)) {
+            Set<Long> currentReportObject = updateReqVO.getReportObject();
             for(UserReportDO userReportDO : userReportDOS){
-                if(userReportDO.getReportObject().contains(getLoginUserId()) && updateReqVO.getId() != userReportDO.getId()){
+                if(!Collections.disjoint(userReportDO.getReportObject(), currentReportObject)
+                        && updateReqVO.getId() != userReportDO.getId()){
                     throw exception(USER_REPORT_EXISTS);
                 }
             }
