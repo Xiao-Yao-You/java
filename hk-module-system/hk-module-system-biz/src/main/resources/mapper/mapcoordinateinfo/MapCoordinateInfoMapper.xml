@@ -5,7 +5,7 @@
     <select id="getMapCoordinateInfoAll" resultMap="mapCoordinateInfoMap" parameterType="String">
         select id,zone_type as zoneType,type,name,alias,mark_name,longitude,latitude,create_time as createTime,factory_code as factoryCode
         from hk_map_coordinate_info
-        where zone_type = '00' and deleted = 0 and factory_code = #{factoryCode}
+        where zone_type = '00' and deleted = 0 and status = 0 and factory_code = #{factoryCode}
         order by type,sort
     </select>
 

@@ -10,6 +10,7 @@ import com.hk.jigai.module.system.dal.mysql.userreport.ReportJobPlanMapper;
 import com.hk.jigai.module.system.dal.mysql.userreport.ReportJobScheduleMapper;
 import com.hk.jigai.module.system.dal.mysql.userreport.ReportAttentionMapper;
 import com.hk.jigai.module.system.dal.mysql.userreport.UserReportMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -37,6 +38,7 @@ import static com.hk.jigai.module.system.enums.ErrorCodeConstants.*;
  */
 @Service
 @Validated
+@Slf4j
 public class UserReportServiceImpl implements UserReportService {
     @Resource
     private UserReportMapper userReportMapper;
@@ -57,6 +59,7 @@ public class UserReportServiceImpl implements UserReportService {
         List<UserReportDO> userReportDOS = userReportMapper.selectList(new QueryWrapper<UserReportDO>().lambda()
                 .eq(UserReportDO::getDateReport, createReqVO.getDateReport())
                 .eq(UserReportDO::getUserId, getLoginUserId()));
+        log.info("创建新的汇报，并判断当前汇报人当前日期是否已经汇报");
         if (CollectionUtil.isNotEmpty(userReportDOS)) {
             Set<Long> currentReportObject = userReport.getReportObject();
             for(UserReportDO userReportDO : userReportDOS){
@@ -120,11 +123,14 @@ public class UserReportServiceImpl implements UserReportService {
         List<UserReportDO> userReportDOS = userReportMapper.selectList(new QueryWrapper<UserReportDO>().lambda()
                 .eq(UserReportDO::getDateReport, updateReqVO.getDateReport())
                 .eq(UserReportDO::getUserId, getLoginUserId()));
+        log.info("更新汇报，并判断当前汇报人当前日期是否已经汇报");
         if (CollectionUtil.isNotEmpty(userReportDOS)) {
             Set<Long> currentReportObject = updateReqVO.getReportObject();
             for(UserReportDO userReportDO : userReportDOS){
                 if(!Collections.disjoint(userReportDO.getReportObject(), currentReportObject)
-                        && updateReqVO.getId() != userReportDO.getId()){
+                        && !Long.valueOf(updateReqVO.getId()).equals(userReportDO.getId())){
+                    //Long.compare(long1, long2) != 0
+                    log.info("更新汇报,已重复！" + updateReqVO.getId() + "," + userReportDO.getId());
                     throw exception(USER_REPORT_EXISTS);
                 }
             }
