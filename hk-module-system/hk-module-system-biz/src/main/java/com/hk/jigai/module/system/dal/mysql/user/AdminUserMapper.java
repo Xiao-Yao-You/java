@@ -20,7 +20,7 @@ public interface AdminUserMapper extends BaseMapperX<AdminUserDO> {
 
     List<AdminUserDO> selectPage(Map<String, Object> requestMap);
 
-    List<AdminUserDO> selectListByNickname(String nickname);
+    List<AdminUserDO> selectListByNickname(Map<String, Object> requestMap);
 
     List<AdminUserDO> selectListByStatus(Integer status);
 

@@ -354,11 +354,6 @@ public class AdminUserServiceImpl implements AdminUserService {
         });
     }
 
-    @Override
-    public List<AdminUserDO> getUserListByNickname(String nickname) {
-        return userMapper.selectListByNickname(nickname);
-    }
-
     /**
      * 获得部门条件：查询指定部门的子部门编号们，包括自身
      * @param deptIdArray 部门编号
@@ -591,8 +586,11 @@ public class AdminUserServiceImpl implements AdminUserService {
         userMapper.updateById(new AdminUserDO().setId(id).setOpenid(openid));
     }
     @Override
-    public List<UserRespVO> getAllUser(String nickname) {
-        List<AdminUserDO> adminUserDOS = userMapper.selectList(new QueryWrapper<AdminUserDO>().lambda().like(AdminUserDO::getNickname, nickname));
+    public List<UserRespVO> getAllUser(String nickname, Long deptId) {
+        Map<String, Object> requestMap = new HashMap();
+        requestMap.put("nickname", nickname);
+        requestMap.put("deptList", getDeptCondition(null,deptId));
+        List<AdminUserDO> adminUserDOS = userMapper.selectListByNickname(requestMap);
         return BeanUtils.toBean(adminUserDOS, UserRespVO.class);
     }
 

@@ -146,6 +146,11 @@ public class SceneCodeServiceImpl implements SceneCodeService {
         return sb.toString();
     }
 
+    @Override
+    public List<SceneCodeDO> getSceneCodeList() {
+        return sceneCodeMapper.selectList();
+    }
+
     private static String formatDate(LocalDate date, String format) {
         return date.format(DateTimeFormatter.ofPattern(format));
     }

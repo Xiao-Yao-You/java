@@ -59,4 +59,11 @@ public interface SceneCodeService {
      */
     String increment(String keyCode);
 
+    /**
+     * 查询列表
+     * @return
+     */
+    List<SceneCodeDO> getSceneCodeList();
+
+
 }

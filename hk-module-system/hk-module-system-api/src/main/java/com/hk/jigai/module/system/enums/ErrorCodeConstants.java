@@ -191,4 +191,16 @@ public interface ErrorCodeConstants {
     ErrorCode REPORT_OBJECT_NOT_EXISTS = new ErrorCode(1_002_032_008, "汇报对象不存在");
     ErrorCode REPORT_ATTENTION_ALREADY_REPLOY = new ErrorCode(1_002_032_009, "已跟进不能取消关注！");
 
+    // ========== 运维管理配置 1-002-033-000 ==========
+    ErrorCode OPERATION_QUESTION_TYPE_NOT_EXISTS = new ErrorCode(1_002_033_000, "运维类型不存在");
+    ErrorCode OPERATION_DEVICE_TYPE_NOT_EXISTS = new ErrorCode(1_002_033_001, "设备类型不存在");
+    ErrorCode OPERATION_ADDRESS_NOT_EXISTS = new ErrorCode(1_002_033_002, "运维地址不存在");
+    ErrorCode OPERATION_LABEL_NOT_EXISTS = new ErrorCode(1_002_033_003, "标签不存在");
+    ErrorCode OPERATION_LABEL_NUM_CORRECT = new ErrorCode(1_002_033_004, "请正确输入数值");
+    ErrorCode OPERATION_DEVICE_NOT_EXISTS = new ErrorCode(1_002_033_005, "设备信息不存在");
+    ErrorCode OPERATION_ORDER_NOT_EXISTS = new ErrorCode(1_002_033_006, "工单不存在");
+    ErrorCode OPERATION_ORDER_OPERATE_NOT_EXISTS = new ErrorCode(1_002_033_007, "操作类型不存在");
+    ErrorCode OPERATION_ORDER_OPERATE_ERROR = new ErrorCode(1_002_033_008, "当前不可执行该操作");
+    ErrorCode OPERATION_ORDER_OPERATE_NOT_PICTURE = new ErrorCode(1_002_033_009, "当前该操作图片必传");
+
 }

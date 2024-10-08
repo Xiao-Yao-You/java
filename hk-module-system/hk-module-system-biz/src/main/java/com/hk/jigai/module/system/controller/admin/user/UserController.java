@@ -235,8 +235,8 @@ public class UserController {
 
     @GetMapping("/getAllUser")
     @Operation(summary = "获取所有用户")
-    public CommonResult<List<UserRespVO>> getAllUser(@RequestParam("nickname") String nickname) {
-        List<UserRespVO> allUser = userService.getAllUser(nickname);
+    public CommonResult<List<UserRespVO>> getAllUser(@RequestParam("nickname") String nickname, Long deptId) {
+        List<UserRespVO> allUser = userService.getAllUser(nickname,deptId);
         return success(allUser);
     }
 }

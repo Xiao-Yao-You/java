@@ -100,7 +100,7 @@
         ORDER BY su.id DESC
     </select>
 
-    <select id="selectListByNickname" resultMap="userMap">
+    <select id="selectListByNickname" parameterType="map" resultMap="userMap">
         SELECT  su.id,
                 su.username,
                 su.password,
@@ -120,7 +120,17 @@
         FROM system_users su
                  LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
                  LEFT JOIN system_dept sd ON sud.dept_id=sd.id and sd.deleted = 0
-        WHERE su.nickname like CONCAT('%' , #{nickname} , '%') and su.deleted = 0
+        WHERE su.deleted = 0
+        <if test="nickname != null  and nickname != ''">
+            and su.nickname like CONCAT('%' , #{nickname} , '%')
+        </if>
+
+        <if test="deptList != null and deptList.size() > 0">
+            and sd.id IN
+            <foreach item="item" index="index" collection="deptList" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
         ORDER BY su.id DESC
     </select>
 

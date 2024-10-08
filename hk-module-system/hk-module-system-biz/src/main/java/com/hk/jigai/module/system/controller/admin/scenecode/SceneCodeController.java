@@ -71,6 +71,14 @@ public class SceneCodeController {
         return success(BeanUtils.toBean(sceneCode, SceneCodeRespVO.class));
     }
 
+    @GetMapping("/getAll")
+    @Operation(summary = "获得单据编码类型配置列表")
+    @PreAuthorize("@ss.hasPermission('system:scene-code:query')")
+    public CommonResult<List<SceneCodeRespVO>> getSceneCodePage() {
+        List<SceneCodeDO> list = sceneCodeService.getSceneCodeList();
+        return success(BeanUtils.toBean(list, SceneCodeRespVO.class));
+    }
+
     @GetMapping("/page")
     @Operation(summary = "获得单据编码类型配置分页")
     @PreAuthorize("@ss.hasPermission('system:scene-code:query')")

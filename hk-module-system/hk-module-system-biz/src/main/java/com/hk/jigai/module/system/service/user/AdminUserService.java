@@ -171,14 +171,6 @@ public interface AdminUserService {
     }
 
     /**
-     * 获得用户列表，基于昵称模糊匹配
-     *
-     * @param nickname 昵称
-     * @return 用户列表
-     */
-    List<AdminUserDO> getUserListByNickname(String nickname);
-
-    /**
      * 批量导入用户
      *
      * @param importUsers     导入用户列表
@@ -230,7 +222,7 @@ public interface AdminUserService {
      * @param nickname
      * @return
      */
-    List<UserRespVO> getAllUser(String nickname);
+    List<UserRespVO> getAllUser(String nickname, Long deptId);
 
     /**
      * 根据用户ID集合查询汇报对象集合
