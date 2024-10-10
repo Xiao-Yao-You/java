@@ -67,6 +67,7 @@
                                         or c.report_object = CONCAT('[' , #{userId} , ']')
                                     )
                  where a.user_id=#{userId}
+                   and a.deleted = 0
                  group by a.report_user_nick_name, c.user_id
                  having (num< DATEDIFF(#{dateReport[${0}]}, #{dateReport[${1}]}))
                      or ke is null) d

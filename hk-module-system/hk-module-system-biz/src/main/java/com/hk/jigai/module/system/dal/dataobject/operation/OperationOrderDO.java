@@ -92,7 +92,7 @@ public class OperationOrderDO extends BaseDO {
     /**
      * 描述
      */
-    private String desc;
+    private String description;
     /**
      * 类型,00 主动接单,01 指派工单,02 转交工单
      */

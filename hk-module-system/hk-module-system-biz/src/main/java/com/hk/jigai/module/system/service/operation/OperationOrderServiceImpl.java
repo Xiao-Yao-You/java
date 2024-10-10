@@ -53,7 +53,7 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         // 插入
         OperationOrderDO operationOrder = BeanUtils.toBean(createReqVO, OperationOrderDO.class);
         operationOrderMapper.insert(operationOrder);
-        String code = sceneCodeService.increment("");//todo 待定义好字典后补充
+        String code = sceneCodeService.increment("REPAIR_ORDER");
         operationOrder.setCode(code);
 
         // 返回

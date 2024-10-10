@@ -32,7 +32,7 @@ public interface OperationOrderMapper extends BaseMapperX<OperationOrderDO> {
                 .eqIfPresent(OperationOrderDO::getRequestType, reqVO.getRequestType())
                 .eqIfPresent(OperationOrderDO::getQuestionType, reqVO.getQuestionType())
                 .eqIfPresent(OperationOrderDO::getLevel, reqVO.getLevel())
-                .eqIfPresent(OperationOrderDO::getDesc, reqVO.getDesc())
+                .eqIfPresent(OperationOrderDO::getDescription, reqVO.getDescription())
                 .eqIfPresent(OperationOrderDO::getType, reqVO.getType())
                 .eqIfPresent(OperationOrderDO::getSourceType, reqVO.getSourceType())
                 .eqIfPresent(OperationOrderDO::getDealUserId, reqVO.getDealUserId())

@@ -75,7 +75,7 @@ public class OperationOrderRespVO {
 
     @Schema(description = "描述")
     @ExcelProperty("描述")
-    private String desc;
+    private String description;
 
     @Schema(description = "类型,00 主动接单,01 指派工单,02 转交工单", example = "2")
     @ExcelProperty("类型,00 主动接单,01 指派工单,02 转交工单")

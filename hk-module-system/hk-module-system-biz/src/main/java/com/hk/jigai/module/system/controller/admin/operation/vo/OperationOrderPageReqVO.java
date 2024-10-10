@@ -58,7 +58,7 @@ public class OperationOrderPageReqVO extends PageParam {
     private String level;
 
     @Schema(description = "描述")
-    private String desc;
+    private String description;
 
     @Schema(description = "类型,00 主动接单,01 指派工单,02 转交工单", example = "2")
     private String type;
