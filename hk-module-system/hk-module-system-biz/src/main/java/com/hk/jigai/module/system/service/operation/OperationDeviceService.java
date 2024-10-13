@@ -45,6 +45,14 @@ public interface OperationDeviceService {
     OperationDeviceRespVO getOperationDevice(Long id);
 
     /**
+     * 根据标签号获得运维设备
+     *
+     * @param labelCode 标签号
+     * @return 运维设备
+     */
+    OperationDeviceRespVO getOperationDeviceByLabelCode(String labelCode);
+
+    /**
      * 获得运维设备分页
      *
      * @param pageReqVO 分页查询

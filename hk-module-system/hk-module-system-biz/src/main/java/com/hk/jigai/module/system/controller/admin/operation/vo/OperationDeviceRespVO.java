@@ -6,8 +6,11 @@ import lombok.*;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.*;
+
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
+
 import com.alibaba.excel.annotation.*;
 
 @Schema(description = "管理后台 - 运维设备 Response VO")
@@ -118,6 +121,7 @@ public class OperationDeviceRespVO {
     @Schema(description = "设备分配登记人", example = "24873")
     @ExcelProperty("设备分配登记人")
     private Long registerUserId;
+    private String registerUserName;
 
     @Schema(description = "设备分配登记时间")
     @ExcelProperty("设备分配登记时间")
@@ -125,7 +129,7 @@ public class OperationDeviceRespVO {
 
     @Schema(description = "报废时间")
     @ExcelProperty("报废时间")
-    private LocalDateTime scrapDate;
+    private LocalDate scrapDate;
 
     @Schema(description = "报废类型", example = "1")
     @ExcelProperty("报废类型")
@@ -135,9 +139,11 @@ public class OperationDeviceRespVO {
     @ExcelProperty("报废处理人")
     private Long scrapUserId;
 
+    private String scrapUserName;
+
     @Schema(description = "报废处理方式")
     @ExcelProperty("报废处理方式")
-    private String scrapDealTyep;
+    private String scrapDealType;
 
     @Schema(description = "报废说明", example = "你说的对")
     @ExcelProperty("报废说明")
@@ -150,7 +156,18 @@ public class OperationDeviceRespVO {
     @Schema(description = "设备图片list")
     private List<OperationDevicePictureSaveReqVO> pictureList;
 
+    @Schema(description = "设备图片")
+    private List<OperationDevicePictureSaveReqVO> devicePictureList;
+
+    @Schema(description = "分配图片")
+    private List<OperationDevicePictureSaveReqVO> distributePictureList;
+
+    @Schema(description = "报废图片")
+    private List<OperationDevicePictureSaveReqVO> scrapPictureList;
+
     @Schema(description = "配置list")
     private List<OperationDeviceAccessorySaveReqVO> accessoryList;
 
+    @Schema(description = "问题类型明文")
+    private String questionTypeStr;
 }

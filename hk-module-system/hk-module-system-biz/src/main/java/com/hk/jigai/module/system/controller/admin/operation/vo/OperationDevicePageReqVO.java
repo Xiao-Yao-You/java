@@ -1,5 +1,6 @@
 package com.hk.jigai.module.system.controller.admin.operation.vo;
 
+import cn.hutool.core.date.DateTime;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -93,6 +94,8 @@ public class OperationDevicePageReqVO extends PageParam {
 
     @Schema(description = "设备分配登记人", example = "24873")
     private Long registerUserId;
+    private String registerUserName;
+
 
     @Schema(description = "设备分配登记时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
@@ -100,7 +103,7 @@ public class OperationDevicePageReqVO extends PageParam {
 
     @Schema(description = "报废时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private LocalDateTime[] scrapDate;
+    private DateTime[] scrapDate;
 
     @Schema(description = "报废类型", example = "1")
     private String scrapType;
@@ -108,8 +111,11 @@ public class OperationDevicePageReqVO extends PageParam {
     @Schema(description = "报废处理人", example = "10844")
     private Long scrapUserId;
 
+    @Schema(description = "报废处理人", requiredMode = Schema.RequiredMode.REQUIRED, example = "10844")
+    private String  scrapUserName;
+
     @Schema(description = "报废处理方式")
-    private String scrapDealTyep;
+    private String scrapDealType;
 
     @Schema(description = "报废说明", example = "你说的对")
     private String scrapRemark;
@@ -120,5 +126,8 @@ public class OperationDevicePageReqVO extends PageParam {
 
     @Schema(description = "地址", example = "你说的对")
     private String address;
+
+    @Schema(description = "问题类型明文")
+    private String questionTypeStr;
 
 }

@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,7 +19,7 @@ public class OperationDeviceScrapReqVO {
 
     @Schema(description = "报废时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY)
-    private LocalDateTime scrapDate;
+    private LocalDate scrapDate;
 
     @Schema(description = "报废类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private String scrapType;
@@ -26,8 +27,11 @@ public class OperationDeviceScrapReqVO {
     @Schema(description = "报废处理人", requiredMode = Schema.RequiredMode.REQUIRED, example = "10844")
     private Long scrapUserId;
 
+    @Schema(description = "报废处理人", requiredMode = Schema.RequiredMode.REQUIRED, example = "10844")
+    private String scrapUserName;
+
     @Schema(description = "报废处理方式", requiredMode = Schema.RequiredMode.REQUIRED)
-    private String scrapDealTyep;
+    private String scrapDealType;
 
     @Schema(description = "报废说明", example = "你说的对", requiredMode = Schema.RequiredMode.REQUIRED)
     private String scrapRemark;

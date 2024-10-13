@@ -9,6 +9,7 @@ import com.hk.jigai.module.system.dal.dataobject.operation.OperationLabelCodeDO;
 import com.hk.jigai.module.system.dal.dataobject.operation.OperationQuestionTypeDO;
 import org.apache.ibatis.annotations.Mapper;
 import com.hk.jigai.module.system.controller.admin.operation.vo.*;
+import org.apache.ibatis.annotations.Select;
 
 /**
  * 运维问题类型 Mapper
@@ -30,5 +31,6 @@ public interface OperationQuestionTypeMapper extends BaseMapperX<OperationQuesti
                 .betweenIfPresent(OperationQuestionTypeDO::getCreateTime, reqVO.getCreateTime()));
     }
 
-
+    @Select("SELECT * FROM hk_operation_question_type")
+    List<OperationQuestionTypeDO> selectAllQuestionType();
 }

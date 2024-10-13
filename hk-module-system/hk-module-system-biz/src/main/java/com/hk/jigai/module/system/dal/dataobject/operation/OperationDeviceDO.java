@@ -1,5 +1,6 @@
 package com.hk.jigai.module.system.dal.dataobject.operation;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -135,6 +136,11 @@ public class OperationDeviceDO extends BaseDO {
      * 设备分配登记人
      */
     private Long registerUserId;
+
+    /**
+     * 设备分配登记人
+     */
+    private String registerUserName;
     /**
      * 设备分配登记时间
      */
@@ -142,7 +148,7 @@ public class OperationDeviceDO extends BaseDO {
     /**
      * 报废时间
      */
-    private LocalDateTime scrapDate;
+    private LocalDate scrapDate;
     /**
      * 报废类型
      */
@@ -151,13 +157,18 @@ public class OperationDeviceDO extends BaseDO {
      * 报废处理人
      */
     private Long scrapUserId;
+
+    private String scrapUserName;
     /**
      * 报废处理方式
      */
-    private String scrapDealTyep;
+    private String scrapDealType;
     /**
      * 报废说明
      */
     private String scrapRemark;
+
+    @TableField(exist = false)
+    private String questionTypeStr;
 
 }

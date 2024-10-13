@@ -145,4 +145,7 @@ public class OperationOrderRespVO {
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 
+    @Schema(description = "问题类型明文")
+    private String questionTypeStr;
+
 }

@@ -43,6 +43,8 @@ public class OperationDeviceRegisterReqVO {
     @Schema(description = "设备分配登记人", requiredMode = Schema.RequiredMode.REQUIRED, example = "24873")
     private Long registerUserId;
 
+    private String registerUserName;
+
     @Schema(description = "设备分配登记时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime registerDate;

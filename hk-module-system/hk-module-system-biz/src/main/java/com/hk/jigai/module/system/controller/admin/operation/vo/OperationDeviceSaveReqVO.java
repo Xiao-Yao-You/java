@@ -23,7 +23,7 @@ public class OperationDeviceSaveReqVO {
     private String name;
 
     @Schema(description = "设备编码", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotEmpty(message = "设备编码不能为空")
+//    @NotEmpty(message = "设备编码不能为空")
     private String code;
 
     @Schema(description = "设备类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
@@ -107,12 +107,13 @@ public class OperationDeviceSaveReqVO {
 
     @Schema(description = "设备分配登记人", example = "24873")
     private Long registerUserId;
+    private String registerUserName;
 
     @Schema(description = "设备分配登记时间")
     private LocalDateTime registerDate;
 
     @Schema(description = "报废时间")
-    private LocalDateTime scrapDate;
+    private LocalDate scrapDate;
 
     @Schema(description = "报废类型", example = "1")
     private String scrapType;
@@ -120,8 +121,11 @@ public class OperationDeviceSaveReqVO {
     @Schema(description = "报废处理人", example = "10844")
     private Long scrapUserId;
 
+    @Schema(description = "报废处理人", requiredMode = Schema.RequiredMode.REQUIRED, example = "10844")
+    private String scrapUserName;
+
     @Schema(description = "报废处理方式")
-    private String scrapDealTyep;
+    private String scrapDealType;
 
     @Schema(description = "报废说明", example = "你说的对")
     private String scrapRemark;

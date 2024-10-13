@@ -1,18 +1,22 @@
 package com.hk.jigai.module.system.service.operation;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hk.jigai.framework.common.util.date.LocalDateTimeUtils;
+import com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils;
 import com.hk.jigai.module.system.dal.dataobject.operation.OperationDeviceAccessoryDO;
 import com.hk.jigai.module.system.dal.dataobject.operation.OperationDevicePictureDO;
 import com.hk.jigai.module.system.dal.dataobject.operation.OperationDeviceTypeDO;
 import com.hk.jigai.module.system.dal.dataobject.scenecode.SceneCodeDO;
 import com.hk.jigai.module.system.dal.dataobject.user.AdminUserDO;
-import com.hk.jigai.module.system.dal.mysql.operation.OperationDeviceAccessoryMapper;
-import com.hk.jigai.module.system.dal.mysql.operation.OperationDevicePictureMapper;
-import com.hk.jigai.module.system.dal.mysql.operation.OperationDeviceTypeMapper;
+import com.hk.jigai.module.system.dal.mysql.operation.*;
+import com.hk.jigai.module.system.dal.mysql.user.AdminUserMapper;
 import com.hk.jigai.module.system.service.scenecode.SceneCodeService;
+import com.hk.jigai.module.system.service.user.AdminUserService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+
 import javax.annotation.Resource;
 
 import org.springframework.validation.annotation.Validated;
@@ -20,13 +24,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
+
 import com.hk.jigai.module.system.controller.admin.operation.vo.*;
 import com.hk.jigai.module.system.dal.dataobject.operation.OperationDeviceDO;
 import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.common.pojo.PageParam;
 import com.hk.jigai.framework.common.util.object.BeanUtils;
-
-import com.hk.jigai.module.system.dal.mysql.operation.OperationDeviceMapper;
 
 import static com.hk.jigai.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static com.hk.jigai.module.system.enums.ErrorCodeConstants.*;
@@ -55,6 +59,10 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
     @Resource
     private OperationDevicePictureMapper operationDevicePictureMapper;
 
+    @Resource
+    private AdminUserService adminUserService;
+
+
     @Override
     @Transactional
     public Long createOperationDevice(OperationDeviceSaveReqVO createReqVO) {
@@ -65,15 +73,15 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
             throw exception(OPERATION_DEVICE_TYPE_NOT_EXISTS);
         }
         SceneCodeDO sceneCodeDO = sceneCodeService.getSceneCode(operationLabelDO.getSceneCodeId().intValue());
-        if(sceneCodeDO==null){
+        if (sceneCodeDO == null) {
             throw exception(SCENE_CODE_NOT_AVAILABLE);
         }
         createReqVO.setCode(sceneCodeService.increment(sceneCodeDO.getKeyCode()));
         operationLabelDO.setCurrentCode(createReqVO.getCode());
         //2.标签编码
-        if(StringUtils.isEmpty(createReqVO.getLabelCode())){
+        if (StringUtils.isEmpty(createReqVO.getLabelCode())) {
             SceneCodeDO labelSceneCodeDO = sceneCodeService.getSceneCode(operationLabelDO.getLabelSceneCodeId().intValue());
-            if(labelSceneCodeDO==null){
+            if (labelSceneCodeDO == null) {
                 throw exception(SCENE_CODE_NOT_AVAILABLE);
             }
             createReqVO.setLabelCode(sceneCodeService.increment(labelSceneCodeDO.getKeyCode()));
@@ -86,11 +94,11 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
         operationDeviceMapper.insert(operationDevice);
         //5.图片
         List<OperationDevicePictureDO> operationDevicePictureList = BeanUtils.toBean(createReqVO.getPictureList(), OperationDevicePictureDO.class);
-        operationDevicePictureList.forEach((a)->a.setDeviceId(operationDevice.getId()));
+        operationDevicePictureList.forEach((a) -> a.setDeviceId(operationDevice.getId()));
         operationDevicePictureMapper.insertBatch(operationDevicePictureList);
         //6.配置
         List<OperationDeviceAccessoryDO> operationDeviceAccessoryList = BeanUtils.toBean(createReqVO.getAccessoryList(), OperationDeviceAccessoryDO.class);
-        operationDeviceAccessoryList.forEach((a)->a.setDeviceId(operationDevice.getId()));
+        operationDeviceAccessoryList.forEach((a) -> a.setDeviceId(operationDevice.getId()));
         operationDeviceAccessoryMapper.insertBatch(operationDeviceAccessoryList);
         //7.返回
         return operationDevice.getId();
@@ -105,14 +113,20 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
         OperationDeviceDO updateObj = BeanUtils.toBean(updateReqVO, OperationDeviceDO.class);
         operationDeviceMapper.updateById(updateObj);
         //5.图片
-        operationDevicePictureMapper.delete(new QueryWrapper<OperationDevicePictureDO>().lambda().in(OperationDevicePictureDO::getDeviceId,updateReqVO.getId()));
+        operationDevicePictureMapper.delete(new QueryWrapper<OperationDevicePictureDO>().lambda().in(OperationDevicePictureDO::getDeviceId, updateReqVO.getId()));
         List<OperationDevicePictureDO> operationDevicePictureList = BeanUtils.toBean(updateReqVO.getPictureList(), OperationDevicePictureDO.class);
-        operationDevicePictureList.forEach((a)->a.setDeviceId(updateReqVO.getId()));
+        operationDevicePictureList.forEach((a) -> {
+            a.setDeviceId(updateReqVO.getId());
+            a.setId(null);
+        });
         operationDevicePictureMapper.insertBatch(operationDevicePictureList);
         //6.配置
-        operationDeviceAccessoryMapper.delete(new QueryWrapper<OperationDeviceAccessoryDO>().lambda().in(OperationDeviceAccessoryDO::getDeviceId,updateReqVO.getId()));
+        operationDeviceAccessoryMapper.delete(new QueryWrapper<OperationDeviceAccessoryDO>().lambda().in(OperationDeviceAccessoryDO::getDeviceId, updateReqVO.getId()));
         List<OperationDeviceAccessoryDO> operationDeviceAccessoryList = BeanUtils.toBean(updateReqVO.getAccessoryList(), OperationDeviceAccessoryDO.class);
-        operationDeviceAccessoryList.forEach((a)->a.setDeviceId(updateReqVO.getId()));
+        operationDeviceAccessoryList.forEach((a) -> {
+            a.setDeviceId(updateReqVO.getId());
+            a.setId(null);
+        });
         operationDeviceAccessoryMapper.insertBatch(operationDeviceAccessoryList);
         //todo 插入变更记录表
 
@@ -125,8 +139,8 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
         validateOperationDeviceExists(id);
         // 删除
         operationDeviceMapper.deleteById(id);
-        operationDevicePictureMapper.delete(new QueryWrapper<OperationDevicePictureDO>().lambda().in(OperationDevicePictureDO::getDeviceId,id));
-        operationDeviceAccessoryMapper.delete(new QueryWrapper<OperationDeviceAccessoryDO>().lambda().in(OperationDeviceAccessoryDO::getDeviceId,id));
+        operationDevicePictureMapper.delete(new QueryWrapper<OperationDevicePictureDO>().lambda().in(OperationDevicePictureDO::getDeviceId, id));
+        operationDeviceAccessoryMapper.delete(new QueryWrapper<OperationDeviceAccessoryDO>().lambda().in(OperationDeviceAccessoryDO::getDeviceId, id));
     }
 
     private void validateOperationDeviceExists(Long id) {
@@ -139,17 +153,40 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
     public OperationDeviceRespVO getOperationDevice(Long id) {
         OperationDeviceDO operationDeviceDO = operationDeviceMapper.selectById(id);
         OperationDeviceRespVO resp = BeanUtils.toBean(operationDeviceDO, OperationDeviceRespVO.class);
-        List<OperationDevicePictureSaveReqVO> pictureList = BeanUtils.toBean(operationDeviceAccessoryMapper.selectList((new QueryWrapper<OperationDeviceAccessoryDO>().lambda()
-                .eq(OperationDeviceAccessoryDO::getDeviceId,operationDeviceDO.getId()))), OperationDevicePictureSaveReqVO.class);
-        resp.setPictureList(pictureList);
-        List<OperationDeviceAccessorySaveReqVO> accessoryList = BeanUtils.toBean(operationDevicePictureMapper.selectList((new QueryWrapper<OperationDevicePictureDO>().lambda()
-                .eq(OperationDevicePictureDO::getDeviceId,operationDeviceDO.getId()))),OperationDeviceAccessorySaveReqVO.class);
+        List<OperationDevicePictureSaveReqVO> pictureList = BeanUtils.toBean(operationDevicePictureMapper.selectList(new QueryWrapper<OperationDevicePictureDO>().lambda().eq(OperationDevicePictureDO::getDeviceId, id)), OperationDevicePictureSaveReqVO.class);
+        if (CollectionUtil.isNotEmpty(pictureList)) {
+            List<OperationDevicePictureSaveReqVO> devicePic = pictureList.stream().filter(p -> "0".equals(p.getType())).collect(Collectors.toList());
+            List<OperationDevicePictureSaveReqVO> distributePic = pictureList.stream().filter(p -> "1".equals(p.getType())).collect(Collectors.toList());
+            List<OperationDevicePictureSaveReqVO> scrapPic = pictureList.stream().filter(p -> "2".equals(p.getType())).collect(Collectors.toList());
+            resp.setDevicePictureList(devicePic);
+            resp.setDistributePictureList(distributePic);
+            resp.setScrapPictureList(scrapPic);
+        }
+        List<OperationDeviceAccessorySaveReqVO> accessoryList = BeanUtils.toBean(operationDeviceAccessoryMapper.selectList((new QueryWrapper<OperationDeviceAccessoryDO>().lambda()
+                .eq(OperationDeviceAccessoryDO::getDeviceId, operationDeviceDO.getId()))), OperationDeviceAccessorySaveReqVO.class);
         resp.setAccessoryList(accessoryList);
         return resp;
     }
 
     @Override
+    public OperationDeviceRespVO getOperationDeviceByLabelCode(String labelCode) {
+        OperationDeviceDO operationDeviceDO = operationDeviceMapper.selectOne(new QueryWrapper<OperationDeviceDO>().lambda().eq(OperationDeviceDO::getLabelCode, labelCode));
+        OperationDeviceRespVO resp = BeanUtils.toBean(operationDeviceDO, OperationDeviceRespVO.class);
+        if (operationDeviceDO != null) {
+            List<OperationDevicePictureSaveReqVO> pictureList = BeanUtils.toBean(operationDeviceAccessoryMapper.selectList((new QueryWrapper<OperationDeviceAccessoryDO>().lambda()
+                    .eq(OperationDeviceAccessoryDO::getDeviceId, operationDeviceDO.getId()))), OperationDevicePictureSaveReqVO.class);
+            resp.setPictureList(pictureList);
+            List<OperationDeviceAccessorySaveReqVO> accessoryList = BeanUtils.toBean(operationDevicePictureMapper.selectList((new QueryWrapper<OperationDevicePictureDO>().lambda()
+                    .eq(OperationDevicePictureDO::getDeviceId, operationDeviceDO.getId()))), OperationDeviceAccessorySaveReqVO.class);
+            resp.setAccessoryList(accessoryList);
+        }
+        return resp;
+    }
+
+    @Override
     public PageResult<OperationDeviceDO> getOperationDevicePage(OperationDevicePageReqVO pageReqVO) {
+
+
         return operationDeviceMapper.selectPage(pageReqVO);
     }
 
@@ -170,13 +207,14 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
         operationDeviceDO.setLocation(registerReqVO.getLocation());
         operationDeviceDO.setIp1(registerReqVO.getIp1());
         operationDeviceDO.setIp2(registerReqVO.getIp2());
-        operationDeviceDO.setRegisterUserId(registerReqVO.getRegisterUserId());
-        operationDeviceDO.setRegisterDate(registerReqVO.getRegisterDate());
+        operationDeviceDO.setRegisterUserId(SecurityFrameworkUtils.getLoginUserId());
+        operationDeviceDO.setRegisterUserName(SecurityFrameworkUtils.getLoginUserNickname());
+        operationDeviceDO.setRegisterDate(LocalDateTime.now());
         //更新
         operationDeviceMapper.updateById(operationDeviceDO);
         //picture表
         List<OperationDevicePictureDO> operationDevicePictureList = BeanUtils.toBean(registerReqVO.getPictureList(), OperationDevicePictureDO.class);
-        operationDevicePictureList.forEach((a)->a.setDeviceId(operationDeviceDO.getId()));
+        operationDevicePictureList.forEach((a) -> a.setDeviceId(operationDeviceDO.getId()));
         operationDevicePictureMapper.insertBatch(operationDevicePictureList);
     }
 
@@ -193,14 +231,17 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
         operationDeviceDO.setScrapDate(scrapReqVO.getScrapDate());
         operationDeviceDO.setScrapType(scrapReqVO.getScrapType());
         operationDeviceDO.setScrapUserId(scrapReqVO.getScrapUserId());
-        operationDeviceDO.setScrapDealTyep(scrapReqVO.getScrapDealTyep());
+        if (StringUtils.isNotBlank(scrapReqVO.getScrapUserId() + "")) {
+            operationDeviceDO.setScrapUserName(adminUserService.getUser(scrapReqVO.getScrapUserId()) == null ? "" : adminUserService.getUser(scrapReqVO.getScrapUserId()).getNickname());
+        }
+        operationDeviceDO.setScrapDealType(scrapReqVO.getScrapDealType());
         operationDeviceDO.setScrapRemark(scrapReqVO.getScrapRemark());
 
         //更新
         operationDeviceMapper.updateById(operationDeviceDO);
         //picture表
         List<OperationDevicePictureDO> operationDevicePictureList = BeanUtils.toBean(scrapReqVO.getPictureList(), OperationDevicePictureDO.class);
-        operationDevicePictureList.forEach((a)->a.setDeviceId(operationDeviceDO.getId()));
+        operationDevicePictureList.forEach((a) -> a.setDeviceId(operationDeviceDO.getId()));
         operationDevicePictureMapper.insertBatch(operationDevicePictureList);
     }
 

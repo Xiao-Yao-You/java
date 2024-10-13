@@ -1,10 +1,11 @@
 package com.hk.jigai.module.system.service.operation;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.hk.jigai.framework.common.util.collection.CollectionUtils;
-import com.hk.jigai.module.system.dal.dataobject.operation.OperationOrderOperatePictureDO;
-import com.hk.jigai.module.system.dal.dataobject.operation.OperationOrderOperateRecordDO;
+import com.hk.jigai.module.system.dal.dataobject.operation.*;
 import com.hk.jigai.module.system.dal.mysql.operation.OperationOrderOperatePictureMapper;
 import com.hk.jigai.module.system.dal.mysql.operation.OperationOrderOperateRecordMapper;
+import com.hk.jigai.module.system.dal.mysql.operation.OperationQuestionTypeMapper;
 import com.hk.jigai.module.system.service.scenecode.SceneCodeService;
 import com.hk.jigai.module.system.util.operate.OperateConstant;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import com.hk.jigai.module.system.controller.admin.operation.vo.*;
-import com.hk.jigai.module.system.dal.dataobject.operation.OperationOrderDO;
 import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.common.pojo.PageParam;
 import com.hk.jigai.framework.common.util.object.BeanUtils;
@@ -47,11 +47,16 @@ public class OperationOrderServiceImpl implements OperationOrderService {
     OperationOrderOperatePictureMapper operationOrderOperatePictureMapper;
 
     @Resource
+    OperationQuestionTypeMapper operationQuestionTypeMapper;
+
+    @Resource
     private SceneCodeService sceneCodeService;
     @Override
     public Long createOperationOrder(OperationOrderSaveReqVO createReqVO) {
         // 插入
         OperationOrderDO operationOrder = BeanUtils.toBean(createReqVO, OperationOrderDO.class);
+        //设置工单初始状态
+        operationOrder.setStatus(OperateConstant.WAIT_ALLOCATION_STATUS);
         operationOrderMapper.insert(operationOrder);
         String code = sceneCodeService.increment("REPAIR_ORDER");
         operationOrder.setCode(code);
@@ -90,14 +95,25 @@ public class OperationOrderServiceImpl implements OperationOrderService {
 
     @Override
     public PageResult<OperationOrderDO> getOperationOrderPage(OperationOrderPageReqVO pageReqVO) {
-        return operationOrderMapper.selectPage(pageReqVO);
+
+        List<OperationQuestionTypeDO> operationQuestionTypeDOS = operationQuestionTypeMapper.selectAllQuestionType();
+        PageResult<OperationOrderDO> operationOrderDOPageResult = operationOrderMapper.selectPage(pageReqVO);
+        List<OperationOrderDO> orderList = operationOrderDOPageResult.getList();
+        if (CollectionUtil.isNotEmpty(orderList) && CollectionUtil.isNotEmpty(operationQuestionTypeDOS) ){
+            for (OperationOrderDO operationOrderDO : orderList) {
+                OperationQuestionTypeDO operationQuestionTypeDO = operationQuestionTypeDOS.stream().filter(p -> p.getId() == Long.parseLong(operationOrderDO.getQuestionType())).findAny().orElse(null);
+                operationOrderDO.setQuestionTypeStr(operationQuestionTypeDO.getName());
+            }
+        }
+        operationOrderDOPageResult.setList(orderList);
+        return operationOrderDOPageResult;
     }
 
     @Override
     @Transactional
     public void operateOrder(OperationOrderReqVO updateReqVO) {
         //工单非空判断
-        OperationOrderDO operationOrderDO = operationOrderMapper.selectById(updateReqVO.getOrderId());
+        OperationOrderDO operationOrderDO = operationOrderMapper.selectById(updateReqVO.getId());
         if (operationOrderDO == null) {
             throw exception(OPERATION_ORDER_NOT_EXISTS);
         }

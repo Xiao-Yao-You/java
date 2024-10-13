@@ -158,4 +158,7 @@ public class OperationOrderDO extends BaseDO {
      */
     private Long completeConsume;
 
+    @TableField(exist = false)
+    private String  questionTypeStr;
+
 }

@@ -1,7 +1,9 @@
 package com.hk.jigai.module.system.controller.admin.operation;
 
 import org.springframework.web.bind.annotation.*;
+
 import javax.annotation.Resource;
+
 import org.springframework.validation.annotation.Validated;
 import org.springframework.security.access.prepost.PreAuthorize;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,11 +20,13 @@ import com.hk.jigai.framework.common.pojo.PageParam;
 import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.common.pojo.CommonResult;
 import com.hk.jigai.framework.common.util.object.BeanUtils;
+
 import static com.hk.jigai.framework.common.pojo.CommonResult.success;
 
 import com.hk.jigai.framework.excel.core.util.ExcelUtils;
 
 import com.hk.jigai.framework.apilog.core.annotation.ApiAccessLog;
+
 import static com.hk.jigai.framework.apilog.core.enums.OperateTypeEnum.*;
 
 import com.hk.jigai.module.system.controller.admin.operation.vo.*;
@@ -70,6 +74,15 @@ public class OperationDeviceController {
         return success(operationDeviceService.getOperationDevice(id));
     }
 
+
+
+    @GetMapping("/getByLabelCode")
+    @Operation(summary = "根据标签号获取设备信息")
+//    @PreAuthorize("@ss.hasPermission('hk:operation-device:query')")
+    public CommonResult<OperationDeviceRespVO> getOperationDeviceByLabelCode(@RequestParam("labelCode") String labelCode) {
+        return success(operationDeviceService.getOperationDeviceByLabelCode(labelCode));
+    }
+
     @GetMapping("/page")
     @Operation(summary = "获得运维设备分页")
     @PreAuthorize("@ss.hasPermission('hk:operation-device:query')")
@@ -83,12 +96,12 @@ public class OperationDeviceController {
     @PreAuthorize("@ss.hasPermission('hk:operation-device:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportOperationDeviceExcel(@Valid OperationDevicePageReqVO pageReqVO,
-              HttpServletResponse response) throws IOException {
+                                           HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<OperationDeviceDO> list = operationDeviceService.getOperationDevicePage(pageReqVO).getList();
         // 导出 Excel
         ExcelUtils.write(response, "运维设备.xls", "数据", OperationDeviceRespVO.class,
-                        BeanUtils.toBean(list, OperationDeviceRespVO.class));
+                BeanUtils.toBean(list, OperationDeviceRespVO.class));
     }
 
     @PutMapping("/register")
