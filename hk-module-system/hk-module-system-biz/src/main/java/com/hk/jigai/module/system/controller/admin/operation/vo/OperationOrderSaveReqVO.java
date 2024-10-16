@@ -53,7 +53,7 @@ public class OperationOrderSaveReqVO {
     private String requestType;
 
     @Schema(description = "问题类型", example = "2")
-    private String questionType;
+    private Long questionType;
 
     @Schema(description = "紧急程度")
     private String level;
@@ -64,8 +64,8 @@ public class OperationOrderSaveReqVO {
     @Schema(description = "类型,00 主动接单,01 指派工单,02 转交工单", example = "2")
     private String type;
 
-    @Schema(description = "来源,00 线上报修,01 线下报修", example = "2")
-    private String sourceType;
+    @Schema(description = "来源,1 线上报修,2 线下报修", example = "2")
+    private Integer sourceType;
 
     @Schema(description = "处理人id", example = "31854")
     private Long dealUserId;

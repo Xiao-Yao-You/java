@@ -1,5 +1,6 @@
 package com.hk.jigai.module.system.dal.dataobject.operation;
 
+import com.hk.jigai.module.system.controller.admin.operation.vo.OperationDevicePictureSaveReqVO;
 import lombok.*;
 import java.util.*;
 import java.time.LocalDateTime;
@@ -69,5 +70,8 @@ public class OperationOrderOperateRecordDO extends BaseDO {
      * 说明/原因
      */
     private String remark;
+
+    @TableField(exist = false)
+    private List<OperationDevicePictureSaveReqVO> picList;
 
 }

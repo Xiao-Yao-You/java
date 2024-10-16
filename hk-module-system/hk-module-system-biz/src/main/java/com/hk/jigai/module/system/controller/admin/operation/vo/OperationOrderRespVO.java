@@ -67,7 +67,7 @@ public class OperationOrderRespVO {
 
     @Schema(description = "问题类型", example = "2")
     @ExcelProperty("问题类型")
-    private String questionType;
+    private Long questionType;
 
     @Schema(description = "紧急程度")
     @ExcelProperty("紧急程度")
@@ -82,8 +82,8 @@ public class OperationOrderRespVO {
     private String type;
 
     @Schema(description = "来源,00 线上报修,01 线下报修", example = "2")
-    @ExcelProperty("来源,00 线上报修,01 线下报修")
-    private String sourceType;
+    @ExcelProperty("来源,1 线上报修,2 线下报修")
+    private Integer sourceType;
 
     @Schema(description = "处理人id", example = "31854")
     @ExcelProperty("处理人id")

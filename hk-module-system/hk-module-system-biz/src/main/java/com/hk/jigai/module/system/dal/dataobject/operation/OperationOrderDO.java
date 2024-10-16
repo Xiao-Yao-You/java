@@ -2,6 +2,7 @@ package com.hk.jigai.module.system.dal.dataobject.operation;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+
 import java.util.*;
 import java.time.LocalDateTime;
 import java.time.LocalDateTime;
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 import java.time.LocalDateTime;
 import java.time.LocalDateTime;
 import java.time.LocalDateTime;
+
 import com.baomidou.mybatisplus.annotation.*;
 import com.hk.jigai.framework.mybatis.core.dataobject.BaseDO;
 
@@ -84,7 +86,7 @@ public class OperationOrderDO extends BaseDO {
     /**
      * 问题类型
      */
-    private String questionType;
+    private Long questionType;
     /**
      * 紧急程度
      */
@@ -98,9 +100,9 @@ public class OperationOrderDO extends BaseDO {
      */
     private String type;
     /**
-     * 来源,00 线上报修,01 线下报修
+     * 来源,1 线上报修,2 线下报修
      */
-    private String sourceType;
+    private Integer sourceType;
     /**
      * 处理人id
      */
@@ -159,6 +161,8 @@ public class OperationOrderDO extends BaseDO {
     private Long completeConsume;
 
     @TableField(exist = false)
-    private String  questionTypeStr;
+    private String questionTypeStr;
+
+    private Integer completeResult;
 
 }

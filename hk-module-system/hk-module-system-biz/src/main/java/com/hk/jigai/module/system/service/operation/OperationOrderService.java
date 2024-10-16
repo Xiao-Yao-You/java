@@ -1,11 +1,15 @@
 package com.hk.jigai.module.system.service.operation;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import javax.validation.*;
+
+import com.hk.jigai.framework.common.pojo.CommonResult;
 import com.hk.jigai.module.system.controller.admin.operation.vo.*;
 import com.hk.jigai.module.system.dal.dataobject.operation.OperationOrderDO;
 import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.common.pojo.PageParam;
+import com.hk.jigai.module.system.dal.dataobject.operation.OperationOrderOperateRecordDO;
 
 /**
  * 工单 Service 接口
@@ -58,4 +62,9 @@ public interface OperationOrderService {
      */
     void operateOrder(OperationOrderReqVO updateReqVO);
 
+    /**
+     *
+     * @param operationOrderReqVO
+     */
+    CommonResult workOrderCirculation(OperationOrderReqVO operationOrderReqVO);
 }

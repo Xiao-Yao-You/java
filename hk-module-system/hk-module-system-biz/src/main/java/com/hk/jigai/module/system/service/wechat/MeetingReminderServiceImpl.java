@@ -70,35 +70,6 @@ public class MeetingReminderServiceImpl implements MeetingReminderService{
         long delay = Duration.between(LocalDateTime.now(), meetingTime.minusMinutes(15)).toMillis();
         ScheduledFuture<?> future = scheduler.schedule(reminderTask, delay, TimeUnit.MILLISECONDS);
         tasks.put(meetingId, future);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
 
     @Override

@@ -200,7 +200,7 @@ public interface ErrorCodeConstants {
     ErrorCode OPERATION_DEVICE_NOT_EXISTS = new ErrorCode(1_002_033_005, "设备信息不存在");
     ErrorCode OPERATION_ORDER_NOT_EXISTS = new ErrorCode(1_002_033_006, "工单不存在");
     ErrorCode OPERATION_ORDER_OPERATE_NOT_EXISTS = new ErrorCode(1_002_033_007, "操作类型不存在");
-    ErrorCode OPERATION_ORDER_OPERATE_ERROR = new ErrorCode(1_002_033_008, "当前不可执行该操作");
+    ErrorCode OPERATION_ORDER_OPERATE_ERROR = new ErrorCode(1_002_033_008, "当前工单状态不可执行该操作");
     ErrorCode OPERATION_ORDER_OPERATE_NOT_PICTURE = new ErrorCode(1_002_033_009, "当前该操作图片必传");
 
 }

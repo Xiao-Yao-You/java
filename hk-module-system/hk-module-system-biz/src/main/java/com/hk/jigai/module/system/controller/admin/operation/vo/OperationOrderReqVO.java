@@ -29,10 +29,29 @@ public class OperationOrderReqVO {
     @Schema(description = "操作类型，00:派单,01:领单,0201:同组转交,0202:跨组转交,03:现场确认,04:挂起,05 已完成,0501:无需处理,0502:无法排除故障,06:撤销", example = "00")
     private String operateType;
 
-    @Schema(description = "图片URL,现场确认必填", example = "https://www.iocoder.cn")
-    private List<String> url;
+    @Schema(description = "图片URL,现场确认必填")
+    private List<OperationDevicePictureSaveReqVO> pictureList;
 
     @Schema(description = "说明或者原因", example = "芋艿")
     private String remark;
+
+    @Schema(description = "处理人id")
+    private Long operateUserId;
+
+    @Schema(description = "处理人名称")
+    private String operateUserNickName;
+
+    @Schema(description = "开始时间")
+    private LocalDateTime beginTime;
+
+    @Schema(description = "结束时间")
+    private LocalDateTime endTime;
+
+    @Schema(description = "操作方法")
+    private String operateMethod;
+
+    @Schema(description = "处理结果")
+    private Integer completeResult;
+
 
 }

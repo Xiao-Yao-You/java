@@ -170,7 +170,7 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
 
     @Override
     public OperationDeviceRespVO getOperationDeviceByLabelCode(String labelCode) {
-        OperationDeviceDO operationDeviceDO = operationDeviceMapper.selectOne(new QueryWrapper<OperationDeviceDO>().lambda().eq(OperationDeviceDO::getLabelCode, labelCode));
+        OperationDeviceDO operationDeviceDO = operationDeviceMapper.selectOne(new QueryWrapper<OperationDeviceDO>().lambda().eq(OperationDeviceDO::getLabelCode, labelCode).eq(OperationDeviceDO::getStatus,0));
         OperationDeviceRespVO resp = BeanUtils.toBean(operationDeviceDO, OperationDeviceRespVO.class);
         if (operationDeviceDO != null) {
             List<OperationDevicePictureSaveReqVO> pictureList = BeanUtils.toBean(operationDeviceAccessoryMapper.selectList((new QueryWrapper<OperationDeviceAccessoryDO>().lambda()

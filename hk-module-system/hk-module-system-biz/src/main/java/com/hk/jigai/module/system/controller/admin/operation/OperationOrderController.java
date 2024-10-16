@@ -1,7 +1,10 @@
 package com.hk.jigai.module.system.controller.admin.operation;
 
+import com.hk.jigai.module.system.dal.dataobject.operation.OperationOrderOperateRecordDO;
 import org.springframework.web.bind.annotation.*;
+
 import javax.annotation.Resource;
+
 import org.springframework.validation.annotation.Validated;
 import org.springframework.security.access.prepost.PreAuthorize;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,11 +21,13 @@ import com.hk.jigai.framework.common.pojo.PageParam;
 import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.common.pojo.CommonResult;
 import com.hk.jigai.framework.common.util.object.BeanUtils;
+
 import static com.hk.jigai.framework.common.pojo.CommonResult.success;
 
 import com.hk.jigai.framework.excel.core.util.ExcelUtils;
 
 import com.hk.jigai.framework.apilog.core.annotation.ApiAccessLog;
+
 import static com.hk.jigai.framework.apilog.core.enums.OperateTypeEnum.*;
 
 import com.hk.jigai.module.system.controller.admin.operation.vo.*;
@@ -75,7 +80,6 @@ public class OperationOrderController {
     @Operation(summary = "获得工单分页")
     @PreAuthorize("@ss.hasPermission('hk:operation-order:query')")
     public CommonResult<PageResult<OperationOrderRespVO>> getOperationOrderPage(@Valid OperationOrderPageReqVO pageReqVO) {
-        //todo 查询条件要对上
         PageResult<OperationOrderDO> pageResult = operationOrderService.getOperationOrderPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, OperationOrderRespVO.class));
     }
@@ -85,12 +89,12 @@ public class OperationOrderController {
     @PreAuthorize("@ss.hasPermission('hk:operation-order:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportOperationOrderExcel(@Valid OperationOrderPageReqVO pageReqVO,
-              HttpServletResponse response) throws IOException {
+                                          HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<OperationOrderDO> list = operationOrderService.getOperationOrderPage(pageReqVO).getList();
         // 导出 Excel
         ExcelUtils.write(response, "工单.xls", "数据", OperationOrderRespVO.class,
-                        BeanUtils.toBean(list, OperationOrderRespVO.class));
+                BeanUtils.toBean(list, OperationOrderRespVO.class));
     }
 
     @PutMapping("/operateOrder")
@@ -99,6 +103,13 @@ public class OperationOrderController {
     public CommonResult<Boolean> operateOrder(@Valid @RequestBody OperationOrderReqVO updateReqVO) {
         operationOrderService.operateOrder(updateReqVO);
         return success(true);
+    }
+
+    @PutMapping("/workOrderCirculation")
+    @Operation(summary = "工单流转")
+    @PreAuthorize("@ss.hasPermission('hk:operation-order:workOrderCirculation')")
+    public CommonResult workOrderCirculation(@Valid @RequestBody OperationOrderReqVO operationOrderReqVO) {
+        return operationOrderService.workOrderCirculation(operationOrderReqVO);
     }
 
 }
