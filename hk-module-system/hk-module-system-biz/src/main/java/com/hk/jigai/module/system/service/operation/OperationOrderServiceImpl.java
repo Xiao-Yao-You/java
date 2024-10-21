@@ -375,6 +375,7 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             operationOrderDO.setDealUserId(operateRecordDO.getUserId());
             operationOrderDO.setDealUserNickName(operateRecordDO.getUserNickName());
             operationOrderDO.setType(OperateConstant.ZHUANJIAO_TYPE);
+            operationOrderDO.setStatus(OperateConstant.WAIT_DEAL_STATUS);
             operationOrderMapper.updateById(operationOrderDO);
             operateRecordDO.setOperateType(OperateConstant.ZHUANJIAO_TYPE);
             operationOrderOperateRecordMapper.insert(operateRecordDO);
@@ -390,6 +391,8 @@ public class OperationOrderServiceImpl implements OperationOrderService {
                 throw exception(OPERATION_ORDER_OPERATE_ERROR);
             }
             operationOrderDO.setStatus(OperateConstant.IN_GOING_STATUS);
+            operationOrderDO.setSiteConfirmTime(LocalDateTime.now());
+            operationOrderDO.setSiteDonfirmConsume(lastOperateRecordDO.getSpendTime());
             operationOrderMapper.updateById(operationOrderDO);
             operateRecordDO.setOperateType(OperateConstant.XIANCHNAGQUEREN_TYPE);
             operationOrderOperateRecordMapper.insert(operateRecordDO);
@@ -430,7 +433,7 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         public void restart(OperationOrderDO operationOrderDO, OperationOrderOperateRecordDO operateRecordDO,
                             OperationOrderOperateRecordDO lastOperateRecordDO) {
             operationOrderDO.setStatus(OperateConstant.IN_GOING_STATUS);
-            operationOrderDO.setHangUpConsume(lastOperateRecordDO.getSpendTime());
+            operationOrderDO.setHangUpConsume(operationOrderDO.getHangUpConsume() == null ? 0 : operationOrderDO.getHangUpConsume() + lastOperateRecordDO.getSpendTime());
             operationOrderMapper.updateById(operationOrderDO);
             operateRecordDO.setOperateType(OperateConstant.KAISHI_TYPE);
             operationOrderOperateRecordMapper.insert(operateRecordDO);
@@ -453,7 +456,14 @@ public class OperationOrderServiceImpl implements OperationOrderService {
                 default:
                     operationOrderDO.setStatus(OperateConstant.COMPLETE_STATUS);
             }
+            operationOrderDO.setDealTime(LocalDateTime.now());
+            List<OperationOrderOperateRecordDO> dealOperateRecordDOS = operationOrderOperateRecordMapper.selectList(new QueryWrapper<OperationOrderOperateRecordDO>().lambda()
+                    .eq(OperationOrderOperateRecordDO::getUserId, operationOrderDO.getDealUserId())
+                    .eq(OperationOrderOperateRecordDO::getOperateType, OperateConstant.KAISHI_TYPE));
+            Long sumSpend = dealOperateRecordDOS.stream().mapToLong(p -> p.getSpendTime().intValue()).sum();
+            operationOrderDO.setDealConsume(sumSpend);
             operationOrderDO.setCompleteTime(LocalDateTime.now());
+            operationOrderDO.setCompleteConsume(Duration.between(LocalDateTime.now(), operationOrderDO.getCreateTime()).toMillis());
             operationOrderMapper.updateById(operationOrderDO);
             operateRecordDO.setOperateType(OperateConstant.WANCHENG_TYPE);
             operationOrderOperateRecordMapper.insert(operateRecordDO);
