@@ -106,6 +106,10 @@ public class OperationDeviceRespVO {
     @ExcelProperty("使用地点")
     private Long addressId;
 
+    @Schema(description = "使用地点名称", example = "32586")
+    @ExcelProperty("使用地点")
+    private String address;
+
     @Schema(description = "设备位置")
     @ExcelProperty("设备位置")
     private String location;

@@ -1,5 +1,6 @@
-package com.hk.jigai.module.system.service.permission;
+package com.hk.jigai.module.system.service.notice;
 
+import com.hk.jigai.module.system.controller.admin.notice.vo.WechatNoticeVO;
 import com.hk.jigai.module.system.controller.admin.permission.vo.menu.MenuListReqVO;
 import com.hk.jigai.module.system.controller.admin.permission.vo.menu.WechatMenuSaveReqVO;
 import com.hk.jigai.module.system.dal.dataobject.permission.WechatMenuDO;
@@ -15,6 +16,6 @@ import java.util.List;
  */
 public interface WeChatSendMessageService {
 
-    void sendModelMessage();
+    void sendModelMessage(List<String> openIdList, WechatNoticeVO wechatNoticeVO);
 
 }

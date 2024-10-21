@@ -4,9 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hk.jigai.framework.common.util.date.LocalDateTimeUtils;
 import com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils;
-import com.hk.jigai.module.system.dal.dataobject.operation.OperationDeviceAccessoryDO;
-import com.hk.jigai.module.system.dal.dataobject.operation.OperationDevicePictureDO;
-import com.hk.jigai.module.system.dal.dataobject.operation.OperationDeviceTypeDO;
+import com.hk.jigai.module.system.dal.dataobject.operation.*;
 import com.hk.jigai.module.system.dal.dataobject.scenecode.SceneCodeDO;
 import com.hk.jigai.module.system.dal.dataobject.user.AdminUserDO;
 import com.hk.jigai.module.system.dal.mysql.operation.*;
@@ -27,7 +25,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.hk.jigai.module.system.controller.admin.operation.vo.*;
-import com.hk.jigai.module.system.dal.dataobject.operation.OperationDeviceDO;
 import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.common.pojo.PageParam;
 import com.hk.jigai.framework.common.util.object.BeanUtils;
@@ -62,6 +59,12 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
     @Resource
     private AdminUserService adminUserService;
 
+    @Resource
+    private OperationAddressMapper operationAddressMapper;
+
+    @Resource
+    private OperationLabelCodeMapper operationLabelCodeMapper;
+
 
     @Override
     @Transactional
@@ -78,6 +81,7 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
         }
         createReqVO.setCode(sceneCodeService.increment(sceneCodeDO.getKeyCode()));
         operationLabelDO.setCurrentCode(createReqVO.getCode());
+
         //2.标签编码
         if (StringUtils.isEmpty(createReqVO.getLabelCode())) {
             SceneCodeDO labelSceneCodeDO = sceneCodeService.getSceneCode(operationLabelDO.getLabelSceneCodeId().intValue());
@@ -86,11 +90,18 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
             }
             createReqVO.setLabelCode(sceneCodeService.increment(labelSceneCodeDO.getKeyCode()));
             operationLabelDO.setLabelCurrentCode(createReqVO.getLabelCode());
+        } else {
+            //绑定了设备，更新设备标签状态为已使用
+            OperationLabelCodeDO operationLabelCodeDO = operationLabelCodeMapper.selectOne(new QueryWrapper<OperationLabelCodeDO>().lambda().eq(OperationLabelCodeDO::getCode, createReqVO.getLabelCode()));
+            operationLabelCodeDO.setStatus(1);
+            operationLabelCodeMapper.updateById(operationLabelCodeDO);
         }
         //3.更新设备类型表
         operationDeviceTypeMapper.updateById(operationLabelDO);
         //4.设备表插入
         OperationDeviceDO operationDevice = BeanUtils.toBean(createReqVO, OperationDeviceDO.class);
+        OperationAddressDO operationAddressDO = operationAddressMapper.selectById(operationDevice.getAddressId());
+        operationDevice.setAddress(operationAddressDO == null ? "" : operationAddressDO.getAddressName());
         operationDeviceMapper.insert(operationDevice);
         //5.图片
         List<OperationDevicePictureDO> operationDevicePictureList = BeanUtils.toBean(createReqVO.getPictureList(), OperationDevicePictureDO.class);
@@ -170,7 +181,7 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
 
     @Override
     public OperationDeviceRespVO getOperationDeviceByLabelCode(String labelCode) {
-        OperationDeviceDO operationDeviceDO = operationDeviceMapper.selectOne(new QueryWrapper<OperationDeviceDO>().lambda().eq(OperationDeviceDO::getLabelCode, labelCode).eq(OperationDeviceDO::getStatus,0));
+        OperationDeviceDO operationDeviceDO = operationDeviceMapper.selectOne(new QueryWrapper<OperationDeviceDO>().lambda().eq(OperationDeviceDO::getLabelCode, labelCode).eq(OperationDeviceDO::getStatus, 0));
         OperationDeviceRespVO resp = BeanUtils.toBean(operationDeviceDO, OperationDeviceRespVO.class);
         if (operationDeviceDO != null) {
             List<OperationDevicePictureSaveReqVO> pictureList = BeanUtils.toBean(operationDeviceAccessoryMapper.selectList((new QueryWrapper<OperationDeviceAccessoryDO>().lambda()
@@ -204,6 +215,8 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
         operationDeviceDO.setDeptName(registerReqVO.getDeptName());
         operationDeviceDO.setUserId(registerReqVO.getUserId());
         operationDeviceDO.setAddressId(registerReqVO.getAddressId());
+        OperationAddressDO operationAddressDO = operationAddressMapper.selectById(operationDeviceDO.getAddressId());
+        operationDeviceDO.setAddress(operationAddressDO == null ? "" : operationAddressDO.getAddressName());
         operationDeviceDO.setLocation(registerReqVO.getLocation());
         operationDeviceDO.setIp1(registerReqVO.getIp1());
         operationDeviceDO.setIp2(registerReqVO.getIp2());
