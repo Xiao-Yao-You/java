@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.time.LocalDateTime;
 import java.time.LocalDateTime;
+
 import com.baomidou.mybatisplus.annotation.*;
 import com.hk.jigai.framework.mybatis.core.dataobject.BaseDO;
 
@@ -73,7 +74,7 @@ public class OperationDeviceDO extends BaseDO {
     /**
      * 编号名称
      */
-    private String numberName;
+    private Long numberName;
     /**
      * 影响程度
      */
@@ -111,6 +112,8 @@ public class OperationDeviceDO extends BaseDO {
      * 使用人
      */
     private Long userId;
+
+    private String userNickName;
     /**
      * 使用地点
      */

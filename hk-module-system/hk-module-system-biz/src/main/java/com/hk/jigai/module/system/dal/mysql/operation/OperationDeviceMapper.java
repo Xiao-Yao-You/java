@@ -29,7 +29,7 @@ public interface OperationDeviceMapper extends BaseMapperX<OperationDeviceDO> {
                 .eqIfPresent(OperationDeviceDO::getCompany, reqVO.getCompany())
                 .eqIfPresent(OperationDeviceDO::getSerialNumber, reqVO.getSerialNumber())
                 .eqIfPresent(OperationDeviceDO::getEffectLevel, reqVO.getEffectLevel())
-                .likeIfPresent(OperationDeviceDO::getNumberName, reqVO.getNumberName())
+                .eqIfPresent(OperationDeviceDO::getNumberName, reqVO.getNumberName())
                 .likeIfPresent(OperationDeviceDO::getAssetNumber, reqVO.getAssetNumber())
                 .likeIfPresent(OperationDeviceDO::getMacAddress1, reqVO.getMacAddress1())
                 .likeIfPresent(OperationDeviceDO::getMacAddress2, reqVO.getMacAddress2())

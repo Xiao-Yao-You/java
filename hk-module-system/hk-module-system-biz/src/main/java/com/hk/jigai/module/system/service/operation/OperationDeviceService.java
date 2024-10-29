@@ -2,6 +2,8 @@ package com.hk.jigai.module.system.service.operation;
 
 import java.util.*;
 import javax.validation.*;
+
+import com.hk.jigai.framework.common.pojo.CommonResult;
 import com.hk.jigai.module.system.controller.admin.operation.vo.*;
 import com.hk.jigai.module.system.dal.dataobject.operation.OperationDeviceDO;
 import com.hk.jigai.framework.common.pojo.PageResult;
@@ -62,14 +64,21 @@ public interface OperationDeviceService {
 
     /**
      * 设备分配
+     *
      * @param registerReqVO
      */
     void register(OperationDeviceRegisterReqVO registerReqVO);
 
     /**
      * 设备报废
+     *
      * @param scrapReqVO
      */
     void scrap(OperationDeviceScrapReqVO scrapReqVO);
 
+    /**
+     * 获取所有可用的标签号
+     * @return
+     */
+    CommonResult<List<OperationLabelCodeRespVO>> getUseableLabelCode();
 }

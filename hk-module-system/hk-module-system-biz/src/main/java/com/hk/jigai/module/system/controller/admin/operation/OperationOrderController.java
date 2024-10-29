@@ -78,7 +78,7 @@ public class OperationOrderController {
 
     @GetMapping("/page")
     @Operation(summary = "获得工单分页")
-    @PreAuthorize("@ss.hasPermission('hk:operation-order:query')")
+//    @PreAuthorize("@ss.hasPermission('hk:operation-order:query')")
     public CommonResult<PageResult<OperationOrderRespVO>> getOperationOrderPage(@Valid OperationOrderPageReqVO pageReqVO) {
         PageResult<OperationOrderDO> pageResult = operationOrderService.getOperationOrderPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, OperationOrderRespVO.class));

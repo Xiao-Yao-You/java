@@ -100,4 +100,11 @@ public class FileController {
         return success(BeanUtils.toBean(pageResult, FileRespVO.class));
     }
 
+    @RequestMapping(value = "/uploadAppFile",
+            method = {RequestMethod.POST, RequestMethod.PUT}) // 解决 uni-app 不支持 Put 上传文件的问题
+    @Operation(summary = "小程序专用上传图片", description = "小程序专用上传图片")
+    public CommonResult<String> uploadAppFile(@RequestParam("file") MultipartFile file) throws Exception {
+        return success(fileService.createFile(file.getOriginalFilename(), null, IoUtil.readBytes(file.getInputStream())));
+    }
+
 }

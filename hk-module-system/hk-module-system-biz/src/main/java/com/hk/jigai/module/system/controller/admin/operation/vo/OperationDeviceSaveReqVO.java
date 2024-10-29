@@ -8,7 +8,9 @@ import lombok.*;
 import java.time.LocalDate;
 import java.util.*;
 import javax.validation.constraints.*;
+
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
 
 @Schema(description = "管理后台 - 运维设备新增/修改 Request VO")
@@ -42,7 +44,7 @@ public class OperationDeviceSaveReqVO {
     private String labelCode;
 
     @Schema(description = "状态 0:在用,1:闲置,2:报废", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @NotNull(message = "状态 0:在用,1:闲置,2:报废不能为空")
+//    @NotNull(message = "状态 0:在用,1:闲置,2:报废不能为空")
     private Integer status;
 
     @Schema(description = "所属单位 0:恒科,1:轩达,2:其他", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -58,8 +60,8 @@ public class OperationDeviceSaveReqVO {
     private String effectLevel;
 
     @Schema(description = "编号名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
-    @NotEmpty(message = "编号名称不能为空")
-    private String numberName;
+//    @NotEmpty(message = "编号名称不能为空")
+    private Long numberName;
 
     @Schema(description = "影响程度", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "影响程度不能为空")
@@ -127,8 +129,11 @@ public class OperationDeviceSaveReqVO {
     @Schema(description = "报废处理方式")
     private String scrapDealType;
 
-    @Schema(description = "报废说明", example = "你说的对")
+    @Schema(description = "报废说明")
     private String scrapRemark;
+
+    @Schema(description = "使用人姓名")
+    private String userNickName;
 
     @Schema(description = "设备图片list")
     private List<OperationDevicePictureSaveReqVO> pictureList;

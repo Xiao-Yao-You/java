@@ -74,7 +74,7 @@ public class OperationDeviceTypeController {
 
     @GetMapping("/getAll")
     @Operation(summary = "获得运维设备类型")
-    @PreAuthorize("@ss.hasPermission('hk:operation-device-type:query')")
+//    @PreAuthorize("@ss.hasPermission('hk:operation-device-type:query')")
     public CommonResult<List<OperationDeviceTypeRespVO>> getAll() {
         List<OperationDeviceTypeDO> list = operationDeviceTypeService.getAll();
         return success(BeanUtils.toBean(list, OperationDeviceTypeRespVO.class));

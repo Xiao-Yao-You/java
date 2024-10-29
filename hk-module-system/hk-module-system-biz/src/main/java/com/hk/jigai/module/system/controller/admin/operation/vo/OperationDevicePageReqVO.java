@@ -49,7 +49,7 @@ public class OperationDevicePageReqVO extends PageParam {
     private String effectLevel;
 
     @Schema(description = "编号名称", example = "芋艿")
-    private String numberName;
+    private Long numberName;
 
     @Schema(description = "影响程度")
     private String assetNumber;
@@ -80,6 +80,8 @@ public class OperationDevicePageReqVO extends PageParam {
     @Schema(description = "使用人", example = "27028")
     private Long userId;
 
+    private String userNickName;
+
     @Schema(description = "使用地点", example = "32586")
     private Long addressId;
 
@@ -95,7 +97,6 @@ public class OperationDevicePageReqVO extends PageParam {
     @Schema(description = "设备分配登记人", example = "24873")
     private Long registerUserId;
     private String registerUserName;
-
 
     @Schema(description = "设备分配登记时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)

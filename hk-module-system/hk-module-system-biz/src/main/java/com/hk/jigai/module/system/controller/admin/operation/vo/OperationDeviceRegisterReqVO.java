@@ -28,6 +28,8 @@ public class OperationDeviceRegisterReqVO {
     @Schema(description = "使用人", example = "27028")
     private Long userId;
 
+    private String userNickName;
+
     @Schema(description = "使用地点", requiredMode = Schema.RequiredMode.REQUIRED, example = "32586")
     private Long addressId;
 

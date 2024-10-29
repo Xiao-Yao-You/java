@@ -8,6 +8,8 @@ import com.hk.jigai.framework.common.util.collection.CollectionUtils;
 import com.hk.jigai.framework.common.util.object.BeanUtils;
 import com.hk.jigai.framework.mybatis.core.dataobject.BaseDO;
 import com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils;
+import com.hk.jigai.module.system.controller.admin.notice.NoticeController;
+import com.hk.jigai.module.system.controller.admin.notice.vo.WechatNoticeVO;
 import com.hk.jigai.module.system.controller.admin.operation.vo.OperationDevicePictureSaveReqVO;
 import com.hk.jigai.module.system.controller.admin.operation.vo.OperationOrderPageReqVO;
 import com.hk.jigai.module.system.controller.admin.operation.vo.OperationOrderReqVO;
@@ -22,19 +24,28 @@ import com.hk.jigai.module.system.dal.mysql.operation.OperationOrderOperatePictu
 import com.hk.jigai.module.system.dal.mysql.operation.OperationOrderOperateRecordMapper;
 import com.hk.jigai.module.system.dal.mysql.operation.OperationQuestionTypeMapper;
 import com.hk.jigai.module.system.enums.OrderOperateEnum;
+import com.hk.jigai.module.system.service.notice.NoticeService;
+import com.hk.jigai.module.system.service.notice.NoticeServiceImpl;
+import com.hk.jigai.module.system.service.notice.WeChatSendMessageService;
 import com.hk.jigai.module.system.service.scenecode.SceneCodeService;
 import com.hk.jigai.module.system.service.user.AdminUserService;
 import com.hk.jigai.module.system.util.operate.OperateConstant;
+import jodd.util.StringUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.lang.invoke.SwitchPoint;
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.hk.jigai.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -68,6 +79,16 @@ public class OperationOrderServiceImpl implements OperationOrderService {
     @Resource
     private SceneCodeService sceneCodeService;
 
+    @Resource
+    private WeChatSendMessageService weChatSendMessageService;
+
+    /**
+     * 新建工单消息模板
+     */
+    private final String templateId = "2pXmLdpwIns8NpfTwExqVCB1mWLOQrzsosdJHy2Yx7M";
+
+    private final String appId = "wx49590d619c10f743";
+
     @Override
     @Transactional
     public Long createOperationOrder(OperationOrderSaveReqVO createReqVO) {
@@ -91,6 +112,40 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         operationOrderOperateRecordDO.setUserId(submitUser.getId());
         operationOrderOperateRecordDO.setUserNickName(submitUser.getNickname());
         operationOrderOperateRecordMapper.insert(operationOrderOperateRecordDO);
+
+        List<String> openIdList = new ArrayList<>();
+        // TODO  2024/10/24 15:13 设置接收消息的人员
+        openIdList.add("o__Px6pWasRvDQ0hVwyS0kOiVLGc");
+        //发送微信公众号消息
+        WechatNoticeVO wechatNoticeVO = new WechatNoticeVO();
+        wechatNoticeVO.setTemplate_id(templateId); //模板Id
+        Map dataMap = new HashMap<>();
+        Map cs = new HashMap<>();
+        cs.put("value", operationOrder.getCode());
+        dataMap.put("character_string2", cs);    //工单编号
+        Map t5 = new HashMap<>();
+        t5.put("value", operationOrder.getSubmitUserNickName());
+        dataMap.put("thing5", t5);    //报修人员
+        Map t3 = new HashMap<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        t3.put("value", operationOrder.getCreateTime().format(formatter));
+        dataMap.put("time3", t3);//报修时间
+        Map p13 = new HashMap<>();
+        p13.put("value", operationOrder.getSubmitUserMobile());
+        dataMap.put("phone_number13", p13);//联系电话
+        Map t6 = new HashMap<>();
+        t6.put("value", operationOrder.getDescription());
+        dataMap.put("thing6", t6);//故障描述
+        wechatNoticeVO.setData(dataMap);
+        wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram("appId", "/"));
+
+        try {
+            weChatSendMessageService.sendModelMessage(openIdList, wechatNoticeVO);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
         // 返回
         return operationOrder.getId();
     }
@@ -274,7 +329,8 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         operateRecordDO.setPicList(operationOrderReqVO.getPictureList());
         //有操作对象的时候就存，没有的是时候就是当前登录人
         operateRecordDO.setUserId(operationOrderReqVO.getUserId() == null ? SecurityFrameworkUtils.getLoginUserId() : operationOrderReqVO.getUserId());
-        operateRecordDO.setUserNickName(operationOrderReqVO.getUserNickName() == null ? SecurityFrameworkUtils.getLoginUserNickname() : operationOrderReqVO.getUserNickName());
+        AdminUserDO user = adminUserService.getUser(operateRecordDO.getUserId());
+        operateRecordDO.setUserNickName(user.getNickname());
 
         OperationOrderOperateRecordDO lastOperateRecordDO = operationOrderOperateRecordMapper.selectOne(new QueryWrapper<OperationOrderOperateRecordDO>().lambda()
                 .eq(OperationOrderOperateRecordDO::getOrderId, operationOrderReqVO.getId())
@@ -329,6 +385,48 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             operationOrderDO.setAllocationUserId(getLoginUserId());
             operationOrderDO.setAllocationUserNickName(getLoginUserNickname());
             operationOrderMapper.updateById(operationOrderDO);
+            //发送微信公众号消息--信息部内部消息
+            List<String> openIdList = new ArrayList<>();
+            AdminUserDO user = adminUserService.getUser(operateRecordDO.getUserId());
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            if (user != null) {
+                openIdList.add(user.getOpenid());
+                WechatNoticeVO wechatNoticeVO = new WechatNoticeVO();
+                String templateId = "moCz5xqQZooEghuw2D_EU57tmilMtnACDeEYjraRD1I";  //工单派工消息模板
+                wechatNoticeVO.setTemplate_id(templateId); //模板Id,templateId
+                Map dataMap = new HashMap<>();
+                Map<String, String> cs2 = new HashMap<>();
+                cs2.put("value", operationOrderDO.getCode());
+                dataMap.put("character_string2", cs2);
+                Map<String, String> t8 = new HashMap<>();
+                t8.put("value", operationOrderDO.getTitle());
+                dataMap.put("thing8", t8);
+                Map<String, String> p10 = new HashMap<>();
+                p10.put("value", operateRecordDO.getUserNickName());
+                dataMap.put("phrase10", p10);
+                Map<String, String> time13 = new HashMap<>();
+
+                time13.put("value", operateRecordDO.getCreateTime().format(formatter));
+                dataMap.put("time13", time13);
+                wechatNoticeVO.setData(dataMap);
+                wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram("appId", "/"));
+                try {
+                    weChatSendMessageService.sendModelMessage(openIdList, wechatNoticeVO);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            //给报修人的状态反馈
+            AdminUserDO repairer = adminUserService.getUser(Long.valueOf(operationOrderDO.getCreator()));
+            String repairerOpenId = repairer.getOpenid();
+            String code = operationOrderDO.getCode();
+            String orderStatus = "待处理";
+            String operatorName = "工单由" + operateRecordDO.getOperateUserNickName() + "指派给" + operateRecordDO.getUserNickName();
+            String time = operateRecordDO.getCreateTime().format(formatter);
+            if (StringUtil.isNotBlank(repairerOpenId)) {
+                orderStatusChangeNotice(repairerOpenId, code, orderStatus, operatorName, time);
+            }
+
         }
 
         /**
@@ -356,6 +454,19 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             operationOrderDO.setAllocationUserId(getLoginUserId());
             operationOrderDO.setAllocationUserNickName(getLoginUserNickname());
             operationOrderMapper.updateById(operationOrderDO);
+
+            //发送微信公众号消息--信息部内部消息
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            //给报修人的状态反馈
+            AdminUserDO repairer = adminUserService.getUser(Long.valueOf(operationOrderDO.getCreator()));
+            String repairerOpenId = repairer.getOpenid();
+            String code = operationOrderDO.getCode();
+            String orderStatus = "待处理";
+            String operatorName = operateRecordDO.getUserNickName() + "认领了工单";
+            String time = operateRecordDO.getCreateTime().format(formatter);
+            if (StringUtil.isNotBlank(repairerOpenId)) {
+                orderStatusChangeNotice(repairerOpenId, code, orderStatus, operatorName, time);
+            }
         }
 
         /**
@@ -379,6 +490,52 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             operationOrderMapper.updateById(operationOrderDO);
             operateRecordDO.setOperateType(OperateConstant.ZHUANJIAO_TYPE);
             operationOrderOperateRecordMapper.insert(operateRecordDO);
+
+            //发送微信公众号消息--信息部内部消息
+            List<String> openIdList = new ArrayList<>();
+            AdminUserDO user = adminUserService.getUser(operateRecordDO.getUserId());
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            if (user != null) {
+                openIdList.add(user.getOpenid());
+                WechatNoticeVO wechatNoticeVO = new WechatNoticeVO();
+                String templateId = "8rW5_qBpLfqYzgsrpuXrGKatI4mxf2CwiYfuSO-Qgc8";  //工单转交消息模板
+                wechatNoticeVO.setTemplate_id(templateId); //模板Id,templateId
+                Map dataMap = new HashMap<>();
+                Map<String, String> cs2 = new HashMap<>();
+                cs2.put("value", operationOrderDO.getCode());
+                dataMap.put("character_string1", cs2);
+                Map<String, String> t6 = new HashMap<>();
+                t6.put("value", operationOrderDO.getTitle());
+                dataMap.put("thing6", t6);
+
+                Map<String, String> thing9 = new HashMap<>();
+                thing9.put("value", operateRecordDO.getOperateUserNickName());
+                dataMap.put("thing9", thing9);
+                Map<String, String> thing12 = new HashMap<>();
+                thing12.put("value", operateRecordDO.getUserNickName());
+                dataMap.put("thing12", thing12);
+                Map<String, String> time13 = new HashMap<>();
+                time13.put("value", operateRecordDO.getCreateTime().format(formatter));
+                dataMap.put("time5", time13);
+                wechatNoticeVO.setData(dataMap);
+                wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram("appId", "/"));
+                try {
+                    weChatSendMessageService.sendModelMessage(openIdList, wechatNoticeVO);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            //给报修人的状态反馈
+            AdminUserDO repairer = adminUserService.getUser(Long.valueOf(operationOrderDO.getCreator()));
+            String repairerOpenId = repairer.getOpenid();
+            String code = operationOrderDO.getCode();
+            String orderStatus = "待处理";
+            String operatorName = "工单由" + operateRecordDO.getOperateUserNickName() + "转交给" + operateRecordDO.getUserNickName();
+            String time = operateRecordDO.getCreateTime().format(formatter);
+            if (StringUtil.isNotBlank(repairerOpenId)) {
+                orderStatusChangeNotice(repairerOpenId, code, orderStatus, operatorName, time);
+            }
+
         }
 
         /**
@@ -407,6 +564,18 @@ public class OperationOrderServiceImpl implements OperationOrderService {
                 }
                 operationOrderOperatePictureMapper.insertBatch(pictureDOList);
             }
+            //发送微信公众号消息--信息部内部消息
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            //给报修人的状态反馈
+            AdminUserDO repairer = adminUserService.getUser(Long.valueOf(operationOrderDO.getCreator()));
+            String repairerOpenId = repairer.getOpenid();
+            String code = operationOrderDO.getCode();
+            String orderStatus = "处理中";
+            String operatorName = operateRecordDO.getUserNickName() + "进行了工单现场确认";
+            String time = operateRecordDO.getCreateTime().format(formatter);
+            if (StringUtil.isNotBlank(repairerOpenId)) {
+                orderStatusChangeNotice(repairerOpenId, code, orderStatus, operatorName, time);
+            }
         }
 
         /**
@@ -424,6 +593,18 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             operationOrderMapper.updateById(operationOrderDO);
             operateRecordDO.setOperateType(OperateConstant.GUAQI_TYPE);
             operationOrderOperateRecordMapper.insert(operateRecordDO);
+            //发送微信公众号消息--信息部内部消息
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            //给报修人的状态反馈
+            AdminUserDO repairer = adminUserService.getUser(Long.valueOf(operationOrderDO.getCreator()));
+            String repairerOpenId = repairer.getOpenid();
+            String code = operationOrderDO.getCode();
+            String orderStatus = "已挂起";
+            String operatorName = operateRecordDO.getUserNickName() + "暂停了当前工单进度";
+            String time = operateRecordDO.getCreateTime().format(formatter);
+            if (StringUtil.isNotBlank(repairerOpenId)) {
+                orderStatusChangeNotice(repairerOpenId, code, orderStatus, operatorName, time);
+            }
         }
 
         /**
@@ -432,11 +613,28 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         @Transactional
         public void restart(OperationOrderDO operationOrderDO, OperationOrderOperateRecordDO operateRecordDO,
                             OperationOrderOperateRecordDO lastOperateRecordDO) {
+            //只有挂起状态的工单才能再次开始
+            if (!OperateConstant.HANG_UP_STATUS.equals(operationOrderDO.getStatus())) {
+                throw exception(OPERATION_ORDER_OPERATE_ERROR);
+            }
             operationOrderDO.setStatus(OperateConstant.IN_GOING_STATUS);
             operationOrderDO.setHangUpConsume(operationOrderDO.getHangUpConsume() == null ? 0 : operationOrderDO.getHangUpConsume() + lastOperateRecordDO.getSpendTime());
             operationOrderMapper.updateById(operationOrderDO);
             operateRecordDO.setOperateType(OperateConstant.KAISHI_TYPE);
             operationOrderOperateRecordMapper.insert(operateRecordDO);
+
+            //发送微信公众号消息--信息部内部消息
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            //给报修人的状态反馈
+            AdminUserDO repairer = adminUserService.getUser(Long.valueOf(operationOrderDO.getCreator()));
+            String repairerOpenId = repairer.getOpenid();
+            String code = operationOrderDO.getCode();
+            String orderStatus = "处理中";
+            String operatorName = operateRecordDO.getUserNickName() + "重启了工单进度";
+            String time = operateRecordDO.getCreateTime().format(formatter);
+            if (StringUtil.isNotBlank(repairerOpenId)) {
+                orderStatusChangeNotice(repairerOpenId, code, orderStatus, operatorName, time);
+            }
         }
 
         /**
@@ -446,14 +644,20 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         public void complete(OperationOrderDO operationOrderDO, OperationOrderOperateRecordDO operateRecordDO,
                              OperationOrderOperateRecordDO lastOperateRecordDO) {
 
+            //只有进行中状态的工单才能完成
+            if (!OperateConstant.IN_GOING_STATUS.equals(operationOrderDO.getStatus())) {
+                throw exception(OPERATION_ORDER_OPERATE_ERROR);
+            }
+            //处理完成的工单无法继续进行状态操作
+            //处理不同的完工状态
             switch (operationOrderDO.getCompleteResult()) {
-                case 1:
+                case 1: //无需处理
                     operationOrderDO.setStatus(OperateConstant.COMPLETE_NO_NEED_DEAL_STATUS);
                     break;
-                case 2:
+                case 2: //无法处理
                     operationOrderDO.setStatus(OperateConstant.COMPLETE_CAN_NOT_DEAL_STATUS);
                     break;
-                default:
+                default:    //默认已完成
                     operationOrderDO.setStatus(OperateConstant.COMPLETE_STATUS);
             }
             operationOrderDO.setDealTime(LocalDateTime.now());
@@ -463,10 +667,23 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             Long sumSpend = dealOperateRecordDOS.stream().mapToLong(p -> p.getSpendTime().intValue()).sum();
             operationOrderDO.setDealConsume(sumSpend);
             operationOrderDO.setCompleteTime(LocalDateTime.now());
+            //计算完成总耗时
             operationOrderDO.setCompleteConsume(Duration.between(LocalDateTime.now(), operationOrderDO.getCreateTime()).toMillis());
             operationOrderMapper.updateById(operationOrderDO);
             operateRecordDO.setOperateType(OperateConstant.WANCHENG_TYPE);
             operationOrderOperateRecordMapper.insert(operateRecordDO);
+            //发送微信公众号消息--信息部内部消息
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            //给报修人的状态反馈
+            AdminUserDO repairer = adminUserService.getUser(Long.valueOf(operationOrderDO.getCreator()));
+            String repairerOpenId = repairer.getOpenid();
+            String code = operationOrderDO.getCode();
+            String orderStatus = "已完成";
+            String operatorName = operateRecordDO.getUserNickName() + "对工单提报完工";
+            String time = operateRecordDO.getCreateTime().format(formatter);
+            if (StringUtil.isNotBlank(repairerOpenId)) {
+                orderStatusChangeNotice(repairerOpenId, code, orderStatus, operatorName, time);
+            }
 
         }
 
@@ -476,12 +693,60 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         @Transactional
         public void revoke(OperationOrderDO operationOrderDO, OperationOrderOperateRecordDO operateRecordDO,
                            OperationOrderOperateRecordDO lastOperateRecordDO) {
+            //撤销后无法恢复工单状态
             operationOrderDO.setStatus(OperateConstant.ROLLBACK_STATUS);
             operationOrderMapper.updateById(operationOrderDO);
             operateRecordDO.setOperateType(OperateConstant.CHEXIAO_TYPE);
             operateRecordDO.setEndTime(LocalDateTime.now());
             operateRecordDO.setSpendTime(0L);
             operationOrderOperateRecordMapper.insert(operateRecordDO);
+            //发送微信公众号消息--信息部内部消息
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            //给报修人的状态反馈
+            AdminUserDO repairer = adminUserService.getUser(Long.valueOf(operationOrderDO.getCreator()));
+            AdminUserDO dealer = adminUserService.getUser(Long.valueOf(operationOrderDO.getDealUserId()));
+            String repairerOpenId = repairer.getOpenid();
+            String dealerOpenId = dealer.getOpenid();
+            String code = operationOrderDO.getCode();
+            String orderStatus = "已撤销";
+            String operatorName = operateRecordDO.getUserNickName() + "撤销了工单";
+            String time = operateRecordDO.getCreateTime().format(formatter);
+            if (StringUtil.isNotBlank(repairerOpenId)) {
+                orderStatusChangeNotice(repairerOpenId, code, orderStatus, operatorName, time);
+            }
+            if (StringUtil.isNotBlank(dealerOpenId)) {
+                orderStatusChangeNotice(dealerOpenId, code, orderStatus, operatorName, time);
+            }
         }
+    }
+
+    private void orderStatusChangeNotice(String repairerOpenId, String code, String orderStatus, String operatorName, String time) {
+
+        try {
+            List<String> openIdList = new ArrayList<>();
+            openIdList.add(repairerOpenId);
+            WechatNoticeVO wechatNoticeVO = new WechatNoticeVO();
+            String templateId = "hGGuKzP2XQpO57rVcwQwYWn9V36keth4agPcuvLfyCo";  //工单派工消息模板
+            wechatNoticeVO.setTemplate_id(templateId); //模板Id,templateId
+            Map dataMap = new HashMap<>();
+            Map<String, String> cs9 = new HashMap<>();
+            cs9.put("value", orderStatus);
+            dataMap.put("character_string9", code);
+            Map<String, String> st5 = new HashMap<>();
+            st5.put("value", orderStatus);
+            dataMap.put("short_thing5", st5);
+            Map<String, String> t14 = new HashMap<>();
+            t14.put("value", operatorName);
+            dataMap.put("thing14", t14);
+            Map<String, String> time13 = new HashMap<>();
+            time13.put("value", time);
+            dataMap.put("time13", time13);
+            wechatNoticeVO.setData(dataMap);
+            wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram("appId", "/"));
+            weChatSendMessageService.sendModelMessage(openIdList, wechatNoticeVO);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }

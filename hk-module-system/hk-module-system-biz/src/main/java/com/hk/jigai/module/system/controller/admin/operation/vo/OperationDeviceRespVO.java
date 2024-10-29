@@ -60,11 +60,15 @@ public class OperationDeviceRespVO {
 
     @Schema(description = "影响程度", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("影响程度")
-    private String effectLevel;
+    private Long effectLevel;
 
     @Schema(description = "编号名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
     @ExcelProperty("编号名称")
-    private String numberName;
+    private Long numberName;
+
+    @Schema(description = "编号名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
+    @ExcelProperty("编号名称")
+    private String numberNameStr;
 
     @Schema(description = "影响程度", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("影响程度")
@@ -101,6 +105,8 @@ public class OperationDeviceRespVO {
     @Schema(description = "使用人", example = "27028")
     @ExcelProperty("使用人")
     private Long userId;
+
+    private String userNickName;
 
     @Schema(description = "使用地点", example = "32586")
     @ExcelProperty("使用地点")

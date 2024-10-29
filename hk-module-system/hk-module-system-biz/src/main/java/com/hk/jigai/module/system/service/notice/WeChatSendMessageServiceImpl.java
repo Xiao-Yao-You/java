@@ -52,19 +52,24 @@ public class WeChatSendMessageServiceImpl implements WeChatSendMessageService {
             //封装请求头
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<HashMap> requestEntity = new HttpEntity(wechatNoticeVO, headers);
-            //调用请求
-            HashMap result = restTemplate.exchange("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + serviceAccessToken,
-                    HttpMethod.POST, requestEntity, new ParameterizedTypeReference<HashMap>() {
-                    }).getBody();
-            Integer successode = new Integer("0");
-            if (result == null || !successode.equals((Integer) result.get("errcode"))) {
-                log.info("发送会议消息异常" + (Integer) result.get("errcode") + ":" + (String) result.get("errmsg"));
-                Integer tokenExpired = new Integer("42001");
-                if (tokenExpired.equals((Integer) result.get("errcode"))) {
-                    redisTemplate.delete(RedisKeyConstants.WECHAT_AUTHTOKEN);
+
+            for (String openId : openIdList) {
+                wechatNoticeVO.setTouser(openId);
+                HttpEntity<HashMap> requestEntity = new HttpEntity(wechatNoticeVO, headers);
+                //调用请求
+                HashMap result = restTemplate.exchange("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + serviceAccessToken,
+                        HttpMethod.POST, requestEntity, new ParameterizedTypeReference<HashMap>() {
+                        }).getBody();
+                Integer successode = new Integer("0");
+                if (result == null || !successode.equals((Integer) result.get("errcode"))) {
+                    log.info("发送消息异常" + (Integer) result.get("errcode") + ":" + (String) result.get("errmsg"));
+                    Integer tokenExpired = new Integer("42001");
+                    if (tokenExpired.equals((Integer) result.get("errcode"))) {
+                        redisTemplate.delete(RedisKeyConstants.WECHAT_AUTHTOKEN);
+                    }
                 }
             }
+
         } catch (Exception e) {
             log.info("发送会议模板消息异常！", e);
         }

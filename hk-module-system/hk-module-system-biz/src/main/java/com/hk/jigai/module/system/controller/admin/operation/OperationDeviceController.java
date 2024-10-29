@@ -75,7 +75,6 @@ public class OperationDeviceController {
     }
 
 
-
     @GetMapping("/getByLabelCode")
     @Operation(summary = "根据标签号获取设备信息")
 //    @PreAuthorize("@ss.hasPermission('hk:operation-device:query')")
@@ -118,5 +117,10 @@ public class OperationDeviceController {
     public CommonResult<Boolean> scrap(@Valid @RequestBody OperationDeviceScrapReqVO scrapReqVO) {
         operationDeviceService.scrap(scrapReqVO);
         return success(true);
+    }
+
+    @GetMapping("/getUseableLabelCode")
+    public CommonResult<List<OperationLabelCodeRespVO>> getUseableLabelCode() {
+        return operationDeviceService.getUseableLabelCode();
     }
 }
