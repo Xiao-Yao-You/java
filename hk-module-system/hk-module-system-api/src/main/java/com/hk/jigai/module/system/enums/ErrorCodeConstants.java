@@ -202,5 +202,9 @@ public interface ErrorCodeConstants {
     ErrorCode OPERATION_ORDER_OPERATE_NOT_EXISTS = new ErrorCode(1_002_033_007, "操作类型不存在");
     ErrorCode OPERATION_ORDER_OPERATE_ERROR = new ErrorCode(1_002_033_008, "当前工单状态不可执行该操作");
     ErrorCode OPERATION_ORDER_OPERATE_NOT_PICTURE = new ErrorCode(1_002_033_009, "当前该操作图片必传");
+    ErrorCode OPERATION_NOTICE_OBJECT_NOT_EXISTS = new ErrorCode(1_002_033_010, "消息通知对象设置不存在");
+    ErrorCode OPERATION_DEVICE_HISTORY_NOT_EXISTS = new ErrorCode(1_002_033_011, "运维设备不存在");
+    ErrorCode OPERATION_DEVICE_ACCESSORY_HISTORY_NOT_EXISTS = new ErrorCode(1_002_033_012, "运维设备配件表_快照不存在");
+    ErrorCode OPERATION_DEVICE_PICTURE_HISTORY_NOT_EXISTS = new ErrorCode(1_002_033_013, "运维设备照片表_快照不存在");
 
 }

@@ -63,6 +63,10 @@ public class OperationOrderDO extends BaseDO {
      * 设备地点
      */
     private Long addressId;
+
+    @TableField(exist = false)
+    private String address;
+
     /**
      * 设备位置
      */
@@ -163,6 +167,10 @@ public class OperationOrderDO extends BaseDO {
     @TableField(exist = false)
     private String questionTypeStr;
 
+    /**
+     * 完成结构
+     */
     private Integer completeResult;
+
 
 }

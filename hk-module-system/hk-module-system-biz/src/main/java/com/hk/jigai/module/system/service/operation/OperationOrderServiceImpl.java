@@ -10,14 +10,12 @@ import com.hk.jigai.framework.mybatis.core.dataobject.BaseDO;
 import com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils;
 import com.hk.jigai.module.system.controller.admin.notice.NoticeController;
 import com.hk.jigai.module.system.controller.admin.notice.vo.WechatNoticeVO;
-import com.hk.jigai.module.system.controller.admin.operation.vo.OperationDevicePictureSaveReqVO;
-import com.hk.jigai.module.system.controller.admin.operation.vo.OperationOrderPageReqVO;
-import com.hk.jigai.module.system.controller.admin.operation.vo.OperationOrderReqVO;
-import com.hk.jigai.module.system.controller.admin.operation.vo.OperationOrderSaveReqVO;
+import com.hk.jigai.module.system.controller.admin.operation.vo.*;
 import com.hk.jigai.module.system.dal.dataobject.operation.OperationOrderDO;
 import com.hk.jigai.module.system.dal.dataobject.operation.OperationOrderOperatePictureDO;
 import com.hk.jigai.module.system.dal.dataobject.operation.OperationOrderOperateRecordDO;
 import com.hk.jigai.module.system.dal.dataobject.operation.OperationQuestionTypeDO;
+import com.hk.jigai.module.system.dal.dataobject.operationnoticeobject.OperationNoticeObjectDO;
 import com.hk.jigai.module.system.dal.dataobject.user.AdminUserDO;
 import com.hk.jigai.module.system.dal.mysql.operation.OperationOrderMapper;
 import com.hk.jigai.module.system.dal.mysql.operation.OperationOrderOperatePictureMapper;
@@ -27,6 +25,7 @@ import com.hk.jigai.module.system.enums.OrderOperateEnum;
 import com.hk.jigai.module.system.service.notice.NoticeService;
 import com.hk.jigai.module.system.service.notice.NoticeServiceImpl;
 import com.hk.jigai.module.system.service.notice.WeChatSendMessageService;
+import com.hk.jigai.module.system.service.operationnoticeobject.OperationNoticeObjectService;
 import com.hk.jigai.module.system.service.scenecode.SceneCodeService;
 import com.hk.jigai.module.system.service.user.AdminUserService;
 import com.hk.jigai.module.system.util.operate.OperateConstant;
@@ -46,6 +45,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.hk.jigai.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils.getLoginUserId;
@@ -81,6 +81,11 @@ public class OperationOrderServiceImpl implements OperationOrderService {
 
     @Resource
     private WeChatSendMessageService weChatSendMessageService;
+    @Resource
+    private OperationNoticeObjectService operationNoticeObjectService;
+
+    @Resource
+    private OperationDeviceService operationDeviceService;
 
     /**
      * 新建工单消息模板
@@ -114,37 +119,44 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         operationOrderOperateRecordMapper.insert(operationOrderOperateRecordDO);
 
         List<String> openIdList = new ArrayList<>();
-        // TODO  2024/10/24 15:13 设置接收消息的人员
-        openIdList.add("o__Px6pWasRvDQ0hVwyS0kOiVLGc");
-        //发送微信公众号消息
-        WechatNoticeVO wechatNoticeVO = new WechatNoticeVO();
-        wechatNoticeVO.setTemplate_id(templateId); //模板Id
-        Map dataMap = new HashMap<>();
-        Map cs = new HashMap<>();
-        cs.put("value", operationOrder.getCode());
-        dataMap.put("character_string2", cs);    //工单编号
-        Map t5 = new HashMap<>();
-        t5.put("value", operationOrder.getSubmitUserNickName());
-        dataMap.put("thing5", t5);    //报修人员
-        Map t3 = new HashMap<>();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        t3.put("value", operationOrder.getCreateTime().format(formatter));
-        dataMap.put("time3", t3);//报修时间
-        Map p13 = new HashMap<>();
-        p13.put("value", operationOrder.getSubmitUserMobile());
-        dataMap.put("phone_number13", p13);//联系电话
-        Map t6 = new HashMap<>();
-        t6.put("value", operationOrder.getDescription());
-        dataMap.put("thing6", t6);//故障描述
-        wechatNoticeVO.setData(dataMap);
-        wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram("appId", "/"));
 
-        try {
-            weChatSendMessageService.sendModelMessage(openIdList, wechatNoticeVO);
-        } catch (Exception e) {
-            e.printStackTrace();
+        List<OperationNoticeObjectDO> allUsers = operationNoticeObjectService.getAllUsers();
+        if (CollectionUtil.isNotEmpty(allUsers)) {
+            List<Long> collect = allUsers.stream().map(p -> p.getUserId()).collect(Collectors.toList());
+            for (Long aLong : collect) {
+                AdminUserDO user = adminUserService.getUser(aLong);
+                openIdList.add(user.getOpenid());
+            }
+//            openIdList.add("o__Px6pWasRvDQ0hVwyS0kOiVLGc");
+            //发送微信公众号消息
+            WechatNoticeVO wechatNoticeVO = new WechatNoticeVO();
+            wechatNoticeVO.setTemplate_id(templateId); //模板Id
+            Map dataMap = new HashMap<>();
+            Map cs = new HashMap<>();
+            cs.put("value", operationOrder.getCode());
+            dataMap.put("character_string2", cs);    //工单编号
+            Map t5 = new HashMap<>();
+            t5.put("value", operationOrder.getSubmitUserNickName());
+            dataMap.put("thing5", t5);    //报修人员
+            Map t3 = new HashMap<>();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            t3.put("value", operationOrder.getCreateTime().format(formatter));
+            dataMap.put("time3", t3);//报修时间
+            Map p13 = new HashMap<>();
+            p13.put("value", operationOrder.getSubmitUserMobile());
+            dataMap.put("phone_number13", p13);//联系电话
+            Map t6 = new HashMap<>();
+            t6.put("value", operationOrder.getDescription());
+            dataMap.put("thing6", t6);//故障描述
+            wechatNoticeVO.setData(dataMap);
+            wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram("appId", "/"));
+
+            try {
+                weChatSendMessageService.sendModelMessage(openIdList, wechatNoticeVO);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-
 
         // 返回
         return operationOrder.getId();
@@ -175,7 +187,12 @@ public class OperationOrderServiceImpl implements OperationOrderService {
 
     @Override
     public OperationOrderDO getOperationOrder(Long id) {
-        return operationOrderMapper.selectById(id);
+        OperationOrderDO operationOrderDO = operationOrderMapper.selectById(id);
+        if (operationOrderDO != null) {
+            OperationDeviceRespVO operationDevice = operationDeviceService.getOperationDevice(operationOrderDO.getDeviceId());
+            operationOrderDO.setAddress(operationDevice.getAddress());
+        }
+        return operationOrderDO;
     }
 
     @Override
@@ -384,6 +401,7 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             operationOrderDO.setAllocationConsume(lastOperateRecordDO.getSpendTime());
             operationOrderDO.setAllocationUserId(getLoginUserId());
             operationOrderDO.setAllocationUserNickName(getLoginUserNickname());
+            operationOrderDO.setType("0");
             operationOrderMapper.updateById(operationOrderDO);
             //发送微信公众号消息--信息部内部消息
             List<String> openIdList = new ArrayList<>();
@@ -453,6 +471,7 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             operationOrderDO.setAllocationConsume(lastOperateRecordDO.getSpendTime());
             operationOrderDO.setAllocationUserId(getLoginUserId());
             operationOrderDO.setAllocationUserNickName(getLoginUserNickname());
+            operationOrderDO.setType("1");
             operationOrderMapper.updateById(operationOrderDO);
 
             //发送微信公众号消息--信息部内部消息
@@ -487,6 +506,7 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             operationOrderDO.setDealUserNickName(operateRecordDO.getUserNickName());
             operationOrderDO.setType(OperateConstant.ZHUANJIAO_TYPE);
             operationOrderDO.setStatus(OperateConstant.WAIT_DEAL_STATUS);
+            operationOrderDO.setType("2");
             operationOrderMapper.updateById(operationOrderDO);
             operateRecordDO.setOperateType(OperateConstant.ZHUANJIAO_TYPE);
             operationOrderOperateRecordMapper.insert(operateRecordDO);
