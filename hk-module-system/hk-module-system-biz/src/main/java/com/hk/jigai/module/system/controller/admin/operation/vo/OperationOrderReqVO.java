@@ -27,7 +27,7 @@ public class OperationOrderReqVO {
     private String userNickName;
 
     @Schema(description = "操作类型，00:派单,01:领单,0201:同组转交,0202:跨组转交,03:现场确认,04:挂起,05 已完成,0501:无需处理,0502:无法排除故障,06:撤销", example = "00")
-    private String operateType;
+    private Integer operateType;
 
     @Schema(description = "图片URL,现场确认必填")
     private List<OperationDevicePictureSaveReqVO> pictureList;

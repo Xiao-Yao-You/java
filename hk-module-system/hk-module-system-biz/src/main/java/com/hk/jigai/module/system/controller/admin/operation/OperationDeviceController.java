@@ -1,5 +1,8 @@
 package com.hk.jigai.module.system.controller.admin.operation;
 
+import com.hk.jigai.module.system.controller.admin.operationdevicehistory.vo.OperationDeviceHistoryPageReqVO;
+import com.hk.jigai.module.system.controller.admin.operationdevicehistory.vo.OperationDeviceHistoryRespVO;
+import com.hk.jigai.module.system.dal.dataobject.operationdevicehistory.OperationDeviceHistoryDO;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -122,5 +125,12 @@ public class OperationDeviceController {
     @GetMapping("/getUseableLabelCode")
     public CommonResult<List<OperationLabelCodeRespVO>> getUseableLabelCode() {
         return operationDeviceService.getUseableLabelCode();
+    }
+
+    @GetMapping("/getDeviceHistory")
+    @Operation(summary = "获得运维设备分页")
+    public CommonResult<PageResult<OperationDeviceHistoryRespVO>> getDeviceHistory(@Valid OperationDeviceHistoryPageReqVO pageReqVO) {
+        PageResult<OperationDeviceHistoryDO> pageResult = operationDeviceService.getOperationDeviceHistoryPage(pageReqVO);
+        return success(BeanUtils.toBean(pageResult, OperationDeviceHistoryRespVO.class));
     }
 }

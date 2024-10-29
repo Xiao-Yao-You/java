@@ -4,10 +4,13 @@ import com.baomidou.mybatisplus.annotation.KeySequence;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.hk.jigai.framework.mybatis.core.dataobject.BaseDO;
+import com.hk.jigai.module.system.dal.dataobject.operationdeviceaccessoryhistory.OperationDeviceAccessoryHistoryDO;
+import com.hk.jigai.module.system.dal.dataobject.operationdevicepicturehistory.OperationDevicePictureHistoryDO;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 运维设备 DO
@@ -173,5 +176,9 @@ public class OperationDeviceHistoryDO extends BaseDO {
      * 设备关联Id
      */
     private Long deviceId;
+
+    List<OperationDevicePictureHistoryDO> operationDevicePictureHistoryDOS;
+
+    List<OperationDeviceAccessoryHistoryDO> operationDeviceAccessoryHistoryDOS;
 
 }

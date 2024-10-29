@@ -39,14 +39,12 @@ public class OperationDevicePictureHistoryController {
 
     @PostMapping("/create")
     @Operation(summary = "创建运维设备照片表_快照")
-    @PreAuthorize("@ss.hasPermission('hk:operation-device-picture-history:create')")
     public CommonResult<Long> createOperationDevicePictureHistory(@Valid @RequestBody OperationDevicePictureHistorySaveReqVO createReqVO) {
         return success(operationDevicePictureHistoryService.createOperationDevicePictureHistory(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新运维设备照片表_快照")
-    @PreAuthorize("@ss.hasPermission('hk:operation-device-picture-history:update')")
     public CommonResult<Boolean> updateOperationDevicePictureHistory(@Valid @RequestBody OperationDevicePictureHistorySaveReqVO updateReqVO) {
         operationDevicePictureHistoryService.updateOperationDevicePictureHistory(updateReqVO);
         return success(true);
@@ -55,7 +53,6 @@ public class OperationDevicePictureHistoryController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除运维设备照片表_快照")
     @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthorize("@ss.hasPermission('hk:operation-device-picture-history:delete')")
     public CommonResult<Boolean> deleteOperationDevicePictureHistory(@RequestParam("id") Long id) {
         operationDevicePictureHistoryService.deleteOperationDevicePictureHistory(id);
         return success(true);
@@ -64,7 +61,6 @@ public class OperationDevicePictureHistoryController {
     @GetMapping("/get")
     @Operation(summary = "获得运维设备照片表_快照")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('hk:operation-device-picture-history:query')")
     public CommonResult<OperationDevicePictureHistoryRespVO> getOperationDevicePictureHistory(@RequestParam("id") Long id) {
         OperationDevicePictureHistoryDO operationDevicePictureHistory = operationDevicePictureHistoryService.getOperationDevicePictureHistory(id);
         return success(BeanUtils.toBean(operationDevicePictureHistory, OperationDevicePictureHistoryRespVO.class));
@@ -72,7 +68,6 @@ public class OperationDevicePictureHistoryController {
 
     @GetMapping("/page")
     @Operation(summary = "获得运维设备照片表_快照分页")
-    @PreAuthorize("@ss.hasPermission('hk:operation-device-picture-history:query')")
     public CommonResult<PageResult<OperationDevicePictureHistoryRespVO>> getOperationDevicePictureHistoryPage(@Valid OperationDevicePictureHistoryPageReqVO pageReqVO) {
         PageResult<OperationDevicePictureHistoryDO> pageResult = operationDevicePictureHistoryService.getOperationDevicePictureHistoryPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, OperationDevicePictureHistoryRespVO.class));
@@ -80,7 +75,6 @@ public class OperationDevicePictureHistoryController {
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出运维设备照片表_快照 Excel")
-    @PreAuthorize("@ss.hasPermission('hk:operation-device-picture-history:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportOperationDevicePictureHistoryExcel(@Valid OperationDevicePictureHistoryPageReqVO pageReqVO,
               HttpServletResponse response) throws IOException {

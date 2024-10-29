@@ -61,7 +61,7 @@ public class OperationOrderPageReqVO extends PageParam {
     private String description;
 
     @Schema(description = "类型,00 主动接单,01 指派工单,02 转交工单", example = "2")
-    private String type;
+    private Integer type;
 
     @Schema(description = "来源,1 线上报修,2 线下报修", example = "2")
     private Integer sourceType;

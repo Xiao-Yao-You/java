@@ -1,15 +1,22 @@
 package com.hk.jigai.module.system.service.operationdevicehistory;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.common.util.object.BeanUtils;
 import com.hk.jigai.module.system.controller.admin.operationdevicehistory.vo.OperationDeviceHistoryPageReqVO;
 import com.hk.jigai.module.system.controller.admin.operationdevicehistory.vo.OperationDeviceHistorySaveReqVO;
+import com.hk.jigai.module.system.dal.dataobject.operationdeviceaccessoryhistory.OperationDeviceAccessoryHistoryDO;
 import com.hk.jigai.module.system.dal.dataobject.operationdevicehistory.OperationDeviceHistoryDO;
+import com.hk.jigai.module.system.dal.dataobject.operationdevicepicturehistory.OperationDevicePictureHistoryDO;
+import com.hk.jigai.module.system.dal.mysql.operationdeviceaccessoryhistory.OperationDeviceAccessoryHistoryMapper;
 import com.hk.jigai.module.system.dal.mysql.operationdevicehistory.OperationDeviceHistoryMapper;
+import com.hk.jigai.module.system.dal.mysql.operationdevicepicturehistory.OperationDevicePictureHistoryMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+
+import java.util.List;
 
 import static com.hk.jigai.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static com.hk.jigai.module.system.enums.ErrorCodeConstants.OPERATION_DEVICE_HISTORY_NOT_EXISTS;
@@ -25,6 +32,10 @@ public class OperationDeviceHistoryServiceImpl implements OperationDeviceHistory
 
     @Resource
     private OperationDeviceHistoryMapper operationDeviceHistoryMapper;
+    @Resource
+    private OperationDevicePictureHistoryMapper operationDevicePictureHistoryMapper;
+    @Resource
+    private OperationDeviceAccessoryHistoryMapper operationDeviceAccessoryHistoryMapper;
 
     @Override
     public Long createOperationDeviceHistory(OperationDeviceHistorySaveReqVO createReqVO) {
@@ -60,7 +71,12 @@ public class OperationDeviceHistoryServiceImpl implements OperationDeviceHistory
 
     @Override
     public OperationDeviceHistoryDO getOperationDeviceHistory(Long id) {
-        return operationDeviceHistoryMapper.selectById(id);
+        OperationDeviceHistoryDO operationDeviceHistoryDO = operationDeviceHistoryMapper.selectById(id);
+        List<OperationDevicePictureHistoryDO> operationDevicePictureHistoryDOS = operationDevicePictureHistoryMapper.selectList(new QueryWrapper<OperationDevicePictureHistoryDO>().lambda().eq(OperationDevicePictureHistoryDO::getHistoryId, id));
+        List<OperationDeviceAccessoryHistoryDO> operationDeviceAccessoryHistoryDOS = operationDeviceAccessoryHistoryMapper.selectList(new QueryWrapper<OperationDeviceAccessoryHistoryDO>().lambda().eq(OperationDeviceAccessoryHistoryDO::getHistoryId, id));
+        operationDeviceHistoryDO.setOperationDevicePictureHistoryDOS(operationDevicePictureHistoryDOS);
+        operationDeviceHistoryDO.setOperationDeviceAccessoryHistoryDOS(operationDeviceAccessoryHistoryDOS);
+        return operationDeviceHistoryDO;
     }
 
     @Override

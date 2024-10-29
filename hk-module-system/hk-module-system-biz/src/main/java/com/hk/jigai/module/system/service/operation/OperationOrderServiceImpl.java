@@ -188,6 +188,11 @@ public class OperationOrderServiceImpl implements OperationOrderService {
     @Override
     public OperationOrderDO getOperationOrder(Long id) {
         OperationOrderDO operationOrderDO = operationOrderMapper.selectById(id);
+        OperationQuestionTypeDO operationQuestionTypeDO = operationQuestionTypeMapper.selectById(operationOrderDO.getQuestionType());
+        if (operationQuestionTypeDO != null) {
+            operationOrderDO.setQuestionTypeStr(operationQuestionTypeDO.getName());
+        }
+
         if (operationOrderDO != null) {
             OperationDeviceRespVO operationDevice = operationDeviceService.getOperationDevice(operationOrderDO.getDeviceId());
             operationOrderDO.setAddress(operationDevice.getAddress());
@@ -232,7 +237,7 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             }
             //修改订单信息
             orderOperateRecordDO.setBeginTime(LocalDateTime.now());//当前状态的开始时间
-            operationOrderDO.setType("00");
+            operationOrderDO.setType(0);
             operationOrderDO.setStatus(OperateConstant.WAIT_DEAL_STATUS);
             operationOrderDO.setDealUserId(operationOrderReqVO.getUserId());
             operationOrderDO.setDealUserNickName(operationOrderReqVO.getUserNickName());
@@ -247,7 +252,7 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             orderOperateRecordDO.setBeginTime(operationOrderDO.getCreateTime());
             orderOperateRecordDO.setUserId(SecurityFrameworkUtils.getLoginUserId());
             orderOperateRecordDO.setUserNickName(SecurityFrameworkUtils.getLoginUserNickname());
-            operationOrderDO.setType("01");
+            operationOrderDO.setType(1);
             operationOrderDO.setStatus(OperateConstant.WAIT_DEAL_STATUS);
             operationOrderDO.setDealUserId(getLoginUserId());
             operationOrderDO.setDealUserNickName(getLoginUserNickname());
@@ -268,7 +273,7 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             } else {
                 orderOperateRecordDO.setBeginTime(operationOrderDO.getHangUpTime());
             }
-            operationOrderDO.setType("02");
+            operationOrderDO.setType(2);
             operationOrderDO.setStatus(OperateConstant.WAIT_DEAL_STATUS);
             operationOrderDO.setDealUserId(operationOrderReqVO.getUserId());
             operationOrderDO.setDealUserNickName(operationOrderReqVO.getUserNickName());
@@ -401,7 +406,7 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             operationOrderDO.setAllocationConsume(lastOperateRecordDO.getSpendTime());
             operationOrderDO.setAllocationUserId(getLoginUserId());
             operationOrderDO.setAllocationUserNickName(getLoginUserNickname());
-            operationOrderDO.setType("0");
+            operationOrderDO.setType(0);
             operationOrderMapper.updateById(operationOrderDO);
             //发送微信公众号消息--信息部内部消息
             List<String> openIdList = new ArrayList<>();
@@ -471,7 +476,7 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             operationOrderDO.setAllocationConsume(lastOperateRecordDO.getSpendTime());
             operationOrderDO.setAllocationUserId(getLoginUserId());
             operationOrderDO.setAllocationUserNickName(getLoginUserNickname());
-            operationOrderDO.setType("1");
+            operationOrderDO.setType(1);
             operationOrderMapper.updateById(operationOrderDO);
 
             //发送微信公众号消息--信息部内部消息
@@ -494,19 +499,19 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         @Transactional
         public void transfer(OperationOrderDO operationOrderDO, OperationOrderOperateRecordDO operateRecordDO,
                              OperationOrderOperateRecordDO lastOperateRecordDO) {
-            if (!(OperateConstant.WAIT_ALLOCATION_STATUS.equals(operationOrderDO.getStatus())
+            if (OperateConstant.WAIT_ALLOCATION_STATUS.equals(operationOrderDO.getStatus())
                     || OperateConstant.ALREADY_DEAL_STATUS.equals(operationOrderDO.getStatus())
                     || OperateConstant.COMPLETE_STATUS.equals(operationOrderDO.getStatus())
                     || OperateConstant.ROLLBACK_STATUS.equals(operationOrderDO.getStatus())
                     || OperateConstant.COMPLETE_NO_NEED_DEAL_STATUS.equals(operationOrderDO.getStatus())
-                    || OperateConstant.COMPLETE_CAN_NOT_DEAL_STATUS.equals(operationOrderDO.getStatus()))) {
+                    || OperateConstant.COMPLETE_CAN_NOT_DEAL_STATUS.equals(operationOrderDO.getStatus())) {
                 throw exception(OPERATION_ORDER_OPERATE_ERROR);
             }
             operationOrderDO.setDealUserId(operateRecordDO.getUserId());
             operationOrderDO.setDealUserNickName(operateRecordDO.getUserNickName());
             operationOrderDO.setType(OperateConstant.ZHUANJIAO_TYPE);
             operationOrderDO.setStatus(OperateConstant.WAIT_DEAL_STATUS);
-            operationOrderDO.setType("2");
+            operationOrderDO.setType(2);
             operationOrderMapper.updateById(operationOrderDO);
             operateRecordDO.setOperateType(OperateConstant.ZHUANJIAO_TYPE);
             operationOrderOperateRecordMapper.insert(operateRecordDO);

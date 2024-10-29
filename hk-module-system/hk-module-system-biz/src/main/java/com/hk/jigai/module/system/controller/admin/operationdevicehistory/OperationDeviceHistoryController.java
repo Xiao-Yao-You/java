@@ -14,7 +14,6 @@ import com.hk.jigai.module.system.service.operationdevicehistory.OperationDevice
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,14 +38,12 @@ public class OperationDeviceHistoryController {
 
     @PostMapping("/create")
     @Operation(summary = "创建运维设备")
-    @PreAuthorize("@ss.hasPermission('hk:operation-device-history:create')")
     public CommonResult<Long> createOperationDeviceHistory(@Valid @RequestBody OperationDeviceHistorySaveReqVO createReqVO) {
         return success(operationDeviceHistoryService.createOperationDeviceHistory(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新运维设备")
-    @PreAuthorize("@ss.hasPermission('hk:operation-device-history:update')")
     public CommonResult<Boolean> updateOperationDeviceHistory(@Valid @RequestBody OperationDeviceHistorySaveReqVO updateReqVO) {
         operationDeviceHistoryService.updateOperationDeviceHistory(updateReqVO);
         return success(true);
@@ -55,7 +52,6 @@ public class OperationDeviceHistoryController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除运维设备")
     @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthorize("@ss.hasPermission('hk:operation-device-history:delete')")
     public CommonResult<Boolean> deleteOperationDeviceHistory(@RequestParam("id") Long id) {
         operationDeviceHistoryService.deleteOperationDeviceHistory(id);
         return success(true);
@@ -64,7 +60,6 @@ public class OperationDeviceHistoryController {
     @GetMapping("/get")
     @Operation(summary = "获得运维设备")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('hk:operation-device-history:query')")
     public CommonResult<OperationDeviceHistoryRespVO> getOperationDeviceHistory(@RequestParam("id") Long id) {
         OperationDeviceHistoryDO operationDeviceHistory = operationDeviceHistoryService.getOperationDeviceHistory(id);
         return success(BeanUtils.toBean(operationDeviceHistory, OperationDeviceHistoryRespVO.class));
@@ -72,7 +67,6 @@ public class OperationDeviceHistoryController {
 
     @GetMapping("/page")
     @Operation(summary = "获得运维设备分页")
-    @PreAuthorize("@ss.hasPermission('hk:operation-device-history:query')")
     public CommonResult<PageResult<OperationDeviceHistoryRespVO>> getOperationDeviceHistoryPage(@Valid OperationDeviceHistoryPageReqVO pageReqVO) {
         PageResult<OperationDeviceHistoryDO> pageResult = operationDeviceHistoryService.getOperationDeviceHistoryPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, OperationDeviceHistoryRespVO.class));
@@ -80,7 +74,6 @@ public class OperationDeviceHistoryController {
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出运维设备 Excel")
-    @PreAuthorize("@ss.hasPermission('hk:operation-device-history:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportOperationDeviceHistoryExcel(@Valid OperationDeviceHistoryPageReqVO pageReqVO,
                                                   HttpServletResponse response) throws IOException {

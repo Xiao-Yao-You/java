@@ -2,11 +2,14 @@ package com.hk.jigai.module.system.controller.admin.operationdevicehistory.vo;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.hk.jigai.module.system.dal.dataobject.operationdeviceaccessoryhistory.OperationDeviceAccessoryHistoryDO;
+import com.hk.jigai.module.system.dal.dataobject.operationdevicepicturehistory.OperationDevicePictureHistoryDO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Schema(description = "管理后台 - 运维设备 Response VO")
 @Data
@@ -164,5 +167,9 @@ public class OperationDeviceHistoryRespVO {
     @Schema(description = "设备关联Id", example = "12929")
     @ExcelProperty("设备关联Id")
     private Long deviceId;
+
+    List<OperationDevicePictureHistoryDO> operationDevicePictureHistoryDOS;
+
+    List<OperationDeviceAccessoryHistoryDO> operationDeviceAccessoryHistoryDOS;
 
 }

@@ -5,9 +5,11 @@ import javax.validation.*;
 
 import com.hk.jigai.framework.common.pojo.CommonResult;
 import com.hk.jigai.module.system.controller.admin.operation.vo.*;
+import com.hk.jigai.module.system.controller.admin.operationdevicehistory.vo.OperationDeviceHistoryPageReqVO;
 import com.hk.jigai.module.system.dal.dataobject.operation.OperationDeviceDO;
 import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.common.pojo.PageParam;
+import com.hk.jigai.module.system.dal.dataobject.operationdevicehistory.OperationDeviceHistoryDO;
 
 /**
  * 运维设备 Service 接口
@@ -63,6 +65,14 @@ public interface OperationDeviceService {
     PageResult<OperationDeviceDO> getOperationDevicePage(OperationDevicePageReqVO pageReqVO);
 
     /**
+     * 获得运维设备快照分页
+     *
+     * @param pageReqVO 分页查询
+     * @return 运维设备分页
+     */
+    PageResult<OperationDeviceHistoryDO> getOperationDeviceHistoryPage(OperationDeviceHistoryPageReqVO pageReqVO);
+
+    /**
      * 设备分配
      *
      * @param registerReqVO
@@ -78,7 +88,9 @@ public interface OperationDeviceService {
 
     /**
      * 获取所有可用的标签号
+     *
      * @return
      */
     CommonResult<List<OperationLabelCodeRespVO>> getUseableLabelCode();
+
 }
