@@ -107,7 +107,7 @@ public class OperationOrderController {
 
     @PutMapping("/workOrderCirculation")
     @Operation(summary = "工单流转")
-    @PreAuthorize("@ss.hasPermission('hk:operation-order:workOrderCirculation')")
+//    @PreAuthorize("@ss.hasPermission('hk:operation-order:workOrderCirculation')")
     public CommonResult workOrderCirculation(@Valid @RequestBody OperationOrderReqVO operationOrderReqVO) {
         return operationOrderService.workOrderCirculation(operationOrderReqVO);
     }

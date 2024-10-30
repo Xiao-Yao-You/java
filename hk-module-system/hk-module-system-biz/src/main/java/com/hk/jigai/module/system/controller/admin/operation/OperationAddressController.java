@@ -81,7 +81,7 @@ public class OperationAddressController {
 
     @GetMapping("/getAll")
     @Operation(summary = "获得运维地点List")
-    @PreAuthorize("@ss.hasPermission('hk:operation-address:query')")
+//    @PreAuthorize("@ss.hasPermission('hk:operation-address:query')")
     public CommonResult<List<OperationAddressRespVO>> getAll() {
         List<OperationAddressDO> list = operationAddressService.getAll();
         return success(BeanUtils.toBean(list, OperationAddressRespVO.class));

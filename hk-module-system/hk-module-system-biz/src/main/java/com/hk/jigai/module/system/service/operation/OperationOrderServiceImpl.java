@@ -94,6 +94,8 @@ public class OperationOrderServiceImpl implements OperationOrderService {
 
     private final String appId = "wx49590d619c10f743";
 
+    private final String path = "pages/repair/detail/index?id=";
+
     @Override
     @Transactional
     public Long createOperationOrder(OperationOrderSaveReqVO createReqVO) {
@@ -149,7 +151,7 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             t6.put("value", operationOrder.getDescription());
             dataMap.put("thing6", t6);//故障描述
             wechatNoticeVO.setData(dataMap);
-            wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram("appId", "/"));
+            wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram("appId", path + operationOrder.getId()));
 
             try {
                 weChatSendMessageService.sendModelMessage(openIdList, wechatNoticeVO);
@@ -432,7 +434,7 @@ public class OperationOrderServiceImpl implements OperationOrderService {
                 time13.put("value", operateRecordDO.getCreateTime().format(formatter));
                 dataMap.put("time13", time13);
                 wechatNoticeVO.setData(dataMap);
-                wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram("appId", "/"));
+                wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram("appId", path + operationOrderDO.getId()));
                 try {
                     weChatSendMessageService.sendModelMessage(openIdList, wechatNoticeVO);
                 } catch (Exception e) {
@@ -543,7 +545,7 @@ public class OperationOrderServiceImpl implements OperationOrderService {
                 time13.put("value", operateRecordDO.getCreateTime().format(formatter));
                 dataMap.put("time5", time13);
                 wechatNoticeVO.setData(dataMap);
-                wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram("appId", "/"));
+                wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram("appId", path + operationOrderDO.getId()));
                 try {
                     weChatSendMessageService.sendModelMessage(openIdList, wechatNoticeVO);
                 } catch (Exception e) {
@@ -569,6 +571,13 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         @Transactional
         public void confirm(OperationOrderDO operationOrderDO, OperationOrderOperateRecordDO operateRecordDO,
                             OperationOrderOperateRecordDO lastOperateRecordDO) {
+
+            //非工单当前处理人无法操作工单
+            Long loginUserId = getLoginUserId();
+            if (!loginUserId.equals(operationOrderDO.getDealUserId())) {
+                throw exception(OPERATION_ORDER_NOT_BELONG);
+            }
+
             if (!OperateConstant.WAIT_DEAL_STATUS.equals(operationOrderDO.getStatus())) {
                 throw exception(OPERATION_ORDER_OPERATE_ERROR);
             }
@@ -610,6 +619,12 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         public void hangUp(OperationOrderDO operationOrderDO, OperationOrderOperateRecordDO operateRecordDO,
                            OperationOrderOperateRecordDO lastOperateRecordDO) {
 
+            //非工单当前处理人无法操作工单
+            Long loginUserId = getLoginUserId();
+            if (!loginUserId.equals(operationOrderDO.getDealUserId())) {
+                throw exception(OPERATION_ORDER_NOT_BELONG);
+            }
+
             if (!OperateConstant.IN_GOING_STATUS.equals(operationOrderDO.getStatus())) {
                 throw exception(OPERATION_ORDER_OPERATE_ERROR);
             }
@@ -638,6 +653,12 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         @Transactional
         public void restart(OperationOrderDO operationOrderDO, OperationOrderOperateRecordDO operateRecordDO,
                             OperationOrderOperateRecordDO lastOperateRecordDO) {
+            //非工单当前处理人无法操作工单
+            Long loginUserId = getLoginUserId();
+            if (!loginUserId.equals(operationOrderDO.getDealUserId())) {
+                throw exception(OPERATION_ORDER_NOT_BELONG);
+            }
+
             //只有挂起状态的工单才能再次开始
             if (!OperateConstant.HANG_UP_STATUS.equals(operationOrderDO.getStatus())) {
                 throw exception(OPERATION_ORDER_OPERATE_ERROR);
@@ -669,6 +690,12 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         public void complete(OperationOrderDO operationOrderDO, OperationOrderOperateRecordDO operateRecordDO,
                              OperationOrderOperateRecordDO lastOperateRecordDO) {
 
+            //非工单当前处理人无法操作工单
+            Long loginUserId = getLoginUserId();
+            if (!loginUserId.equals(operationOrderDO.getDealUserId())) {
+                throw exception(OPERATION_ORDER_NOT_BELONG);
+            }
+
             //只有进行中状态的工单才能完成
             if (!OperateConstant.IN_GOING_STATUS.equals(operationOrderDO.getStatus())) {
                 throw exception(OPERATION_ORDER_OPERATE_ERROR);
@@ -685,18 +712,19 @@ public class OperationOrderServiceImpl implements OperationOrderService {
                 default:    //默认已完成
                     operationOrderDO.setStatus(OperateConstant.COMPLETE_STATUS);
             }
+            operateRecordDO.setOperateType(OperateConstant.WANCHENG_TYPE);
+            operationOrderOperateRecordMapper.insert(operateRecordDO);
             operationOrderDO.setDealTime(LocalDateTime.now());
             List<OperationOrderOperateRecordDO> dealOperateRecordDOS = operationOrderOperateRecordMapper.selectList(new QueryWrapper<OperationOrderOperateRecordDO>().lambda()
                     .eq(OperationOrderOperateRecordDO::getUserId, operationOrderDO.getDealUserId())
-                    .eq(OperationOrderOperateRecordDO::getOperateType, OperateConstant.KAISHI_TYPE));
+                    .eq(OperationOrderOperateRecordDO::getOperateType, OperateConstant.XIANCHNAGQUEREN_TYPE));
             Long sumSpend = dealOperateRecordDOS.stream().mapToLong(p -> p.getSpendTime().intValue()).sum();
             operationOrderDO.setDealConsume(sumSpend);
             operationOrderDO.setCompleteTime(LocalDateTime.now());
             //计算完成总耗时
-            operationOrderDO.setCompleteConsume(Duration.between(LocalDateTime.now(), operationOrderDO.getCreateTime()).toMillis());
+            operationOrderDO.setCompleteConsume(Duration.between(operationOrderDO.getCreateTime(), LocalDateTime.now()).toMillis());
             operationOrderMapper.updateById(operationOrderDO);
-            operateRecordDO.setOperateType(OperateConstant.WANCHENG_TYPE);
-            operationOrderOperateRecordMapper.insert(operateRecordDO);
+
             //发送微信公众号消息--信息部内部消息
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             //给报修人的状态反馈
@@ -718,6 +746,11 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         @Transactional
         public void revoke(OperationOrderDO operationOrderDO, OperationOrderOperateRecordDO operateRecordDO,
                            OperationOrderOperateRecordDO lastOperateRecordDO) {
+            //非工单当前处理人无法操作工单
+            Long loginUserId = getLoginUserId();
+            if (!loginUserId.equals(operationOrderDO.getCreator())) {
+                throw exception(OPERATION_ORDER_NOT_BELONG);
+            }
             //撤销后无法恢复工单状态
             operationOrderDO.setStatus(OperateConstant.ROLLBACK_STATUS);
             operationOrderMapper.updateById(operationOrderDO);
@@ -746,6 +779,7 @@ public class OperationOrderServiceImpl implements OperationOrderService {
     }
 
     private void orderStatusChangeNotice(String repairerOpenId, String code, String orderStatus, String operatorName, String time) {
+        OperationOrderDO operationOrderDO = operationOrderMapper.selectOne(new QueryWrapper<OperationOrderDO>().lambda().eq(OperationOrderDO::getCode, code));
 
         try {
             List<String> openIdList = new ArrayList<>();
@@ -767,7 +801,7 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             time13.put("value", time);
             dataMap.put("time13", time13);
             wechatNoticeVO.setData(dataMap);
-            wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram("appId", "/"));
+            wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram("appId", path + operationOrderDO.getId()));
             weChatSendMessageService.sendModelMessage(openIdList, wechatNoticeVO);
         } catch (Exception e) {
             e.printStackTrace();
