@@ -78,7 +78,7 @@ public class OperationOrderController {
 
     @GetMapping("/page")
     @Operation(summary = "获得工单分页")
-//    @PreAuthorize("@ss.hasPermission('hk:operation-order:query')")
+    @PreAuthorize("@ss.hasPermission('hk:operation-order:query')")
     public CommonResult<PageResult<OperationOrderRespVO>> getOperationOrderPage(@Valid OperationOrderPageReqVO pageReqVO) {
         PageResult<OperationOrderDO> pageResult = operationOrderService.getOperationOrderPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, OperationOrderRespVO.class));
@@ -110,6 +110,12 @@ public class OperationOrderController {
 //    @PreAuthorize("@ss.hasPermission('hk:operation-order:workOrderCirculation')")
     public CommonResult workOrderCirculation(@Valid @RequestBody OperationOrderReqVO operationOrderReqVO) {
         return operationOrderService.workOrderCirculation(operationOrderReqVO);
+    }
+
+    @GetMapping("/getUnDealOrderCount")
+    @Operation(summary = "查询未处理的工单数量")
+    public CommonResult<Integer> getUnDealOrderCount(){
+        return operationOrderService.getUnDealOrderCount();
     }
 
 }

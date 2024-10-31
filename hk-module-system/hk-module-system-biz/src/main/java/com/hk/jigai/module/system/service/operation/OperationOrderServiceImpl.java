@@ -151,7 +151,7 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             t6.put("value", operationOrder.getDescription());
             dataMap.put("thing6", t6);//故障描述
             wechatNoticeVO.setData(dataMap);
-            wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram("appId", path + operationOrder.getId()));
+            wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram(appId, path + operationOrder.getId()));
 
             try {
                 weChatSendMessageService.sendModelMessage(openIdList, wechatNoticeVO);
@@ -382,6 +382,12 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         return CommonResult.success(true);
     }
 
+    @Override
+    public CommonResult<Integer> getUnDealOrderCount() {
+        Long count = operationOrderMapper.selectCount(new QueryWrapper<OperationOrderDO>().lambda().eq(OperationOrderDO::getStatus, OperateConstant.WAIT_ALLOCATION_STATUS));
+        return CommonResult.success(count.intValue());
+    }
+
 
     class WorkOrderCirculationClass {
         /**
@@ -434,7 +440,7 @@ public class OperationOrderServiceImpl implements OperationOrderService {
                 time13.put("value", operateRecordDO.getCreateTime().format(formatter));
                 dataMap.put("time13", time13);
                 wechatNoticeVO.setData(dataMap);
-                wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram("appId", path + operationOrderDO.getId()));
+                wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram(appId, path + operationOrderDO.getId()));
                 try {
                     weChatSendMessageService.sendModelMessage(openIdList, wechatNoticeVO);
                 } catch (Exception e) {
@@ -545,7 +551,7 @@ public class OperationOrderServiceImpl implements OperationOrderService {
                 time13.put("value", operateRecordDO.getCreateTime().format(formatter));
                 dataMap.put("time5", time13);
                 wechatNoticeVO.setData(dataMap);
-                wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram("appId", path + operationOrderDO.getId()));
+                wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram(appId, path + operationOrderDO.getId()));
                 try {
                     weChatSendMessageService.sendModelMessage(openIdList, wechatNoticeVO);
                 } catch (Exception e) {
@@ -785,23 +791,23 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             List<String> openIdList = new ArrayList<>();
             openIdList.add(repairerOpenId);
             WechatNoticeVO wechatNoticeVO = new WechatNoticeVO();
-            String templateId = "hGGuKzP2XQpO57rVcwQwYWn9V36keth4agPcuvLfyCo";  //工单派工消息模板
+            String templateId = "hGGuKzP2XQpO57rVcwQwYWn9V36keth4agPcuvLfyCo";  //工单状态变更消息模板
             wechatNoticeVO.setTemplate_id(templateId); //模板Id,templateId
             Map dataMap = new HashMap<>();
             Map<String, String> cs9 = new HashMap<>();
-            cs9.put("value", orderStatus);
-            dataMap.put("character_string9", code);
+            cs9.put("value", code);
+            dataMap.put("character_string9", cs9);
             Map<String, String> st5 = new HashMap<>();
             st5.put("value", orderStatus);
             dataMap.put("short_thing5", st5);
             Map<String, String> t14 = new HashMap<>();
             t14.put("value", operatorName);
             dataMap.put("thing14", t14);
-            Map<String, String> time13 = new HashMap<>();
-            time13.put("value", time);
-            dataMap.put("time13", time13);
+            Map<String, String> time11 = new HashMap<>();
+            time11.put("value", time);
+            dataMap.put("time11", time11);
             wechatNoticeVO.setData(dataMap);
-            wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram("appId", path + operationOrderDO.getId()));
+            wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram(appId, path + operationOrderDO.getId()));
             weChatSendMessageService.sendModelMessage(openIdList, wechatNoticeVO);
         } catch (Exception e) {
             e.printStackTrace();

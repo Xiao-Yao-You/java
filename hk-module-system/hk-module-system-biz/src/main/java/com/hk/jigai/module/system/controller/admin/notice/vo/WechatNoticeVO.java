@@ -39,6 +39,4 @@ public class WechatNoticeVO {
             this.pagepath = pagepath;
         }
     }
-
-
 }

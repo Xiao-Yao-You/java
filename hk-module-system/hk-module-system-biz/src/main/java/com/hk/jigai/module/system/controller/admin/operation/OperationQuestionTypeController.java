@@ -61,7 +61,7 @@ public class OperationQuestionTypeController {
     @GetMapping("/getAll")
     @Operation(summary = "获得运维问题类型")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-//    @PreAuthorize("@ss.hasPermission('hk:operation-question-type:query')")
+//    @PreAuthorize("@ss.hasPermission('hk:operation-question-type:queryAll')")
     public CommonResult<List<OperationQuestionTypeRespVO>> getAllOperationQuestionType(OperationQuestionTypeReqVO req) {
         List<OperationQuestionTypeDO> list = operationQuestionTypeService.queryAll(req);
         return success(BeanUtils.toBean(list, OperationQuestionTypeRespVO.class));

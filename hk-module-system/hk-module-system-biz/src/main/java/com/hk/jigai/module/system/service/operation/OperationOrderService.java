@@ -58,13 +58,22 @@ public interface OperationOrderService {
 
     /**
      * 运维组操作工单
+     *
      * @param updateReqVO
      */
     void operateOrder(OperationOrderReqVO updateReqVO);
 
     /**
+     * 工单流转
      *
      * @param operationOrderReqVO
      */
     CommonResult workOrderCirculation(OperationOrderReqVO operationOrderReqVO);
+
+    /**
+     * 查询所有未处理的工单数量
+     *
+     * @return
+     */
+    CommonResult<Integer> getUnDealOrderCount();
 }
