@@ -45,14 +45,14 @@ public class OperationOrderController {
 
     @PostMapping("/create")
     @Operation(summary = "创建工单")
-    @PreAuthorize("@ss.hasPermission('hk:operation-order:create')")
+//    @PreAuthorize("@ss.hasPermission('hk:operation-order:create')")
     public CommonResult<Long> createOperationOrder(@Valid @RequestBody OperationOrderSaveReqVO createReqVO) {
         return success(operationOrderService.createOperationOrder(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新工单")
-    @PreAuthorize("@ss.hasPermission('hk:operation-order:update')")
+//    @PreAuthorize("@ss.hasPermission('hk:operation-order:update')")
     public CommonResult<Boolean> updateOperationOrder(@Valid @RequestBody OperationOrderSaveReqVO updateReqVO) {
         operationOrderService.updateOperationOrder(updateReqVO);
         return success(true);
@@ -61,7 +61,7 @@ public class OperationOrderController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除工单")
     @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthorize("@ss.hasPermission('hk:operation-order:delete')")
+//    @PreAuthorize("@ss.hasPermission('hk:operation-order:delete')")
     public CommonResult<Boolean> deleteOperationOrder(@RequestParam("id") Long id) {
         operationOrderService.deleteOperationOrder(id);
         return success(true);
@@ -70,7 +70,7 @@ public class OperationOrderController {
     @GetMapping("/get")
     @Operation(summary = "获得工单")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('hk:operation-order:query')")
+//    @PreAuthorize("@ss.hasPermission('hk:operation-order:query')")
     public CommonResult<OperationOrderRespVO> getOperationOrder(@RequestParam("id") Long id) {
         OperationOrderDO operationOrder = operationOrderService.getOperationOrder(id);
         return success(BeanUtils.toBean(operationOrder, OperationOrderRespVO.class));
@@ -78,7 +78,7 @@ public class OperationOrderController {
 
     @GetMapping("/page")
     @Operation(summary = "获得工单分页")
-    @PreAuthorize("@ss.hasPermission('hk:operation-order:query')")
+//    @PreAuthorize("@ss.hasPermission('hk:operation-order:query')")
     public CommonResult<PageResult<OperationOrderRespVO>> getOperationOrderPage(@Valid OperationOrderPageReqVO pageReqVO) {
         PageResult<OperationOrderDO> pageResult = operationOrderService.getOperationOrderPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, OperationOrderRespVO.class));
@@ -86,7 +86,7 @@ public class OperationOrderController {
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出工单 Excel")
-    @PreAuthorize("@ss.hasPermission('hk:operation-order:export')")
+//    @PreAuthorize("@ss.hasPermission('hk:operation-order:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportOperationOrderExcel(@Valid OperationOrderPageReqVO pageReqVO,
                                           HttpServletResponse response) throws IOException {
@@ -99,7 +99,7 @@ public class OperationOrderController {
 
     @PutMapping("/operateOrder")
     @Operation(summary = "运维团队处理工单")
-    @PreAuthorize("@ss.hasPermission('hk:operation-order:update')")
+//    @PreAuthorize("@ss.hasPermission('hk:operation-order:update')")
     public CommonResult<Boolean> operateOrder(@Valid @RequestBody OperationOrderReqVO updateReqVO) {
         operationOrderService.operateOrder(updateReqVO);
         return success(true);

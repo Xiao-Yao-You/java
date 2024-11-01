@@ -40,14 +40,14 @@ public class OperationAddressController {
 
     @PostMapping("/create")
     @Operation(summary = "创建运维地点")
-    @PreAuthorize("@ss.hasPermission('hk:operation-address:create')")
+//    @PreAuthorize("@ss.hasPermission('hk:operation-address:create')")
     public CommonResult<Long> createOperationAddress(@Valid @RequestBody OperationAddressSaveReqVO createReqVO) {
         return success(operationAddressService.createOperationAddress(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新运维地点")
-    @PreAuthorize("@ss.hasPermission('hk:operation-address:update')")
+//    @PreAuthorize("@ss.hasPermission('hk:operation-address:update')")
     public CommonResult<Boolean> updateOperationAddress(@Valid @RequestBody OperationAddressSaveReqVO updateReqVO) {
         operationAddressService.updateOperationAddress(updateReqVO);
         return success(true);
@@ -56,7 +56,7 @@ public class OperationAddressController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除运维地点")
     @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthorize("@ss.hasPermission('hk:operation-address:delete')")
+//    @PreAuthorize("@ss.hasPermission('hk:operation-address:delete')")
     public CommonResult<Boolean> deleteOperationAddress(@RequestParam("id") Long id) {
         operationAddressService.deleteOperationAddress(id);
         return success(true);
@@ -65,7 +65,7 @@ public class OperationAddressController {
     @GetMapping("/get")
     @Operation(summary = "获得运维地点")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('hk:operation-address:query')")
+//    @PreAuthorize("@ss.hasPermission('hk:operation-address:query')")
     public CommonResult<OperationAddressRespVO> getOperationAddress(@RequestParam("id") Long id) {
         OperationAddressDO operationAddress = operationAddressService.getOperationAddress(id);
         return success(BeanUtils.toBean(operationAddress, OperationAddressRespVO.class));
@@ -73,7 +73,7 @@ public class OperationAddressController {
 
     @GetMapping("/page")
     @Operation(summary = "获得运维地点分页")
-    @PreAuthorize("@ss.hasPermission('hk:operation-address:query')")
+//    @PreAuthorize("@ss.hasPermission('hk:operation-address:query')")
     public CommonResult<PageResult<OperationAddressRespVO>> getOperationAddressPage(@Valid OperationAddressPageReqVO pageReqVO) {
         PageResult<OperationAddressDO> pageResult = operationAddressService.getOperationAddressPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, OperationAddressRespVO.class));
@@ -89,7 +89,7 @@ public class OperationAddressController {
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出运维地点 Excel")
-    @PreAuthorize("@ss.hasPermission('hk:operation-address:export')")
+//    @PreAuthorize("@ss.hasPermission('hk:operation-address:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportOperationAddressExcel(@Valid OperationAddressPageReqVO pageReqVO,
               HttpServletResponse response) throws IOException {

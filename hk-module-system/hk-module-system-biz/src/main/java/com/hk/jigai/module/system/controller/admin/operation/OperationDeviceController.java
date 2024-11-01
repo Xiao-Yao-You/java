@@ -63,7 +63,7 @@ public class OperationDeviceController {
     @DeleteMapping("/delete")
     @Operation(summary = "删除运维设备")
     @Parameter(name = "id", description = "编号", required = true)
-    @PreAuthorize("@ss.hasPermission('hk:operation-device:delete')")
+//    @PreAuthorize("@ss.hasPermission('hk:operation-device:delete')")
     public CommonResult<Boolean> deleteOperationDevice(@RequestParam("id") Long id) {
         operationDeviceService.deleteOperationDevice(id);
         return success(true);
@@ -72,7 +72,7 @@ public class OperationDeviceController {
     @GetMapping("/get")
     @Operation(summary = "获得运维设备")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
-    @PreAuthorize("@ss.hasPermission('hk:operation-device:query')")
+//    @PreAuthorize("@ss.hasPermission('hk:operation-device:query')")
     public CommonResult<OperationDeviceRespVO> getOperationDevice(@RequestParam("id") Long id) {
         return success(operationDeviceService.getOperationDevice(id));
     }
@@ -87,7 +87,7 @@ public class OperationDeviceController {
 
     @GetMapping("/page")
     @Operation(summary = "获得运维设备分页")
-    @PreAuthorize("@ss.hasPermission('hk:operation-device:query')")
+//    @PreAuthorize("@ss.hasPermission('hk:operation-device:query')")
     public CommonResult<PageResult<OperationDeviceRespVO>> getOperationDevicePage(@Valid OperationDevicePageReqVO pageReqVO) {
         PageResult<OperationDeviceDO> pageResult = operationDeviceService.getOperationDevicePage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, OperationDeviceRespVO.class));
@@ -95,7 +95,7 @@ public class OperationDeviceController {
 
     @GetMapping("/export-excel")
     @Operation(summary = "导出运维设备 Excel")
-    @PreAuthorize("@ss.hasPermission('hk:operation-device:export')")
+//    @PreAuthorize("@ss.hasPermission('hk:operation-device:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportOperationDeviceExcel(@Valid OperationDevicePageReqVO pageReqVO,
                                            HttpServletResponse response) throws IOException {
@@ -108,7 +108,7 @@ public class OperationDeviceController {
 
     @PutMapping("/register")
     @Operation(summary = "设备分配")
-    @PreAuthorize("@ss.hasPermission('hk:operation-device:update')")
+//    @PreAuthorize("@ss.hasPermission('hk:operation-device:update')")
     public CommonResult<Boolean> register(@Valid @RequestBody OperationDeviceRegisterReqVO registerReqVO) {
         operationDeviceService.register(registerReqVO);
         return success(true);
@@ -116,7 +116,7 @@ public class OperationDeviceController {
 
     @PutMapping("/scrap")
     @Operation(summary = "设备报废")
-    @PreAuthorize("@ss.hasPermission('hk:operation-device:update')")
+//    @PreAuthorize("@ss.hasPermission('hk:operation-device:update')")
     public CommonResult<Boolean> scrap(@Valid @RequestBody OperationDeviceScrapReqVO scrapReqVO) {
         operationDeviceService.scrap(scrapReqVO);
         return success(true);
