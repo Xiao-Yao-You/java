@@ -38,6 +38,7 @@ public interface ErrorCodeConstants {
     ErrorCode USER_EMAIL_EXISTS = new ErrorCode(1_002_003_002, "邮箱已经存在");
     ErrorCode USER_NOT_EXISTS = new ErrorCode(1_002_003_003, "用户不存在");
     ErrorCode USER_IMPORT_LIST_IS_EMPTY = new ErrorCode(1_002_003_004, "导入用户数据不能为空！");
+    ErrorCode IMPORT_LIST_IS_EMPTY = new ErrorCode(1_002_003_104, "导入数据不能为空！");
     ErrorCode USER_PASSWORD_FAILED = new ErrorCode(1_002_003_005, "用户密码校验失败");
     ErrorCode USER_IS_DISABLE = new ErrorCode(1_002_003_006, "名字为【{}】的用户已被禁用");
     ErrorCode USER_COUNT_MAX = new ErrorCode(1_002_003_008, "创建用户失败，原因：超过租户最大租户配额({})！");

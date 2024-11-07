@@ -2,6 +2,7 @@ package com.hk.jigai.module.system.service.operation;
 
 import java.util.*;
 import javax.validation.*;
+
 import com.hk.jigai.module.system.controller.admin.operation.vo.*;
 import com.hk.jigai.module.system.dal.dataobject.operation.OperationDeviceTypeDO;
 import com.hk.jigai.framework.common.pojo.PageResult;
@@ -55,12 +56,14 @@ public interface OperationDeviceTypeService {
 
     /**
      * 查询所有设备类型
+     *
      * @return
      */
     List<OperationDeviceTypeDO> getAll();
 
     /**
      * 预览
+     *
      * @param id
      * @return
      */
@@ -69,8 +72,17 @@ public interface OperationDeviceTypeService {
 
     /**
      * 标签的批量生成
+     *
      * @param req
      */
     List<BatchPrintLabelRespVO> batchCreateLabelCode(OperationBatchCreateLabelReqVO req);
 
+    /**
+     * 导入设备类型
+     *
+     * @param list
+     * @param updateSupport
+     * @return
+     */
+    DeviceTypeImportRespVO importDeviceTypeList(List<DeviceTypeImportExcelVO> list, Boolean updateSupport);
 }

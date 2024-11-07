@@ -2,6 +2,7 @@ package com.hk.jigai.module.system.service.operation;
 
 import java.util.*;
 import javax.validation.*;
+
 import com.hk.jigai.module.system.controller.admin.operation.vo.*;
 import com.hk.jigai.module.system.dal.dataobject.operation.OperationAddressDO;
 import com.hk.jigai.framework.common.pojo.PageResult;
@@ -54,8 +55,17 @@ public interface OperationAddressService {
 
     /**
      * 所有地点
+     *
      * @return
      */
-    List<OperationAddressDO> getAll();
+    List<OperationAddressDO> getAll(OperationAddressRespVO reqVO);
 
+    /**
+     * 导入厂区地点
+     *
+     * @param list
+     * @param updateSupport
+     * @return
+     */
+    AddressImportRespVO importAddressList(List<AddressImportExcelVO> list, Boolean updateSupport);
 }

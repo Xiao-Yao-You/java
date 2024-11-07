@@ -2,6 +2,7 @@ package com.hk.jigai.module.system.service.scenecode;
 
 import java.util.*;
 import javax.validation.*;
+
 import com.hk.jigai.module.system.controller.admin.scenecode.vo.*;
 import com.hk.jigai.module.system.dal.dataobject.scenecode.SceneCodeDO;
 import com.hk.jigai.framework.common.pojo.PageResult;
@@ -54,16 +55,25 @@ public interface SceneCodeService {
 
     /**
      * 获取各种收据号
-      * @param keyCode
+     *
+     * @param keyCode
      * @return
      */
     String increment(String keyCode);
 
     /**
      * 查询列表
+     *
      * @return
      */
     List<SceneCodeDO> getSceneCodeList();
 
-
+    /**
+     * 导入单据编码
+     *
+     * @param list
+     * @param updateSupport
+     * @return
+     */
+    SceneCodeImportRespVO importSceneCodeList(List<SceneCodeImportExcelVO> list, Boolean updateSupport);
 }

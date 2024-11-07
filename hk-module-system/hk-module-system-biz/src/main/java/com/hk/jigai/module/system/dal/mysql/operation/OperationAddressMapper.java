@@ -6,6 +6,7 @@ import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.mybatis.core.query.LambdaQueryWrapperX;
 import com.hk.jigai.framework.mybatis.core.mapper.BaseMapperX;
 import com.hk.jigai.module.system.dal.dataobject.operation.OperationAddressDO;
+import com.hk.jigai.module.system.dal.dataobject.operation.OperationQuestionTypeDO;
 import org.apache.ibatis.annotations.Mapper;
 import com.hk.jigai.module.system.controller.admin.operation.vo.*;
 
@@ -31,4 +32,10 @@ public interface OperationAddressMapper extends BaseMapperX<OperationAddressDO> 
                 .orderByDesc(OperationAddressDO::getId));
     }
 
+
+    default List<OperationAddressDO> selectList(OperationAddressRespVO reqVO) {
+        return selectList(new LambdaQueryWrapperX<OperationAddressDO>()
+                .likeIfPresent(OperationAddressDO::getAddressName, reqVO.getAddressName())
+        );
+    }
 }

@@ -1,7 +1,12 @@
 package com.hk.jigai.module.system.controller.admin.scenecode;
 
+import com.hk.jigai.framework.common.enums.CommonStatusEnum;
+import com.hk.jigai.module.system.controller.admin.user.vo.user.UserImportExcelVO;
+import com.hk.jigai.module.system.enums.common.SexEnum;
 import org.springframework.web.bind.annotation.*;
+
 import javax.annotation.Resource;
+
 import org.springframework.validation.annotation.Validated;
 import org.springframework.security.access.prepost.PreAuthorize;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,16 +23,19 @@ import com.hk.jigai.framework.common.pojo.PageParam;
 import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.common.pojo.CommonResult;
 import com.hk.jigai.framework.common.util.object.BeanUtils;
+
 import static com.hk.jigai.framework.common.pojo.CommonResult.success;
 
 import com.hk.jigai.framework.excel.core.util.ExcelUtils;
 
 import com.hk.jigai.framework.apilog.core.annotation.ApiAccessLog;
+
 import static com.hk.jigai.framework.apilog.core.enums.OperateTypeEnum.*;
 
 import com.hk.jigai.module.system.controller.admin.scenecode.vo.*;
 import com.hk.jigai.module.system.dal.dataobject.scenecode.SceneCodeDO;
 import com.hk.jigai.module.system.service.scenecode.SceneCodeService;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "管理后台 - 单据编码类型配置")
 @RestController
@@ -92,12 +100,29 @@ public class SceneCodeController {
     @PreAuthorize("@ss.hasPermission('system:scene-code:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportSceneCodeExcel(@Valid SceneCodePageReqVO pageReqVO,
-              HttpServletResponse response) throws IOException {
+                                     HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<SceneCodeDO> list = sceneCodeService.getSceneCodePage(pageReqVO).getList();
         // 导出 Excel
         ExcelUtils.write(response, "单据编码类型配置.xls", "数据", SceneCodeRespVO.class,
-                        BeanUtils.toBean(list, SceneCodeRespVO.class));
+                BeanUtils.toBean(list, SceneCodeRespVO.class));
+    }
+
+    @GetMapping("/get-import-template")
+    @Operation(summary = "获得导入模板")
+    public void importTemplate(HttpServletResponse response) throws IOException {
+        // 手动创建导出 空白表单
+        List<SceneCodeImportExcelVO> list = Arrays.asList();
+        // 输出
+        ExcelUtils.write(response, "单据编码模板.xls", "单据编码", SceneCodeImportExcelVO.class, list);
+    }
+
+    @PostMapping("/import-excel")
+    @Operation(summary = "单据编码导入")
+    public CommonResult<SceneCodeImportRespVO> importExcel(@RequestParam("file") MultipartFile file,
+                            @RequestParam(value = "updateSupport", required = false, defaultValue = "false") Boolean updateSupport) throws Exception {
+        List<SceneCodeImportExcelVO> list = ExcelUtils.read(file, SceneCodeImportExcelVO.class);
+        return success(sceneCodeService.importSceneCodeList(list, updateSupport));
     }
 
 }

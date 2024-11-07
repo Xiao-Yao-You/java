@@ -1,5 +1,7 @@
 package com.hk.jigai.module.system.controller.admin.operation;
 
+import com.hk.jigai.module.system.controller.admin.scenecode.vo.SceneCodeImportExcelVO;
+import com.hk.jigai.module.system.controller.admin.scenecode.vo.SceneCodeImportRespVO;
 import com.hk.jigai.module.system.dal.dataobject.operation.OperationLabelCodeDO;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +35,7 @@ import static com.hk.jigai.framework.apilog.core.enums.OperateTypeEnum.*;
 import com.hk.jigai.module.system.controller.admin.operation.vo.*;
 import com.hk.jigai.module.system.dal.dataobject.operation.OperationDeviceTypeDO;
 import com.hk.jigai.module.system.service.operation.OperationDeviceTypeService;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "管理后台 - 运维设备类型")
 @RestController
@@ -119,6 +122,24 @@ public class OperationDeviceTypeController {
     //   @PreAuthorize("@ss.hasPermission('hk:operation-label-code:create')")
     public CommonResult<List<BatchPrintLabelRespVO>> batchPrintLabelCode(OperationBatchCreateLabelReqVO req) {
         return success(operationDeviceTypeService.batchCreateLabelCode(req));
+    }
+
+
+    @GetMapping("/get-import-template")
+    @Operation(summary = "获得导入模板")
+    public void importTemplate(HttpServletResponse response) throws IOException {
+        // 手动创建导出 空白表单
+        List<DeviceTypeImportExcelVO> list = Arrays.asList();
+        // 输出
+        ExcelUtils.write(response, "设备类型导入模板.xls", "设备类型", DeviceTypeImportExcelVO.class, list);
+    }
+
+    @PostMapping("/import-excel")
+    @Operation(summary = "设备类型导入")
+    public CommonResult<DeviceTypeImportRespVO> importExcel(@RequestParam("file") MultipartFile file,
+                                                           @RequestParam(value = "updateSupport", required = false, defaultValue = "false") Boolean updateSupport) throws Exception {
+        List<DeviceTypeImportExcelVO> list = ExcelUtils.read(file, DeviceTypeImportExcelVO.class);
+        return success(operationDeviceTypeService.importDeviceTypeList(list, updateSupport));
     }
 
 }

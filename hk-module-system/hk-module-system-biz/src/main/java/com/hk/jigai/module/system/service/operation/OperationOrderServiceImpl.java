@@ -211,7 +211,9 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         if (CollectionUtil.isNotEmpty(orderList) && CollectionUtil.isNotEmpty(operationQuestionTypeDOS)) {
             for (OperationOrderDO operationOrderDO : orderList) {
                 OperationQuestionTypeDO operationQuestionTypeDO = operationQuestionTypeDOS.stream().filter(p -> p.getId() == operationOrderDO.getQuestionType()).findAny().orElse(null);
-                operationOrderDO.setQuestionTypeStr(operationQuestionTypeDO.getName());
+                if (operationQuestionTypeDO != null) {
+                    operationOrderDO.setQuestionTypeStr(operationQuestionTypeDO.getName());
+                }
             }
         }
         operationOrderDOPageResult.setList(orderList);

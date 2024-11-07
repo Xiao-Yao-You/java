@@ -39,6 +39,8 @@ public class OperationNoticeObjectServiceImpl implements OperationNoticeObjectSe
 
     @Override
     public Boolean createOperationNoticeObject(OperationNoticeObjectSaveReqVO createReqVO) {
+        //先删除
+        operationNoticeObjectMapper.delete(new QueryWrapper<OperationNoticeObjectDO>().lambda().isNotNull(OperationNoticeObjectDO::getId));
         List<OperationNoticeObjectDO> operationNoticeObjectList = new ArrayList<>();
         for (Long id : createReqVO.getUserId()) {
             OperationNoticeObjectDO operationNoticeObject = new OperationNoticeObjectDO();

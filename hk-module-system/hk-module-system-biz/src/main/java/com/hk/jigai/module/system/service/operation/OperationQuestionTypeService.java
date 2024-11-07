@@ -2,6 +2,7 @@ package com.hk.jigai.module.system.service.operation;
 
 import java.util.*;
 import javax.validation.*;
+
 import com.hk.jigai.module.system.controller.admin.operation.vo.*;
 import com.hk.jigai.module.system.dal.dataobject.operation.OperationLabelCodeDO;
 import com.hk.jigai.module.system.dal.dataobject.operation.OperationQuestionTypeDO;
@@ -47,8 +48,17 @@ public interface OperationQuestionTypeService {
 
     /**
      * 查询所有问题
+     *
      * @return
      */
     List<OperationQuestionTypeDO> queryAll(OperationQuestionTypeReqVO req);
 
+    /**
+     * 问题类型导入
+     *
+     * @param list
+     * @param updateSupport
+     * @return
+     */
+    QuestionTypeImportRespVO importQuestionTypeList(List<QuestionTypeImportExcelVO> list, Boolean updateSupport);
 }

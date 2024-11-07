@@ -1,11 +1,23 @@
 package com.hk.jigai.module.system.service.operation;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.CollectionUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hk.jigai.module.system.dal.dataobject.user.AdminUserDO;
+import com.hk.jigai.module.system.dal.mysql.user.AdminUserMapper;
+import io.netty.channel.AddressedEnvelope;
+import jodd.util.StringUtil;
 import org.springframework.stereotype.Service;
+
 import javax.annotation.Resource;
+
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
 import com.hk.jigai.module.system.controller.admin.operation.vo.*;
 import com.hk.jigai.module.system.dal.dataobject.operation.OperationAddressDO;
 import com.hk.jigai.framework.common.pojo.PageResult;
@@ -28,6 +40,8 @@ public class OperationAddressServiceImpl implements OperationAddressService {
 
     @Resource
     private OperationAddressMapper operationAddressMapper;
+    @Resource
+    private AdminUserMapper adminUserMapper;
 
     @Override
     public Long createOperationAddress(OperationAddressSaveReqVO createReqVO) {
@@ -72,8 +86,108 @@ public class OperationAddressServiceImpl implements OperationAddressService {
     }
 
     @Override
-    public List<OperationAddressDO> getAll() {
-        return operationAddressMapper.selectList();
+    public List<OperationAddressDO> getAll(OperationAddressRespVO reqVO) {
+        return operationAddressMapper.selectList(reqVO);
+    }
+
+    @Override
+    public AddressImportRespVO importAddressList(List<AddressImportExcelVO> list, Boolean updateSupport) {
+        //判空
+        if (CollUtil.isEmpty(list)) {
+            throw exception(IMPORT_LIST_IS_EMPTY);
+        }
+        AddressImportRespVO respVO = AddressImportRespVO.builder().createList(new ArrayList<>())
+                .updateList(new ArrayList<>()).failureList(new LinkedHashMap<>()).build();
+
+        //处理数据
+        if (CollectionUtil.isNotEmpty(list)) {
+            //区分父级节点和子级节点
+            List<AddressImportExcelVO> parentAddress = list.stream().filter(p -> "0".equals(p.getParentCode())).collect(Collectors.toList());
+            List<AddressImportExcelVO> childAddress = list.stream().filter(p -> !"0".equals(p.getParentCode())).collect(Collectors.toList());
+            //处理父级地点
+            parentAddress.forEach(item -> {
+                OperationAddressDO operationAddressDO = BeanUtils.toBean(item, OperationAddressDO.class);
+                operationAddressDO.setParentAddressId(0L);
+                operationAddressDO.setStatus(0);
+                if (StringUtil.isNotBlank(item.getSoftManager())) {
+                    AdminUserDO adminUserDO = adminUserMapper.selectOne(new QueryWrapper<AdminUserDO>().lambda().eq(AdminUserDO::getUsername, item.getSoftManager()));
+                    if (adminUserDO != null) {
+                        operationAddressDO.setSoftUserId(adminUserDO.getId());
+                        operationAddressDO.setSoftUserNickName(adminUserDO.getNickname());
+                    }
+                }
+
+                if (StringUtil.isNotBlank(item.getHardManager())) {
+                    AdminUserDO adminUserDO = adminUserMapper.selectOne(new QueryWrapper<AdminUserDO>().lambda().eq(AdminUserDO::getUsername, item.getHardManager()));
+                    if (adminUserDO != null) {
+                        operationAddressDO.setHardwareUserId(adminUserDO.getId());
+                        operationAddressDO.setHardwareUserNickName(adminUserDO.getNickname());
+                    }
+                }
+                OperationAddressDO checkAddress = operationAddressMapper.selectOne(new QueryWrapper<OperationAddressDO>().lambda().eq(OperationAddressDO::getAddressName, item.getAddressName()));
+                if (checkAddress == null) {
+                    operationAddressMapper.insert(operationAddressDO);
+                    respVO.getCreateList().add(item.getAddressName());
+                    return;
+                }
+                if (!updateSupport) {
+                    respVO.getFailureList().put(item.getAddressName(), "地点已存在");
+                    return;
+                }
+                operationAddressMapper.updateById(operationAddressDO.setId(checkAddress.getId()));
+                respVO.getUpdateList().add(item.getAddressName());
+                return;
+            });
+            //处理子级地点
+            childAddress.forEach(item -> {
+                OperationAddressDO operationAddressDO = BeanUtils.toBean(item, OperationAddressDO.class);
+                if (StringUtil.isNotBlank(item.getParentCode())) {
+                    List<AddressImportExcelVO> collect = list.stream().filter(p -> item.getParentCode().equals(p.getAddressCode())).collect(Collectors.toList());
+                    String addressName = collect.get(0).getAddressName();
+                    OperationAddressDO pAddress = operationAddressMapper.selectOne(new QueryWrapper<OperationAddressDO>().lambda().eq(OperationAddressDO::getAddressName, addressName));
+                    if (pAddress != null) {
+                        operationAddressDO.setParentAddressId(pAddress.getId());
+                    } else {
+                        pAddress.setParentAddressId(0L);
+                    }
+                }
+                operationAddressDO.setStatus(0);
+                if (StringUtil.isNotBlank(item.getSoftManager())) {
+                    AdminUserDO adminUserDO = adminUserMapper.selectOne(new QueryWrapper<AdminUserDO>().lambda().eq(AdminUserDO::getUsername, item.getSoftManager()));
+                    if (adminUserDO != null) {
+                        operationAddressDO.setSoftUserId(adminUserDO.getId());
+                        operationAddressDO.setSoftUserNickName(adminUserDO.getNickname());
+                    }
+                }
+
+                if (StringUtil.isNotBlank(item.getHardManager())) {
+                    AdminUserDO adminUserDO = adminUserMapper.selectOne(new QueryWrapper<AdminUserDO>().lambda().eq(AdminUserDO::getUsername, item.getHardManager()));
+                    if (adminUserDO != null) {
+                        operationAddressDO.setHardwareUserId(adminUserDO.getId());
+                        operationAddressDO.setHardwareUserNickName(adminUserDO.getNickname());
+                    }
+                }
+                OperationAddressDO checkAddress = operationAddressMapper.selectOne(new QueryWrapper<OperationAddressDO>().lambda()
+                        .eq(OperationAddressDO::getAddressName, item.getAddressName())
+                        .eq(OperationAddressDO::getParentAddressId, operationAddressDO.getParentAddressId()));
+                if (checkAddress == null) {
+                    operationAddressMapper.insert(operationAddressDO);
+                    respVO.getCreateList().add(item.getAddressName());
+                    return;
+                }
+                if (!updateSupport) {
+                    respVO.getFailureList().put(item.getAddressName(), "地点已存在");
+                    return;
+                }
+                operationAddressMapper.updateById(operationAddressDO.setId(checkAddress.getId()));
+                respVO.getUpdateList().add(item.getAddressName());
+                return;
+
+            });
+
+
+        }
+        return respVO;
     }
 
 }

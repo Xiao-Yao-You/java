@@ -1,7 +1,9 @@
 package com.hk.jigai.module.system.controller.admin.operation;
 
 import org.springframework.web.bind.annotation.*;
+
 import javax.annotation.Resource;
+
 import org.springframework.validation.annotation.Validated;
 import org.springframework.security.access.prepost.PreAuthorize;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,16 +20,19 @@ import com.hk.jigai.framework.common.pojo.PageParam;
 import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.common.pojo.CommonResult;
 import com.hk.jigai.framework.common.util.object.BeanUtils;
+
 import static com.hk.jigai.framework.common.pojo.CommonResult.success;
 
 import com.hk.jigai.framework.excel.core.util.ExcelUtils;
 
 import com.hk.jigai.framework.apilog.core.annotation.ApiAccessLog;
+
 import static com.hk.jigai.framework.apilog.core.enums.OperateTypeEnum.*;
 
 import com.hk.jigai.module.system.controller.admin.operation.vo.*;
 import com.hk.jigai.module.system.dal.dataobject.operation.OperationAddressDO;
 import com.hk.jigai.module.system.service.operation.OperationAddressService;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "管理后台 - 运维地点")
 @RestController
@@ -82,8 +87,8 @@ public class OperationAddressController {
     @GetMapping("/getAll")
     @Operation(summary = "获得运维地点List")
 //    @PreAuthorize("@ss.hasPermission('hk:operation-address:query')")
-    public CommonResult<List<OperationAddressRespVO>> getAll() {
-        List<OperationAddressDO> list = operationAddressService.getAll();
+    public CommonResult<List<OperationAddressRespVO>> getAll(OperationAddressRespVO reqVO) {
+        List<OperationAddressDO> list = operationAddressService.getAll(reqVO);
         return success(BeanUtils.toBean(list, OperationAddressRespVO.class));
     }
 
@@ -92,12 +97,29 @@ public class OperationAddressController {
 //    @PreAuthorize("@ss.hasPermission('hk:operation-address:export')")
     @ApiAccessLog(operateType = EXPORT)
     public void exportOperationAddressExcel(@Valid OperationAddressPageReqVO pageReqVO,
-              HttpServletResponse response) throws IOException {
+                                            HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<OperationAddressDO> list = operationAddressService.getOperationAddressPage(pageReqVO).getList();
         // 导出 Excel
         ExcelUtils.write(response, "运维地点.xls", "数据", OperationAddressRespVO.class,
-                        BeanUtils.toBean(list, OperationAddressRespVO.class));
+                BeanUtils.toBean(list, OperationAddressRespVO.class));
+    }
+
+    @GetMapping("/get-import-template")
+    @Operation(summary = "获得导入模板")
+    public void importTemplate(HttpServletResponse response) throws IOException {
+        // 手动创建导出 空白表单
+        List<AddressImportExcelVO> list = Arrays.asList();
+        // 输出
+        ExcelUtils.write(response, "厂区地点导入模板.xls", "厂区地点", AddressImportExcelVO.class, list);
+    }
+
+    @PostMapping("/import-excel")
+    @Operation(summary = "设备类型导入")
+    public CommonResult<AddressImportRespVO> importExcel(@RequestParam("file") MultipartFile file,
+                                                         @RequestParam(value = "updateSupport", required = false, defaultValue = "false") Boolean updateSupport) throws Exception {
+        List<AddressImportExcelVO> list = ExcelUtils.read(file, AddressImportExcelVO.class);
+        return success(operationAddressService.importAddressList(list, updateSupport));
     }
 
 }

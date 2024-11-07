@@ -9,11 +9,9 @@ import javax.validation.constraints.*;
 @Data
 public class OperationNoticeObjectSaveReqVO {
 
-    @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "11946")
     private Long id;
 
     @Schema(description = "消息通知对象", example = "17974")
     private List<Long> userId;
 
-    private String nickName;
 }
