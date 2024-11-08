@@ -103,25 +103,31 @@ public class OperationDeviceDO extends BaseDO {
     /**
      * 设备部门
      */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Long deptId;
     /**
      * 设备部门名称
      */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private String deptName;
     /**
      * 使用人
      */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Long userId;
 
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private String userNickName;
     /**
      * 使用地点
      */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Long addressId;
 
     /**
      * 地址
      */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private String address;
     /**
      * 设备位置

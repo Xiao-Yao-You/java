@@ -310,6 +310,8 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
         AdminUserDO user = adminUserService.getUser(registerReqVO.getUserId());
         if (user != null) {
             operationDeviceDO.setUserNickName(user.getNickname());
+        } else {
+            operationDeviceDO.setStatus(1);
         }
         //更新
         operationDeviceMapper.updateById(operationDeviceDO);

@@ -127,7 +127,9 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             List<Long> collect = allUsers.stream().map(p -> p.getUserId()).collect(Collectors.toList());
             for (Long aLong : collect) {
                 AdminUserDO user = adminUserService.getUser(aLong);
-                openIdList.add(user.getOpenid());
+                if (user != null) {
+                    openIdList.add(user.getOpenid());
+                }
             }
 //            openIdList.add("o__Px6pWasRvDQ0hVwyS0kOiVLGc");
             //发送微信公众号消息
@@ -210,7 +212,7 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         List<OperationOrderDO> orderList = operationOrderDOPageResult.getList();
         if (CollectionUtil.isNotEmpty(orderList) && CollectionUtil.isNotEmpty(operationQuestionTypeDOS)) {
             for (OperationOrderDO operationOrderDO : orderList) {
-                OperationQuestionTypeDO operationQuestionTypeDO = operationQuestionTypeDOS.stream().filter(p -> p.getId() == operationOrderDO.getQuestionType()).findAny().orElse(null);
+                OperationQuestionTypeDO operationQuestionTypeDO = operationQuestionTypeDOS.stream().filter(p -> p.getId().equals(operationOrderDO.getQuestionType())).findAny().orElse(null);
                 if (operationQuestionTypeDO != null) {
                     operationOrderDO.setQuestionTypeStr(operationQuestionTypeDO.getName());
                 }
@@ -672,7 +674,7 @@ public class OperationOrderServiceImpl implements OperationOrderService {
                 throw exception(OPERATION_ORDER_OPERATE_ERROR);
             }
             operationOrderDO.setStatus(OperateConstant.IN_GOING_STATUS);
-            operationOrderDO.setHangUpConsume(operationOrderDO.getHangUpConsume() == null ? 0 : operationOrderDO.getHangUpConsume() + lastOperateRecordDO.getSpendTime());
+            operationOrderDO.setHangUpConsume(operationOrderDO.getHangUpConsume() == null ? lastOperateRecordDO.getSpendTime() : operationOrderDO.getHangUpConsume() + lastOperateRecordDO.getSpendTime());
             operationOrderMapper.updateById(operationOrderDO);
             operateRecordDO.setOperateType(OperateConstant.KAISHI_TYPE);
             operationOrderOperateRecordMapper.insert(operateRecordDO);

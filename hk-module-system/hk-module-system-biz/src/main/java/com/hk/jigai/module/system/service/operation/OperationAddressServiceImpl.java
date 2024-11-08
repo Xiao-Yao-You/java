@@ -66,7 +66,13 @@ public class OperationAddressServiceImpl implements OperationAddressService {
         // 校验存在
         validateOperationAddressExists(id);
         // 删除
-        operationAddressMapper.deleteById(id);
+        List<OperationAddressDO> operationAddressDOS = operationAddressMapper.selectList(new QueryWrapper<OperationAddressDO>().lambda().eq(OperationAddressDO::getParentAddressId, id));
+        if (CollectionUtil.isNotEmpty(operationAddressDOS)){
+            throw exception(OPERATION_SUB_ADDRESS_EXISTS);
+        }else{
+            operationAddressMapper.deleteById(id);
+        }
+
     }
 
     private void validateOperationAddressExists(Long id) {
