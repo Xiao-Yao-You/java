@@ -53,5 +53,14 @@ public class OperationOrderReqVO {
     @Schema(description = "处理结果")
     private Integer completeResult;
 
+    @Schema(description = "请求类型")
+    private String requestType;
+
+    @Schema(description = "问题类型")
+    private Long questionType;
+
+    @Schema(description = "紧急程度")
+    private String level;
+
 
 }

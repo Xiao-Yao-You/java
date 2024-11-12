@@ -159,8 +159,10 @@ public class OperationDeviceTypeServiceImpl implements OperationDeviceTypeServic
             list.forEach(item -> {
                 OperationDeviceTypeDO deviceType = operationDeviceTypeMapper.selectOne(new QueryWrapper<OperationDeviceTypeDO>().lambda().eq(OperationDeviceTypeDO::getName, item.getName()));
                 OperationDeviceTypeDO operationDeviceTypeDO = BeanUtils.toBean(item, OperationDeviceTypeDO.class);
-                SceneCodeDO typeSceneCode = sceneCodeMapper.selectOne(new QueryWrapper<SceneCodeDO>().lambda().eq(SceneCodeDO::getDescription, item.getName()));
-                SceneCodeDO labelSceneCode = sceneCodeMapper.selectOne(new QueryWrapper<SceneCodeDO>().lambda().eq(SceneCodeDO::getDescription, item.getName() + "-标签"));
+                SceneCodeDO typeSceneCode = sceneCodeMapper.selectList(new QueryWrapper<SceneCodeDO>().lambda()
+                        .eq(SceneCodeDO::getDescription, item.getName())).get(0);
+                SceneCodeDO labelSceneCode = sceneCodeMapper.selectList(new QueryWrapper<SceneCodeDO>().lambda().eq(SceneCodeDO::getDescription, item.getName() + "-标签")).get(0);
+                ;
                 if (deviceType == null) {
 
                     if (typeSceneCode != null && labelSceneCode != null) {

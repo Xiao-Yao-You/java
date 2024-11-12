@@ -47,14 +47,14 @@ public class OperationDeviceController {
 
     @PostMapping("/create")
     @Operation(summary = "创建运维设备")
-    @PreAuthorize("@ss.hasPermission('hk:operation-device:create')")
+//    @PreAuthorize("@ss.hasPermission('hk:operation-device:create')")
     public CommonResult<Long> createOperationDevice(@Valid @RequestBody OperationDeviceSaveReqVO createReqVO) {
         return success(operationDeviceService.createOperationDevice(createReqVO));
     }
 
     @PutMapping("/update")
     @Operation(summary = "更新运维设备")
-    @PreAuthorize("@ss.hasPermission('hk:operation-device:update')")
+//    @PreAuthorize("@ss.hasPermission('hk:operation-device:update')")
     public CommonResult<Boolean> updateOperationDevice(@Valid @RequestBody OperationDeviceSaveReqVO updateReqVO) {
         operationDeviceService.updateOperationDevice(updateReqVO);
         return success(true);

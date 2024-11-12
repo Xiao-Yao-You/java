@@ -5,15 +5,18 @@ import cn.hutool.core.util.StrUtil;
 import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.common.util.io.FileUtils;
 import com.hk.jigai.framework.common.util.object.BeanUtils;
-import com.hk.jigai.module.infra.framework.file.core.client.FileClient;
-import com.hk.jigai.module.infra.framework.file.core.client.s3.FilePresignedUrlRespDTO;
-import com.hk.jigai.module.infra.framework.file.core.utils.FileTypeUtils;
 import com.hk.jigai.module.infra.controller.admin.file.vo.file.FileCreateReqVO;
 import com.hk.jigai.module.infra.controller.admin.file.vo.file.FilePageReqVO;
 import com.hk.jigai.module.infra.controller.admin.file.vo.file.FilePresignedUrlRespVO;
+import com.hk.jigai.module.infra.controller.admin.file.vo.file.MinioProperties;
 import com.hk.jigai.module.infra.dal.dataobject.file.FileDO;
 import com.hk.jigai.module.infra.dal.mysql.file.FileMapper;
+import com.hk.jigai.module.infra.framework.file.core.client.FileClient;
+import com.hk.jigai.module.infra.framework.file.core.client.s3.FilePresignedUrlRespDTO;
+import com.hk.jigai.module.infra.framework.file.core.utils.FileTypeUtils;
 import lombok.SneakyThrows;
+import org.checkerframework.checker.units.qual.A;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -35,10 +38,19 @@ public class FileServiceImpl implements FileService {
     @Resource
     private FileMapper fileMapper;
 
+    @Autowired
+    public FileServiceImpl(MinioProperties minioProperties) {
+        this.minioProperties = minioProperties;
+    }
+
     @Override
     public PageResult<FileDO> getFilePage(FilePageReqVO pageReqVO) {
         return fileMapper.selectPage(pageReqVO);
     }
+
+
+    private final MinioProperties minioProperties;
+
 
     @Override
     @SneakyThrows
@@ -63,6 +75,8 @@ public class FileServiceImpl implements FileService {
         file.setConfigId(client.getId());
         file.setName(name);
         file.setPath(path);
+        //重新填充url
+        url = minioProperties.getMinioUrl() + path;
         file.setUrl(url);
         file.setType(type);
         file.setSize(content.length);

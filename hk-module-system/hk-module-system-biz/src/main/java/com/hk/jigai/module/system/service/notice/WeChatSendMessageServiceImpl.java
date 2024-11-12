@@ -43,7 +43,7 @@ public class WeChatSendMessageServiceImpl implements WeChatSendMessageService {
      * 公众号发送消息
      */
     @Override
-    public void sendModelMessage(List<String> openIdList, WechatNoticeVO wechatNoticeVO) {
+    public void sendModelMessage(List<String> openIdList, Map wechatNoticeVO) {
         try {
             //获取微信公众号token
             String serviceAccessToken = getServiceAccessToken();
@@ -54,7 +54,7 @@ public class WeChatSendMessageServiceImpl implements WeChatSendMessageService {
             headers.setContentType(MediaType.APPLICATION_JSON);
 
             for (String openId : openIdList) {
-                wechatNoticeVO.setTouser(openId);
+                wechatNoticeVO.put("touser", openId);
                 HttpEntity<HashMap> requestEntity = new HttpEntity(wechatNoticeVO, headers);
                 //调用请求
                 HashMap result = restTemplate.exchange("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + serviceAccessToken,

@@ -8,6 +8,7 @@ import com.hk.jigai.module.system.dal.dataobject.permission.WechatMenuDO;
 import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * wechat发送消息封装 接口
@@ -16,6 +17,6 @@ import java.util.List;
  */
 public interface WeChatSendMessageService {
 
-    void sendModelMessage(List<String> openIdList, WechatNoticeVO wechatNoticeVO);
+    void sendModelMessage(List<String> openIdList, Map wechatNoticeVO);
 
 }

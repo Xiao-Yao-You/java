@@ -8,7 +8,6 @@ import com.hk.jigai.framework.common.util.collection.CollectionUtils;
 import com.hk.jigai.framework.common.util.object.BeanUtils;
 import com.hk.jigai.framework.mybatis.core.dataobject.BaseDO;
 import com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils;
-import com.hk.jigai.module.system.controller.admin.notice.NoticeController;
 import com.hk.jigai.module.system.controller.admin.notice.vo.WechatNoticeVO;
 import com.hk.jigai.module.system.controller.admin.operation.vo.*;
 import com.hk.jigai.module.system.dal.dataobject.operation.OperationOrderDO;
@@ -22,8 +21,6 @@ import com.hk.jigai.module.system.dal.mysql.operation.OperationOrderOperatePictu
 import com.hk.jigai.module.system.dal.mysql.operation.OperationOrderOperateRecordMapper;
 import com.hk.jigai.module.system.dal.mysql.operation.OperationQuestionTypeMapper;
 import com.hk.jigai.module.system.enums.OrderOperateEnum;
-import com.hk.jigai.module.system.service.notice.NoticeService;
-import com.hk.jigai.module.system.service.notice.NoticeServiceImpl;
 import com.hk.jigai.module.system.service.notice.WeChatSendMessageService;
 import com.hk.jigai.module.system.service.operationnoticeobject.OperationNoticeObjectService;
 import com.hk.jigai.module.system.service.scenecode.SceneCodeService;
@@ -32,11 +29,9 @@ import com.hk.jigai.module.system.util.operate.OperateConstant;
 import jodd.util.StringUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.lang.invoke.SwitchPoint;
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -133,8 +128,30 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             }
 //            openIdList.add("o__Px6pWasRvDQ0hVwyS0kOiVLGc");
             //发送微信公众号消息
-            WechatNoticeVO wechatNoticeVO = new WechatNoticeVO();
-            wechatNoticeVO.setTemplate_id(templateId); //模板Id
+//            WechatNoticeVO wechatNoticeVO = new WechatNoticeVO();
+//            wechatNoticeVO.setTemplate_id(templateId); //模板Id
+//            Map dataMap = new HashMap<>();
+//            Map cs = new HashMap<>();
+//            cs.put("value", operationOrder.getCode());
+//            dataMap.put("character_string2", cs);    //工单编号
+//            Map t5 = new HashMap<>();
+//            t5.put("value", operationOrder.getSubmitUserNickName());
+//            dataMap.put("thing5", t5);    //报修人员
+//            Map t3 = new HashMap<>();
+//            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//            t3.put("value", operationOrder.getCreateTime().format(formatter));
+//            dataMap.put("time3", t3);//报修时间
+//            Map p13 = new HashMap<>();
+//            p13.put("value", operationOrder.getSubmitUserMobile());
+//            dataMap.put("phone_number13", p13);//联系电话
+//            Map t6 = new HashMap<>();
+//            t6.put("value", operationOrder.getDescription());
+//            dataMap.put("thing6", t6);//故障描述
+//            wechatNoticeVO.setData(dataMap);
+//            wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram(appId, path + operationOrder.getId()));
+
+            Map wechatNoticeVO = new HashMap();
+            wechatNoticeVO.put("template_id", templateId);
             Map dataMap = new HashMap<>();
             Map cs = new HashMap<>();
             cs.put("value", operationOrder.getCode());
@@ -152,8 +169,11 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             Map t6 = new HashMap<>();
             t6.put("value", operationOrder.getDescription());
             dataMap.put("thing6", t6);//故障描述
-            wechatNoticeVO.setData(dataMap);
-            wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram(appId, path + operationOrder.getId()));
+            wechatNoticeVO.put("data", dataMap);
+            Map appIdMap = new HashMap<>();
+            appIdMap.put("appid", appId);
+            appIdMap.put("pagepath", path + operationOrder.getId());
+            wechatNoticeVO.put("miniprogram", appIdMap);
 
             try {
                 weChatSendMessageService.sendModelMessage(openIdList, wechatNoticeVO);
@@ -196,7 +216,6 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         if (operationQuestionTypeDO != null) {
             operationOrderDO.setQuestionTypeStr(operationQuestionTypeDO.getName());
         }
-
         if (operationOrderDO != null) {
             OperationDeviceRespVO operationDevice = operationDeviceService.getOperationDevice(operationOrderDO.getDeviceId());
             operationOrderDO.setAddress(operationDevice.getAddress());
@@ -347,6 +366,9 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         //获取当前工单数据
         OperationOrderDO operationOrderDO = operationOrderMapper.selectById(operationOrderReqVO.getId());
         operationOrderDO.setCompleteResult(operationOrderReqVO.getCompleteResult());
+        operationOrderDO.setRequestType(operationOrderReqVO.getRequestType());
+        operationOrderDO.setQuestionType(operationOrderReqVO.getQuestionType());
+        operationOrderDO.setLevel(operationOrderReqVO.getLevel());
 
         OperationOrderOperateRecordDO operateRecordDO = new OperationOrderOperateRecordDO();
         operateRecordDO.setOrderId(operationOrderDO.getId());
@@ -368,7 +390,9 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         lastOperateRecordDO.setEndTime(LocalDateTime.now());
         lastOperateRecordDO.setSpendTime(Duration.between(lastOperateRecordDO.getBeginTime(), lastOperateRecordDO.getEndTime()).toMillis());
 
+        operationOrderOperateRecordMapper.updateById(lastOperateRecordDO);
         String methodStr = OrderOperateEnum.valueOf(operationOrderReqVO.getOperateMethod()).getValue();
+
         //反射调用方法
         WorkOrderCirculationClass workOrderCirculationClass = new WorkOrderCirculationClass();
         Method method = null;
@@ -380,8 +404,6 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             e.printStackTrace();
             return CommonResult.error(500, "当前工单状态不可执行该操作");
         }
-
-        operationOrderOperateRecordMapper.updateById(lastOperateRecordDO);
 
         return CommonResult.success(true);
     }
@@ -426,9 +448,28 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             if (user != null) {
                 openIdList.add(user.getOpenid());
-                WechatNoticeVO wechatNoticeVO = new WechatNoticeVO();
+
                 String templateId = "moCz5xqQZooEghuw2D_EU57tmilMtnACDeEYjraRD1I";  //工单派工消息模板
-                wechatNoticeVO.setTemplate_id(templateId); //模板Id,templateId
+//                wechatNoticeVO.setTemplate_id(templateId); //模板Id,templateId
+//                Map dataMap = new HashMap<>();
+//                Map<String, String> cs2 = new HashMap<>();
+//                cs2.put("value", operationOrderDO.getCode());
+//                dataMap.put("character_string2", cs2);
+//                Map<String, String> t8 = new HashMap<>();
+//                t8.put("value", operationOrderDO.getTitle());
+//                dataMap.put("thing8", t8);
+//                Map<String, String> p10 = new HashMap<>();
+//                p10.put("value", operateRecordDO.getUserNickName());
+//                dataMap.put("phrase10", p10);
+//                Map<String, String> time13 = new HashMap<>();
+//
+//                time13.put("value", operateRecordDO.getCreateTime().format(formatter));
+//                dataMap.put("time13", time13);
+//                wechatNoticeVO.setData(dataMap);
+//                wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram(appId, path + operationOrderDO.getId()));
+
+                Map wechatNoticeVO = new HashMap();
+                wechatNoticeVO.put("template_id", templateId);
                 Map dataMap = new HashMap<>();
                 Map<String, String> cs2 = new HashMap<>();
                 cs2.put("value", operationOrderDO.getCode());
@@ -443,8 +484,12 @@ public class OperationOrderServiceImpl implements OperationOrderService {
 
                 time13.put("value", operateRecordDO.getCreateTime().format(formatter));
                 dataMap.put("time13", time13);
-                wechatNoticeVO.setData(dataMap);
-                wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram(appId, path + operationOrderDO.getId()));
+                wechatNoticeVO.put("data", dataMap);
+                Map appIdMap = new HashMap<>();
+                appIdMap.put("appid", appId);
+                appIdMap.put("pagepath", path + operationOrderDO.getId());
+                wechatNoticeVO.put("miniprogram", appIdMap);
+
                 try {
                     weChatSendMessageService.sendModelMessage(openIdList, wechatNoticeVO);
                 } catch (Exception e) {
@@ -534,9 +579,30 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             if (user != null) {
                 openIdList.add(user.getOpenid());
-                WechatNoticeVO wechatNoticeVO = new WechatNoticeVO();
+//                WechatNoticeVO wechatNoticeVO = new WechatNoticeVO();
                 String templateId = "8rW5_qBpLfqYzgsrpuXrGKatI4mxf2CwiYfuSO-Qgc8";  //工单转交消息模板
-                wechatNoticeVO.setTemplate_id(templateId); //模板Id,templateId
+//                wechatNoticeVO.setTemplate_id(templateId); //模板Id,templateId
+//                Map dataMap = new HashMap<>();
+//                Map<String, String> cs2 = new HashMap<>();
+//                cs2.put("value", operationOrderDO.getCode());
+//                dataMap.put("character_string1", cs2);
+//                Map<String, String> t6 = new HashMap<>();
+//                t6.put("value", operationOrderDO.getTitle());
+//                dataMap.put("thing6", t6);
+//
+//                Map<String, String> thing9 = new HashMap<>();
+//                thing9.put("value", operateRecordDO.getOperateUserNickName());
+//                dataMap.put("thing9", thing9);
+//                Map<String, String> thing12 = new HashMap<>();
+//                thing12.put("value", operateRecordDO.getUserNickName());
+//                dataMap.put("thing12", thing12);
+//                Map<String, String> time13 = new HashMap<>();
+//                time13.put("value", operateRecordDO.getCreateTime().format(formatter));
+//                dataMap.put("time5", time13);
+//                wechatNoticeVO.setData(dataMap);
+//                wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram(appId, path + operationOrderDO.getId()));
+                Map wechatNoticeVO = new HashMap();
+                wechatNoticeVO.put("template_id", templateId);
                 Map dataMap = new HashMap<>();
                 Map<String, String> cs2 = new HashMap<>();
                 cs2.put("value", operationOrderDO.getCode());
@@ -554,8 +620,11 @@ public class OperationOrderServiceImpl implements OperationOrderService {
                 Map<String, String> time13 = new HashMap<>();
                 time13.put("value", operateRecordDO.getCreateTime().format(formatter));
                 dataMap.put("time5", time13);
-                wechatNoticeVO.setData(dataMap);
-                wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram(appId, path + operationOrderDO.getId()));
+                wechatNoticeVO.put("data", dataMap);
+                Map appIdMap = new HashMap<>();
+                appIdMap.put("appid", appId);
+                appIdMap.put("pagepath", path + operationOrderDO.getId());
+                wechatNoticeVO.put("miniprogram", appIdMap);
                 try {
                     weChatSendMessageService.sendModelMessage(openIdList, wechatNoticeVO);
                 } catch (Exception e) {
@@ -724,12 +793,18 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             }
             operateRecordDO.setOperateType(OperateConstant.WANCHENG_TYPE);
             operationOrderOperateRecordMapper.insert(operateRecordDO);
+            //处理完成时间
             operationOrderDO.setDealTime(LocalDateTime.now());
             List<OperationOrderOperateRecordDO> dealOperateRecordDOS = operationOrderOperateRecordMapper.selectList(new QueryWrapper<OperationOrderOperateRecordDO>().lambda()
                     .eq(OperationOrderOperateRecordDO::getUserId, operationOrderDO.getDealUserId())
-                    .eq(OperationOrderOperateRecordDO::getOperateType, OperateConstant.XIANCHNAGQUEREN_TYPE));
-            Long sumSpend = dealOperateRecordDOS.stream().mapToLong(p -> p.getSpendTime().intValue()).sum();
-            operationOrderDO.setDealConsume(sumSpend);
+                    .eq(OperationOrderOperateRecordDO::getOperateType, OperateConstant.XIANCHNAGQUEREN_TYPE)
+                    .eq(OperationOrderOperateRecordDO::getOrderId, operationOrderDO.getId()));
+            if (CollectionUtil.isNotEmpty(dealOperateRecordDOS)) {
+                Long sumSpend = dealOperateRecordDOS.stream().mapToLong(p -> p.getSpendTime().intValue()).sum();
+                operationOrderDO.setDealConsume(sumSpend);
+            } else {
+                operationOrderDO.setDealConsume(0L);
+            }
             operationOrderDO.setCompleteTime(LocalDateTime.now());
             //计算完成总耗时
             operationOrderDO.setCompleteConsume(Duration.between(operationOrderDO.getCreateTime(), LocalDateTime.now()).toMillis());
@@ -768,6 +843,24 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             operateRecordDO.setEndTime(LocalDateTime.now());
             operateRecordDO.setSpendTime(0L);
             operationOrderOperateRecordMapper.insert(operateRecordDO);
+
+            //处理完成时间
+            operationOrderDO.setDealTime(LocalDateTime.now());
+            List<OperationOrderOperateRecordDO> dealOperateRecordDOS = operationOrderOperateRecordMapper.selectList(new QueryWrapper<OperationOrderOperateRecordDO>().lambda()
+                    .eq(OperationOrderOperateRecordDO::getUserId, operationOrderDO.getDealUserId())
+                    .eq(OperationOrderOperateRecordDO::getOperateType, OperateConstant.XIANCHNAGQUEREN_TYPE)
+                    .eq(OperationOrderOperateRecordDO::getOrderId, operationOrderDO.getId()));
+            if (CollectionUtil.isNotEmpty(dealOperateRecordDOS)) {
+                Long sumSpend = dealOperateRecordDOS.stream().mapToLong(p -> p.getSpendTime().intValue()).sum();
+                operationOrderDO.setDealConsume(sumSpend);
+            } else {
+                operationOrderDO.setDealConsume(0L);
+            }
+            operationOrderDO.setCompleteTime(LocalDateTime.now());
+            //计算完成总耗时
+            operationOrderDO.setCompleteConsume(Duration.between(operationOrderDO.getCreateTime(), LocalDateTime.now()).toMillis());
+            operationOrderMapper.updateById(operationOrderDO);
+
             //发送微信公众号消息--信息部内部消息
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             //给报修人的状态反馈
@@ -794,9 +887,26 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         try {
             List<String> openIdList = new ArrayList<>();
             openIdList.add(repairerOpenId);
-            WechatNoticeVO wechatNoticeVO = new WechatNoticeVO();
+//            WechatNoticeVO wechatNoticeVO = new WechatNoticeVO();
             String templateId = "hGGuKzP2XQpO57rVcwQwYWn9V36keth4agPcuvLfyCo";  //工单状态变更消息模板
-            wechatNoticeVO.setTemplate_id(templateId); //模板Id,templateId
+//            wechatNoticeVO.setTemplate_id(templateId); //模板Id,templateId
+//            Map dataMap = new HashMap<>();
+//            Map<String, String> cs9 = new HashMap<>();
+//            cs9.put("value", code);
+//            dataMap.put("character_string9", cs9);
+//            Map<String, String> st5 = new HashMap<>();
+//            st5.put("value", orderStatus);
+//            dataMap.put("short_thing5", st5);
+//            Map<String, String> t14 = new HashMap<>();
+//            t14.put("value", operatorName);
+//            dataMap.put("thing14", t14);
+//            Map<String, String> time11 = new HashMap<>();
+//            time11.put("value", time);
+//            dataMap.put("time11", time11);
+//            wechatNoticeVO.setData(dataMap);
+//            wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram(appId, path + operationOrderDO.getId()));
+            Map wechatNoticeVO = new HashMap();
+            wechatNoticeVO.put("template_id", templateId);
             Map dataMap = new HashMap<>();
             Map<String, String> cs9 = new HashMap<>();
             cs9.put("value", code);
@@ -810,8 +920,11 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             Map<String, String> time11 = new HashMap<>();
             time11.put("value", time);
             dataMap.put("time11", time11);
-            wechatNoticeVO.setData(dataMap);
-            wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram(appId, path + operationOrderDO.getId()));
+            wechatNoticeVO.put("data", dataMap);
+            Map appIdMap = new HashMap<>();
+            appIdMap.put("appid", appId);
+            appIdMap.put("pagepath", path + operationOrderDO.getId());
+            wechatNoticeVO.put("miniprogram", appIdMap);
             weChatSendMessageService.sendModelMessage(openIdList, wechatNoticeVO);
         } catch (Exception e) {
             e.printStackTrace();
