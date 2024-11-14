@@ -212,6 +212,10 @@ public class OperationOrderServiceImpl implements OperationOrderService {
     @Override
     public OperationOrderDO getOperationOrder(Long id) {
         OperationOrderDO operationOrderDO = operationOrderMapper.selectById(id);
+
+        if (operationOrderDO == null) {
+            throw exception(OPERATION_ORDER_NOT_EXISTS);
+        }
         OperationQuestionTypeDO operationQuestionTypeDO = operationQuestionTypeMapper.selectById(operationOrderDO.getQuestionType());
         if (operationQuestionTypeDO != null) {
             operationOrderDO.setQuestionTypeStr(operationQuestionTypeDO.getName());

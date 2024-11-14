@@ -56,22 +56,45 @@ public class OperationAddressServiceImpl implements OperationAddressService {
     public void updateOperationAddress(OperationAddressSaveReqVO updateReqVO) {
         // 校验存在
         validateOperationAddressExists(updateReqVO.getId());
+        //元数据
+        OperationAddressDO operationAddressDO = operationAddressMapper.selectById(updateReqVO.getId());
+        //状态发生改变，且新状态为禁用时
+        if (operationAddressDO.getStatus() != updateReqVO.getStatus() && updateReqVO.getStatus() == 1) {
+            List<OperationAddressDO> operationAddressDOS = operationAddressMapper.selectList(new QueryWrapper<OperationAddressDO>().lambda()
+                    .eq(OperationAddressDO::getParentAddressId, operationAddressDO.getId()));
+            //找到所有子级
+            if (CollectionUtil.isNotEmpty(operationAddressDOS)) {
+                //设置子级状态与父级一致，禁用
+                operationAddressDOS.forEach(p -> p.setStatus(updateReqVO.getStatus())); //=1
+                //批量更新
+                operationAddressMapper.updateBatch(operationAddressDOS);
+            }
+        }
+
+
         // 更新
         OperationAddressDO updateObj = BeanUtils.toBean(updateReqVO, OperationAddressDO.class);
         operationAddressMapper.updateById(updateObj);
     }
 
     @Override
+    @Transactional
     public void deleteOperationAddress(Long id) {
         // 校验存在
         validateOperationAddressExists(id);
-        // 删除
+
         List<OperationAddressDO> operationAddressDOS = operationAddressMapper.selectList(new QueryWrapper<OperationAddressDO>().lambda().eq(OperationAddressDO::getParentAddressId, id));
-        if (CollectionUtil.isNotEmpty(operationAddressDOS)){
-            throw exception(OPERATION_SUB_ADDRESS_EXISTS);
-        }else{
-            operationAddressMapper.deleteById(id);
+        if (CollectionUtil.isNotEmpty(operationAddressDOS)) {
+            //如果存在启用的子节点
+            List<OperationAddressDO> collect = operationAddressDOS.stream().filter(p -> p.getStatus() == 0).collect(Collectors.toList());
+            if (CollectionUtil.isNotEmpty(collect)) {
+                throw exception(OPERATION_SUB_ADDRESS_EXISTS);
+            } else {
+                operationAddressMapper.deleteBatchIds(operationAddressDOS);
+            }
         }
+        // 删除
+        operationAddressMapper.deleteById(id);
 
     }
 

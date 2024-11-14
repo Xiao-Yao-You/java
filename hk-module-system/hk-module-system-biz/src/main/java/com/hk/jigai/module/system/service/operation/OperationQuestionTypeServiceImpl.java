@@ -61,6 +61,7 @@ public class OperationQuestionTypeServiceImpl implements OperationQuestionTypeSe
     public void updateOperationQuestionType(OperationQuestionTypeSaveReqVO updateReqVO) {
         // 校验存在
         validateOperationQuestionTypeExists(updateReqVO.getId());
+
         // 更新
         OperationQuestionTypeDO updateObj = BeanUtils.toBean(updateReqVO, OperationQuestionTypeDO.class);
         OperationDeviceTypeDO operationDeviceTypeDO = operationDeviceTypeMapper.selectById(updateObj.getDeviceTypeId());
@@ -69,11 +70,17 @@ public class OperationQuestionTypeServiceImpl implements OperationQuestionTypeSe
     }
 
     @Override
+    @Transactional
     public void deleteOperationQuestionType(Long id) {
         // 校验存在
         validateOperationQuestionTypeExists(id);
         // 删除
         operationQuestionTypeMapper.deleteById(id);
+        // 删除子节点
+        List<OperationQuestionTypeDO> operationQuestionTypeDOS = operationQuestionTypeMapper.selectList(new QueryWrapper<OperationQuestionTypeDO>().lambda().eq(OperationQuestionTypeDO::getParentId, id));
+        if (CollectionUtil.isNotEmpty(operationQuestionTypeDOS)) {
+            operationQuestionTypeMapper.deleteBatchIds(operationQuestionTypeDOS);
+        }
     }
 
     private void validateOperationQuestionTypeExists(Long id) {
