@@ -239,4 +239,12 @@ public class UserController {
         List<UserRespVO> allUser = userService.getAllUser(nickname,deptId);
         return success(allUser);
     }
+
+    @GetMapping("/getUserById")
+    @Operation(summary = "获得用户详情")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    public CommonResult<UserRespVO> getUserById(@RequestParam("id") Long id) {
+        AdminUserDO user = userService.getUser(id);
+        return success(BeanUtils.toBean(user, UserRespVO.class));
+    }
 }
