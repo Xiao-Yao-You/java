@@ -96,7 +96,9 @@ public class OperationDeviceSaveReqVO {
     private Long userId;
 
     @Schema(description = "使用地点", example = "32586")
-    private Long addressId;
+    private List<Long> addressId;
+    private String address;
+
 
     @Schema(description = "设备位置")
     private String location;

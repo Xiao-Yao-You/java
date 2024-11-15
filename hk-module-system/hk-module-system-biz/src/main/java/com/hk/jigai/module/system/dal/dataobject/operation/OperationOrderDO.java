@@ -1,5 +1,6 @@
 package com.hk.jigai.module.system.dal.dataobject.operation;
 
+import com.hk.jigai.framework.mybatis.core.type.JsonLongSetTypeHandler;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -20,7 +21,7 @@ import com.hk.jigai.framework.mybatis.core.dataobject.BaseDO;
  *
  * @author 超级管理员
  */
-@TableName("hk_operation_order")
+@TableName(value = "hk_operation_order", autoResultMap = true)
 @KeySequence("hk_operation_order_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -62,7 +63,7 @@ public class OperationOrderDO extends BaseDO {
     /**
      * 设备地点
      */
-    private Long addressId;
+    private String addressId;
 
     @TableField(exist = false)
     private String address;

@@ -96,6 +96,12 @@ public class OperationOrderServiceImpl implements OperationOrderService {
     public Long createOperationOrder(OperationOrderSaveReqVO createReqVO) {
         // 插入
         OperationOrderDO operationOrder = BeanUtils.toBean(createReqVO, OperationOrderDO.class);
+        if (createReqVO.getAddressIdList() != null) {
+            List<Long> addressIdList = createReqVO.getAddressIdList();
+            String result = addressIdList.stream()
+                    .map(String::valueOf).collect(Collectors.joining(", "));
+            operationOrder.setAddressId(result);
+        }
         //设置工单初始状态
         operationOrder.setStatus(OperateConstant.WAIT_ALLOCATION_STATUS);
         String code = sceneCodeService.increment("REPAIR_ORDER");
@@ -192,6 +198,12 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         validateOperationOrderExists(updateReqVO.getId());
         // 更新
         OperationOrderDO updateObj = BeanUtils.toBean(updateReqVO, OperationOrderDO.class);
+        if (updateReqVO.getAddressIdList() != null) {
+            List<Long> addressIdList = updateReqVO.getAddressIdList();
+            String result = addressIdList.stream()
+                    .map(String::valueOf).collect(Collectors.joining(", "));
+            updateObj.setAddressId(result);
+        }
         operationOrderMapper.updateById(updateObj);
     }
 

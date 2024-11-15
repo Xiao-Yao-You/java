@@ -116,8 +116,8 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
         operationDeviceTypeMapper.updateById(operationLabelDO);
         //4.设备表插入
         OperationDeviceDO operationDevice = BeanUtils.toBean(createReqVO, OperationDeviceDO.class);
-        OperationAddressDO operationAddressDO = operationAddressMapper.selectById(operationDevice.getAddressId());
-        operationDevice.setAddress(operationAddressDO == null ? "" : operationAddressDO.getAddressName());
+//        OperationAddressDO operationAddressDO = operationAddressMapper.selectById(operationDevice.getAddressId());
+//        operationDevice.setAddress(operationAddressDO == null ? "" : operationAddressDO.getAddressName());
         operationDeviceMapper.insert(operationDevice);
         //5.图片
         List<OperationDevicePictureDO> operationDevicePictureList = BeanUtils.toBean(createReqVO.getPictureList(), OperationDevicePictureDO.class);
@@ -298,9 +298,15 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
         operationDeviceDO.setDeptId(registerReqVO.getDeptId());
         operationDeviceDO.setDeptName(registerReqVO.getDeptName());
         operationDeviceDO.setUserId(registerReqVO.getUserId());
-        operationDeviceDO.setAddressId(registerReqVO.getAddressId());
-        OperationAddressDO operationAddressDO = operationAddressMapper.selectById(operationDeviceDO.getAddressId());
-        operationDeviceDO.setAddress(operationAddressDO == null ? "" : operationAddressDO.getAddressName());
+        if (registerReqVO.getAddressIdList() != null) {
+            List<Long> addressIdList = registerReqVO.getAddressIdList();
+            String result = addressIdList.stream()
+                    .map(String::valueOf).collect(Collectors.joining(", "));
+            operationDeviceDO.setAddressId(result);
+        }
+
+//        OperationAddressDO operationAddressDO = operationAddressMapper.selectById(operationDeviceDO.getAddressId());
+        operationDeviceDO.setAddress(registerReqVO.getAddress());
         operationDeviceDO.setLocation(registerReqVO.getLocation());
         operationDeviceDO.setIp1(registerReqVO.getIp1());
         operationDeviceDO.setIp2(registerReqVO.getIp2());

@@ -1,9 +1,8 @@
 package com.hk.jigai.module.system.dal.dataobject.operationdevicehistory;
 
-import com.baomidou.mybatisplus.annotation.KeySequence;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.hk.jigai.framework.mybatis.core.dataobject.BaseDO;
+import com.hk.jigai.framework.mybatis.core.type.JsonLongSetTypeHandler;
 import com.hk.jigai.module.system.dal.dataobject.operationdeviceaccessoryhistory.OperationDeviceAccessoryHistoryDO;
 import com.hk.jigai.module.system.dal.dataobject.operationdevicepicturehistory.OperationDevicePictureHistoryDO;
 import lombok.*;
@@ -11,13 +10,14 @@ import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 运维设备 DO
  *
  * @author 邵志伟
  */
-@TableName("hk_operation_device_history")
+@TableName(value = "hk_operation_device_history", autoResultMap = true)
 @KeySequence("hk_operation_device_history_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -115,7 +115,9 @@ public class OperationDeviceHistoryDO extends BaseDO {
     /**
      * 使用地点
      */
-    private Long addressId;
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private String addressId;
+
     /**
      * 地址名称
      */
@@ -177,8 +179,9 @@ public class OperationDeviceHistoryDO extends BaseDO {
      */
     private Long deviceId;
 
+    @TableField(exist = false)
     List<OperationDevicePictureHistoryDO> operationDevicePictureHistoryDOS;
-
+    @TableField(exist = false)
     List<OperationDeviceAccessoryHistoryDO> operationDeviceAccessoryHistoryDOS;
 
 }

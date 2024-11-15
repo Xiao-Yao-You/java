@@ -47,7 +47,7 @@ public class OperationOrderRespVO {
 
     @Schema(description = "设备地点", example = "9013")
     @ExcelProperty("设备地点")
-    private Long addressId;
+    private List<Long> addressId;
 
     private String address;
 

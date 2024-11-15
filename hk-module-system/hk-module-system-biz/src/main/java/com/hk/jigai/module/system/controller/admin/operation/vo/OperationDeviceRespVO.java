@@ -110,7 +110,7 @@ public class OperationDeviceRespVO {
 
     @Schema(description = "使用地点", example = "32586")
     @ExcelProperty("使用地点")
-    private Long addressId;
+    private List<Long> addressId;
 
     @Schema(description = "使用地点名称", example = "32586")
     @ExcelProperty("使用地点")

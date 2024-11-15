@@ -92,7 +92,7 @@ public class OperationDeviceHistorySaveReqVO {
     private Long userId;
 
     @Schema(description = "使用地点", example = "558")
-    private Long addressId;
+    private List<Long> addressId;
 
     @Schema(description = "地址名称")
     private String address;

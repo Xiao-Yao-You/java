@@ -83,7 +83,7 @@ public class OperationDevicePageReqVO extends PageParam {
     private String userNickName;
 
     @Schema(description = "使用地点", example = "32586")
-    private Long addressId;
+    private List<Long> addressId;
 
     @Schema(description = "设备位置")
     private String location;

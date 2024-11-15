@@ -9,6 +9,7 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import static com.hk.jigai.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
 
@@ -31,7 +32,10 @@ public class OperationDeviceRegisterReqVO {
     private String userNickName;
 
     @Schema(description = "使用地点", requiredMode = Schema.RequiredMode.REQUIRED, example = "32586")
-    private Long addressId;
+    private List<Long> addressIdList;
+
+    @Schema(description = "地点")
+    private String address;
 
     @Schema(description = "设备位置", requiredMode = Schema.RequiredMode.REQUIRED)
     private String location;

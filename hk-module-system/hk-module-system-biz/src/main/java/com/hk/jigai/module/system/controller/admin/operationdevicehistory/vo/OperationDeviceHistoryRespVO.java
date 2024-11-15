@@ -10,6 +10,7 @@ import lombok.Data;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Schema(description = "管理后台 - 运维设备 Response VO")
 @Data
@@ -102,7 +103,7 @@ public class OperationDeviceHistoryRespVO {
 
     @Schema(description = "使用地点", example = "558")
     @ExcelProperty("使用地点")
-    private Long addressId;
+    private List<Long> addressId;
 
     @Schema(description = "地址名称")
     @ExcelProperty("地址名称")
