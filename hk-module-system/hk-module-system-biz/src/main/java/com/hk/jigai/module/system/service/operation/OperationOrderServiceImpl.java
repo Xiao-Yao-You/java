@@ -541,7 +541,7 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             operationOrderOperateRecordMapper.insert(operateRecordDO);
             //2、更新工单相关数据
             operationOrderDO.setAllocationConsume(lastOperateRecordDO.getSpendTime());
-            operationOrderDO.setType(OperateConstant.PAIDAN_TYPE);
+            operationOrderDO.setType(OperateConstant.LINGDAN_TYPE);
             operationOrderDO.setStatus(OperateConstant.WAIT_DEAL_STATUS);
             operationOrderDO.setDealUserId(operateRecordDO.getUserId());
             operationOrderDO.setDealUserNickName(operateRecordDO.getUserNickName());
@@ -848,8 +848,9 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         public void revoke(OperationOrderDO operationOrderDO, OperationOrderOperateRecordDO operateRecordDO,
                            OperationOrderOperateRecordDO lastOperateRecordDO) {
             //非工单当前处理人无法操作工单
-            Long loginUserId = getLoginUserId();
-            if (!loginUserId.equals(operationOrderDO.getCreator())) {
+            String loginUserId = getLoginUserId() + "";
+            String creator = operationOrderDO.getCreator();
+            if (!loginUserId.equals(creator)) {
                 throw exception(OPERATION_ORDER_NOT_BELONG);
             }
             //撤销后无法恢复工单状态

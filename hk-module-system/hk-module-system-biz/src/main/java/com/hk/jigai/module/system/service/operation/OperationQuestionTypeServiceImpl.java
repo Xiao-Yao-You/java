@@ -169,13 +169,14 @@ public class OperationQuestionTypeServiceImpl implements OperationQuestionTypeSe
                     } else {
                         List<OperationQuestionTypeDO> operationQuestionTypeDOS = operationQuestionTypeMapper.selectList(new QueryWrapper<OperationQuestionTypeDO>().lambda().eq(OperationQuestionTypeDO::getName, item.getParentCode()));
                         List<Long> parentIds = new ArrayList<>();
+                        List<OperationQuestionTypeDO> operationQuestionTypes = new ArrayList<>();
                         if (CollectionUtil.isNotEmpty(operationQuestionTypeDOS)) {
                             parentIds = operationQuestionTypeDOS.stream().map(p -> p.getId()).collect(Collectors.toList());
-                        }
-                        OperationQuestionTypeDO operationQuestionTypeDO = operationQuestionTypeMapper.selectOne(new QueryWrapper<OperationQuestionTypeDO>().lambda()
-                                .eq(OperationQuestionTypeDO::getName, item.getName())
-                                .in(OperationQuestionTypeDO::getParentId, parentIds));
 
+                            operationQuestionTypes = operationQuestionTypeMapper.selectList(new QueryWrapper<OperationQuestionTypeDO>().lambda()
+                                    .eq(OperationQuestionTypeDO::getName, item.getName())
+                                    .in(OperationQuestionTypeDO::getParentId, parentIds));
+                        }
                         OperationQuestionTypeDO subQuestionDO = BeanUtils.toBean(item, OperationQuestionTypeDO.class);
                         Optional<OperationDeviceTypeDO> deviceType = deviceTypeList.stream().filter(p -> item.getDeviceType().equals(p.getName())).findFirst();
                         if (deviceType == null) {
@@ -196,7 +197,7 @@ public class OperationQuestionTypeServiceImpl implements OperationQuestionTypeSe
                         if (CollectionUtil.isNotEmpty(mainList)) {
                             Optional<OperationQuestionTypeDO> parentQuestion = mainList.stream().filter(p -> item.getParentCode().equals(p.getName())).findFirst();
 
-                            if (parentQuestion.get() == null) {
+                            if (parentQuestion == null) {
                                 respVO.getFailureList().put(item.getQuestionType(), "没有匹配的父级问题类型");
                                 return;
                             }
@@ -204,7 +205,7 @@ public class OperationQuestionTypeServiceImpl implements OperationQuestionTypeSe
                                 subQuestionDO.setParentId(p.getId());
                             });
                         }
-                        if (operationQuestionTypeDO == null) {
+                        if (CollectionUtil.isEmpty(operationQuestionTypes)) {
                             operationQuestionTypeMapper.insert(subQuestionDO);
                             respVO.getCreateList().add(subQuestionDO.getName());
                             return;
@@ -213,7 +214,7 @@ public class OperationQuestionTypeServiceImpl implements OperationQuestionTypeSe
                             respVO.getFailureList().put(item.getName(), "问题类型已存在");
                             return;
                         }
-                        subQuestionDO.setId(operationQuestionTypeDO.getId());
+                        subQuestionDO.setId(operationQuestionTypes.get(0).getId());
                         operationQuestionTypeMapper.updateById(subQuestionDO);
                         respVO.getUpdateList().add(subQuestionDO.getName());
                         return;

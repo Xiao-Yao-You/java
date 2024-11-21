@@ -141,19 +141,27 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
         //创建快照
         createDeviceSnapshot(deviceId);
 
+        OperationDeviceDO last = operationDeviceMapper.selectById(updateReqVO.getId());
+
         // 更新
         OperationDeviceDO updateObj = BeanUtils.toBean(updateReqVO, OperationDeviceDO.class);
+        updateObj.setDeptId(last.getDeptId());
+        updateObj.setDeptName(last.getDeptName());
+        updateObj.setUserId(last.getUserId());
+        updateObj.setUserNickName(last.getUserNickName());
+        updateObj.setAddressId(last.getAddressId());
+        updateObj.setAddress(last.getAddress());
         operationDeviceMapper.updateById(updateObj);
         //5.图片
-        operationDevicePictureMapper.delete(new QueryWrapper<OperationDevicePictureDO>().lambda().in(OperationDevicePictureDO::getDeviceId, updateReqVO.getId()));
+        operationDevicePictureMapper.delete(new QueryWrapper<OperationDevicePictureDO>().lambda()
+                .eq(OperationDevicePictureDO::getDeviceId, updateReqVO.getId())
+                .eq(OperationDevicePictureDO::getType, "0"));
         List<OperationDevicePictureDO> operationDevicePictureList = BeanUtils.toBean(updateReqVO.getPictureList(), OperationDevicePictureDO.class);
         operationDevicePictureList.forEach((a) -> {
             a.setDeviceId(updateReqVO.getId());
             a.setId(null);
         });
-        operationDevicePictureMapper.delete(new QueryWrapper<OperationDevicePictureDO>().lambda()
-                .eq(OperationDevicePictureDO::getDeviceId, updateReqVO.getId())
-                .eq(OperationDevicePictureDO::getType, "0"));
+
         operationDevicePictureMapper.insertBatch(operationDevicePictureList);
         //6.配置
         operationDeviceAccessoryMapper.delete(new QueryWrapper<OperationDeviceAccessoryDO>().lambda().in(OperationDeviceAccessoryDO::getDeviceId, updateReqVO.getId()));
@@ -171,7 +179,8 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
         //原设备基础信息
         OperationDeviceDO oldDevice = operationDeviceMapper.selectById(deviceId);
         //获取原图片
-        List<OperationDevicePictureDO> oldDevicePictureDOS = operationDevicePictureMapper.selectList(new QueryWrapper<OperationDevicePictureDO>().lambda().eq(OperationDevicePictureDO::getDeviceId, deviceId));
+        List<OperationDevicePictureDO> oldDevicePictureDOS = operationDevicePictureMapper.selectList(new QueryWrapper<OperationDevicePictureDO>().lambda()
+                .eq(OperationDevicePictureDO::getDeviceId, deviceId));
         //获取原分配记录
         List<OperationDeviceAccessoryDO> oldDeviceAccessoryDOS = operationDeviceAccessoryMapper.selectList(new QueryWrapper<OperationDeviceAccessoryDO>().lambda().eq(OperationDeviceAccessoryDO::getDeviceId, deviceId));
 
