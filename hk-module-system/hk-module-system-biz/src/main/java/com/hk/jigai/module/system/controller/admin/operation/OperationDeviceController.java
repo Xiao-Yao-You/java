@@ -2,7 +2,9 @@ package com.hk.jigai.module.system.controller.admin.operation;
 
 import com.hk.jigai.module.system.controller.admin.operationdevicehistory.vo.OperationDeviceHistoryPageReqVO;
 import com.hk.jigai.module.system.controller.admin.operationdevicehistory.vo.OperationDeviceHistoryRespVO;
+import com.hk.jigai.module.system.dal.dataobject.operation.OldOperationDeviceDO;
 import com.hk.jigai.module.system.dal.dataobject.operationdevicehistory.OperationDeviceHistoryDO;
+import com.hk.jigai.module.system.service.operation.OldOperationDeviceService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -44,6 +46,10 @@ public class OperationDeviceController {
 
     @Resource
     private OperationDeviceService operationDeviceService;
+
+
+    @Resource
+    private OldOperationDeviceService oldOperationDeviceService;
 
     @PostMapping("/create")
     @Operation(summary = "创建运维设备")
@@ -91,6 +97,14 @@ public class OperationDeviceController {
     public CommonResult<PageResult<OperationDeviceRespVO>> getOperationDevicePage(@Valid OperationDevicePageReqVO pageReqVO) {
         PageResult<OperationDeviceDO> pageResult = operationDeviceService.getOperationDevicePage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, OperationDeviceRespVO.class));
+    }
+
+    @GetMapping("/oldPage")
+    @Operation(summary = "获得运维设备分页")
+//    @PreAuthorize("@ss.hasPermission('hk:operation-device:query')")
+    public CommonResult<PageResult<OldOperationDeviceRespVO>> getOldOperationDevicePage(@Valid OldOperationDevicePageReqVO pageReqVO) {
+        PageResult<OldOperationDeviceDO> pageResult = oldOperationDeviceService.getOldOperationDevicePage(pageReqVO);
+        return success(BeanUtils.toBean(pageResult, OldOperationDeviceRespVO.class));
     }
 
     @GetMapping("/export-excel")

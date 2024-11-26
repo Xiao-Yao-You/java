@@ -65,6 +65,12 @@
             <artifactId>hk-spring-boot-starter-redis</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
+            <version>12.4.1.jre8</version>
+        </dependency>
+
         <!-- Job 定时任务相关 -->
         <dependency>
             <groupId>com.hk.boot</groupId>
