@@ -3,7 +3,8 @@ package com.hk.jigai.module.system.service.operationdevicemodel;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.hk.jigai.module.system.controller.admin.operation.vo.QuestionTypeImportRespVO;
+import com.hk.jigai.framework.common.pojo.PageResult;
+import com.hk.jigai.framework.common.util.object.BeanUtils;
 import com.hk.jigai.module.system.controller.admin.operationdevicemodel.vo.ModelImportExcelVO;
 import com.hk.jigai.module.system.controller.admin.operationdevicemodel.vo.ModelImportRespVO;
 import com.hk.jigai.module.system.controller.admin.operationdevicemodel.vo.OperationDeviceModelPageReqVO;
@@ -13,22 +14,16 @@ import com.hk.jigai.module.system.dal.dataobject.operationdevicemodel.OperationD
 import com.hk.jigai.module.system.dal.mysql.operation.OperationDeviceTypeMapper;
 import com.hk.jigai.module.system.dal.mysql.operationdevicemodel.OperationDeviceModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-
-import org.springframework.validation.annotation.Validated;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
-
-import com.hk.jigai.framework.common.pojo.PageResult;
-import com.hk.jigai.framework.common.pojo.PageParam;
-import com.hk.jigai.framework.common.util.object.BeanUtils;
-
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 import static com.hk.jigai.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static com.hk.jigai.module.system.enums.ErrorCodeConstants.IMPORT_LIST_IS_EMPTY;
-import static com.hk.jigai.module.system.enums.ErrorCodeConstants.OPERATION_DEVICE_MODEL_NOT_EXISTS;
+import static com.hk.jigai.module.system.enums.ErrorCodeConstants.*;
 
 /**
  * 设备型号 Service 实现类
@@ -48,6 +43,12 @@ public class OperationDeviceModelServiceImpl implements OperationDeviceModelServ
 
     @Override
     public Long createOperationDeviceModel(OperationDeviceModelSaveReqVO createReqVO) {
+        //校验是否存在
+        OperationDeviceModelDO operationDeviceModelDO = operationDeviceModelMapper.selectOne(new QueryWrapper<OperationDeviceModelDO>().lambda().eq(OperationDeviceModelDO::getModel, createReqVO.getModel()));
+        if (operationDeviceModelDO != null) {
+            throw exception(OPERATION_DEVICE_MODEL_EXISTS);
+        }
+
         // 插入
         OperationDeviceModelDO operationDeviceModel = BeanUtils.toBean(createReqVO, OperationDeviceModelDO.class);
         operationDeviceModelMapper.insert(operationDeviceModel);
@@ -57,7 +58,7 @@ public class OperationDeviceModelServiceImpl implements OperationDeviceModelServ
 
     @Override
     public void updateOperationDeviceModel(OperationDeviceModelSaveReqVO updateReqVO) {
-        // 校验存在
+        // 校验是否存在
         validateOperationDeviceModelExists(updateReqVO.getId());
         // 更新
         OperationDeviceModelDO updateObj = BeanUtils.toBean(updateReqVO, OperationDeviceModelDO.class);
@@ -105,7 +106,7 @@ public class OperationDeviceModelServiceImpl implements OperationDeviceModelServ
                 OperationDeviceTypeDO operationDeviceTypeDO = operationDeviceTypeMapper.selectOne(new QueryWrapper<OperationDeviceTypeDO>().lambda().eq(OperationDeviceTypeDO::getName, deviceType));
                 //获取设备类型的值
                 if (operationDeviceTypeDO != null) {
-                    operationDeviceModelDO.setDeviceTypeId(operationDeviceModelDO.getId());
+                    operationDeviceModelDO.setDeviceTypeId(operationDeviceTypeDO.getId());
                 } else {
                     respVO.getFailureList().put(item.getModel(), "未找到匹配的设备类型");
                 }
@@ -115,9 +116,7 @@ public class OperationDeviceModelServiceImpl implements OperationDeviceModelServ
             });
 
         }
-
         return respVO;
-
     }
 
     @Override

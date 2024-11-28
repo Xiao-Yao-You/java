@@ -210,5 +210,5 @@ public interface ErrorCodeConstants {
     ErrorCode OPERATION_ORDER_NOT_BELONG = new ErrorCode(1_002_033_014, "无当前工单操作权限");
     ErrorCode OPERATION_SUB_ADDRESS_EXISTS = new ErrorCode(1_002_033_015, "当前地点下存在启用的子级地点，无法删除");
     ErrorCode OPERATION_DEVICE_MODEL_NOT_EXISTS = new ErrorCode(1_002_033_016, "设备型号不存在");
-
+    ErrorCode OPERATION_DEVICE_MODEL_EXISTS = new ErrorCode(1_002_033_017, "设备型号已存在");
 }
