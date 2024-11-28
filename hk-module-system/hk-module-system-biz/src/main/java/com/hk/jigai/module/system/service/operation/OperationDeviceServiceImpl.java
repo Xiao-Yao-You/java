@@ -1,6 +1,7 @@
 package com.hk.jigai.module.system.service.operation;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.baomidou.dynamic.datasource.annotation.Slave;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hk.jigai.framework.common.pojo.CommonResult;
 import com.hk.jigai.framework.common.util.date.LocalDateTimeUtils;
@@ -81,6 +82,9 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
 
     @Resource
     private OperationDeviceAccessoryHistoryMapper operationDeviceAccessoryHistoryMapper;
+
+    @Resource
+    private OldOperationDeviceMapper oldOperationDeviceMapper;
 
     @Override
     @Transactional
@@ -268,8 +272,10 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
     @Override
     public OperationDeviceRespVO getOperationDeviceByLabelCode(String labelCode) {
         OperationDeviceDO operationDeviceDO = operationDeviceMapper.selectOne(new QueryWrapper<OperationDeviceDO>().lambda().eq(OperationDeviceDO::getLabelCode, labelCode));
-        OperationDeviceRespVO resp = BeanUtils.toBean(operationDeviceDO, OperationDeviceRespVO.class);
+        //先从新系统获取数据
+        OperationDeviceRespVO resp = new OperationDeviceRespVO();
         if (operationDeviceDO != null) {
+            resp = BeanUtils.toBean(operationDeviceDO, OperationDeviceRespVO.class);
             List<OperationDevicePictureSaveReqVO> pictureList = BeanUtils.toBean(operationDevicePictureMapper.selectList(new QueryWrapper<OperationDevicePictureDO>().lambda().eq(OperationDevicePictureDO::getDeviceId, operationDeviceDO.getId())), OperationDevicePictureSaveReqVO.class);
             if (CollectionUtil.isNotEmpty(pictureList)) {
                 List<OperationDevicePictureSaveReqVO> devicePic = pictureList.stream().filter(p -> "0".equals(p.getType())).collect(Collectors.toList());
@@ -282,8 +288,22 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
             List<OperationDeviceAccessorySaveReqVO> accessoryList = BeanUtils.toBean(operationDeviceAccessoryMapper.selectList((new QueryWrapper<OperationDeviceAccessoryDO>().lambda()
                     .eq(OperationDeviceAccessoryDO::getDeviceId, operationDeviceDO.getId()))), OperationDeviceAccessorySaveReqVO.class);
             resp.setAccessoryList(accessoryList);
+        } else {
+            OldOperationDeviceDO oldDeviceByLabelCode = getOldDeviceByLabelCode(labelCode);
+            if (oldDeviceByLabelCode != null) {
+                resp.setName(oldDeviceByLabelCode.getResourcename());
+                resp.setCode(labelCode);
+                resp.setAddress(oldDeviceByLabelCode.getLocationex());
+                resp.setLocation(oldDeviceByLabelCode.getLocation());
+            }
         }
         return resp;
+    }
+
+    @Slave  //从数据库
+    public OldOperationDeviceDO getOldDeviceByLabelCode(String labelCode) {
+        OldOperationDeviceDO oldOperationDeviceDO = oldOperationDeviceMapper.selectOne(new QueryWrapper<OldOperationDeviceDO>().lambda().eq(OldOperationDeviceDO::getBarcode, labelCode));
+        return oldOperationDeviceDO;
     }
 
     @Override
