@@ -87,4 +87,16 @@ public class OldOperationDeviceDO extends BaseDO {
 
     private String locationex;
 
+    @TableField(exist = false)
+    private String productname;
+
+    @TableField(exist = false)
+    private String corporationname;
+
+    @TableField(exist = false)
+    private String departmentname;
+
+    @TableField(exist = false)
+    private String personname;
+
 }

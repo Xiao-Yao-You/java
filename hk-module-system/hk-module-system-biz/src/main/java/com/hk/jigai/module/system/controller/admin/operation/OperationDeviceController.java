@@ -83,6 +83,13 @@ public class OperationDeviceController {
         return success(operationDeviceService.getOperationDevice(id));
     }
 
+    @GetMapping("/getOldDevice")
+    @Operation(summary = "获得运维设备")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    public CommonResult<OldOperationDeviceRespVO> getOldDevice(@RequestParam("ciid") Long ciid) {
+        return success(oldOperationDeviceService.getOldOperationDevice(ciid));
+    }
+
 
     @GetMapping("/getByLabelCode")
     @Operation(summary = "根据标签号获取设备信息")

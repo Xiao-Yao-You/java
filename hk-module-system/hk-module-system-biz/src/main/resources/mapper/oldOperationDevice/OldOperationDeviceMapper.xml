@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hk.jigai.module.system.dal.mysql.operation.OldOperationDeviceMapper">
+    <select id="selectPage"
+            parameterType="com.hk.jigai.module.system.controller.admin.operation.vo.OldOperationDevicePageReqVO"
+            resultMap="oldOperationDeviceMap">
+        select *
+        from CI c1 left join CIProduct c2 on c1.ProductId = c2.PRODUCTID left join Corporation c3 on C1.CorporationID =
+        c3.CorporationID left join Department d1 on d1.DepartmentID = c1.deptid
+        where c1.deleted=0
+        <if test=" stateid != null and stateid != ''">
+            and c1.stateid = #{stateid}
+        </if>
+        <if test=" resourcename != null and resourcename != ''">
+            <bind name="resourcenameStr" value="'%' + resourcename + '%'"/>
+            and c1.resourcename like #{resourcenameStr}
+        </if>
+        <if test=" ciid != null and ciid != ''">
+            <bind name="ciidStr" value="'%' + ciid + '%'"/>
+            and c1.ciid like #{ciidStr}
+        </if>
+        <if test=" barcode != null and barcode != ''">
+            <bind name="barcodeStr" value="'%' + barcode + '%'"/>
+            and c1.barcode like #{barcodeStr}
+        </if>
+        <if test=" assettag != null and assettag != ''">
+            <bind name="assettagStr" value="'%' + assettag + '%'"/>
+            and c1.assettag like #{assettagStr}
+        </if>
+        <if test=" ipaddresses1 != null and ipaddresses1 != ''">
+            <bind name="ipaddresses1Str" value="'%' + ipaddresses1 + '%'"/>
+            and c1.ipaddresses1 like #{ipaddresses1Str}
+        </if>
+        <if test=" macaddress1 != null and macaddress1 != ''">
+            <bind name="macaddress1Str" value="'%' + macaddress1 + '%'"/>
+            and c1.macaddress1 like #{macaddress1Str}
+        </if>
+        <if test=" corporationid != null and corporationid != ''">
+            and c1.corporationid like #{corporationid}
+        </if>
+        <if test=" modelIds != null and modelIds != ''">
+            and c1.productid in
+            <foreach item="modelId" collection="modelIds" open="(" separator="," close=")">
+                #{modelId}
+            </foreach>
+        </if>
+        order by
+        c1.RegisterDATE
+        OFFSET (#{pageNo} - 1) * #{pageSize} ROWS FETCH NEXT #{pageSize} ROWS ONLY
+    </select>
+
+    <select id="selectTotal"
+            parameterType="com.hk.jigai.module.system.controller.admin.operation.vo.OldOperationDevicePageReqVO"
+            resultType="Long">
+        select count(1)
+        from CI c1
+        left join CIProduct c2 on c1.ProductId = c2.PRODUCTID
+        left join Corporation c3 on C1.CorporationID = c3.CorporationID
+        left join Department d1 on d1.DepartmentID = c1.deptid
+        where c1.deleted=0
+        <if test=" stateid != null and stateid != ''">
+            and c1.stateid = #{stateid}
+        </if>
+        <if test=" resourcename != null and resourcename != ''">
+            <bind name="resourcenameStr" value="'%' + resourcename + '%'"/>
+            and c1.resourcename like #{resourcenameStr}
+        </if>
+        <if test=" ciid != null and ciid != ''">
+            <bind name="ciidStr" value="'%' + ciid + '%'"/>
+            and c1.ciid like #{ciidStr}
+        </if>
+        <if test=" barcode != null and barcode != ''">
+            <bind name="barcodeStr" value="'%' + barcode + '%'"/>
+            and c1.barcode like #{barcodeStr}
+        </if>
+        <if test=" assettag != null and assettag != ''">
+            <bind name="assettagStr" value="'%' + assettag + '%'"/>
+            and c1.assettag like #{assettagStr}
+        </if>
+        <if test=" ipaddresses1 != null and ipaddresses1 != ''">
+            <bind name="ipaddresses1Str" value="'%' + ipaddresses1 + '%'"/>
+            and c1.ipaddresses1 like #{ipaddresses1Str}
+        </if>
+        <if test=" macaddress1 != null and macaddress1 != ''">
+            <bind name="macaddress1Str" value="'%' + macaddress1 + '%'"/>
+            and c1.macaddress1 like #{macaddress1Str}
+        </if>
+        <if test=" corporationid != null and corporationid != ''">
+            and c1.corporationid like #{corporationid}
+        </if>
+        <if test=" modelIds != null and modelIds != ''">
+            and c1.productid in
+            <foreach item="modelId" collection="modelIds" open="(" separator="," close=")">
+                #{modelId}
+            </foreach>
+        </if>
+    </select>
+
+
+    <select id="selectModelType"
+            parameterType="java.lang.String"
+            resultType="Long">
+        select PRODUCTID
+        from CIProduct c1
+                 left join CIType c2 on c1.CITYPENO = c2.TYPEID
+        where c2.TYPENAME like CONCAT('%', #{citype}, '%')
+    </select>
+
+    <select id="selectModelIds"
+            parameterType="java.lang.String"
+            resultType="Long">
+        select productid
+        from CIProduct c1
+        where c1.productname like CONCAT('%', #{productname}, '%')
+    </select>
+
+    <select id="selectDeptByDeptId"
+            parameterType="java.lang.Long"
+            resultType="String">
+        select DepartmentNAME
+        FROM Department
+        WHERE DepartmentID = #{deptid}
+    </select>
+
+    <select id="selectDeptByDeptId"
+            parameterType="java.lang.Long"
+            resultType="String">
+        select DepartmentNAME
+        FROM Department
+        WHERE DepartmentID = #{deptid}
+    </select>
+
+    <select id="selectCorporationById"
+            parameterType="java.lang.Long"
+            resultType="String">
+        select CorporationNAME
+        FROM Corporation
+        WHERE corporationid = #{corporationid}
+    </select>
+
+    <select id="selectModelById"
+            parameterType="java.lang.Long"
+            resultType="String">
+        select ProductNAME
+        FROM CIProduct
+        WHERE productid = #{productid}
+    </select>
+
+    <select id="selectPersonById"
+            parameterType="java.lang.String"
+            resultType="String">
+        select PersonName
+        FROM Person
+        WHERE personNO = #{personNo}
+    </select>
+
+    <resultMap id="oldOperationDeviceMap"
+               type="com.hk.jigai.module.system.dal.dataobject.operation.OldOperationDeviceDO">
+    </resultMap>
+</mapper>

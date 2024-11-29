@@ -1,6 +1,7 @@
 package com.hk.jigai.module.system.controller.admin.operation.vo;
 
 import cn.hutool.core.date.DateTime;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.hk.jigai.framework.common.pojo.PageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -80,5 +81,14 @@ public class OldOperationDevicePageReqVO extends PageParam {
     private Date productdate;
 
     private String locationex;
+
+    private String productname;
+
+    private String corporationname;
+
+    private String citype;
+
+    private List<Long> modelIds;
+
 
 }

@@ -80,4 +80,19 @@ public class OldOperationDeviceRespVO {
 
     private String locationex;
 
+    private String productname;
+
+    private String corporationname;
+
+    private String departmentname;
+
+    private String personname;
+
+    private List<String> displayPhotoList;
+    private List<String> productPhotoList;
+    private List<String> globalPhotoList;
+
+
+
+
 }

@@ -21,4 +21,5 @@ public interface OldOperationDeviceService {
     PageResult<OldOperationDeviceDO> getOldOperationDevicePage(OldOperationDevicePageReqVO pageReqVO);
 
     OldOperationDeviceRespVO getOldOperationDevice(Long id);
+
 }
