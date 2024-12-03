@@ -31,4 +31,5 @@ public interface OldOperationDeviceMapper extends BaseMapperX<OldOperationDevice
 
     String selectPersonById(String personNo);
 
+    String selectDeviceByProductId(Long productid);
 }

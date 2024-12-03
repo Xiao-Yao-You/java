@@ -180,4 +180,7 @@ public class OperationDeviceRespVO {
 
     @Schema(description = "问题类型明文")
     private String questionTypeStr;
+
+    //1:新，2：旧
+    private Integer flag;
 }

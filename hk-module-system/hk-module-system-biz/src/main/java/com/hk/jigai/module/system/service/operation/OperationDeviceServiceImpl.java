@@ -29,6 +29,8 @@ import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -258,13 +260,16 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
             resp.setDistributePictureList(distributePic);
             resp.setScrapPictureList(scrapPic);
         }
-        List<OperationDeviceAccessorySaveReqVO> accessoryList = BeanUtils.toBean(operationDeviceAccessoryMapper.selectList((new QueryWrapper<OperationDeviceAccessoryDO>().lambda()
-                .eq(OperationDeviceAccessoryDO::getDeviceId, operationDeviceDO.getId()))), OperationDeviceAccessorySaveReqVO.class);
-        resp.setAccessoryList(accessoryList);
-        //编码名称
-        SceneCodeDO sceneCode = sceneCodeService.getSceneCode(operationDeviceDO.getNumberName().intValue());
-        if (sceneCode != null) {
-            resp.setNumberNameStr(sceneCode.getDescription());
+        if (operationDeviceDO != null) {
+            List<OperationDeviceAccessoryDO> operationDeviceAccessoryDOS = operationDeviceAccessoryMapper.selectList((new QueryWrapper<OperationDeviceAccessoryDO>().lambda()
+                    .eq(OperationDeviceAccessoryDO::getDeviceId, operationDeviceDO.getId())));
+            List<OperationDeviceAccessorySaveReqVO> accessoryList = BeanUtils.toBean(operationDeviceAccessoryDOS, OperationDeviceAccessorySaveReqVO.class);
+            resp.setAccessoryList(accessoryList);
+            //编码名称
+            SceneCodeDO sceneCode = sceneCodeService.getSceneCode(operationDeviceDO.getNumberName().intValue());
+            if (sceneCode != null) {
+                resp.setNumberNameStr(sceneCode.getDescription());
+            }
         }
         return resp;
     }
@@ -288,22 +293,49 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
             List<OperationDeviceAccessorySaveReqVO> accessoryList = BeanUtils.toBean(operationDeviceAccessoryMapper.selectList((new QueryWrapper<OperationDeviceAccessoryDO>().lambda()
                     .eq(OperationDeviceAccessoryDO::getDeviceId, operationDeviceDO.getId()))), OperationDeviceAccessorySaveReqVO.class);
             resp.setAccessoryList(accessoryList);
-        } else {
-            OldOperationDeviceDO oldDeviceByLabelCode = getOldDeviceByLabelCode(labelCode);
-            if (oldDeviceByLabelCode != null) {
-                resp.setName(oldDeviceByLabelCode.getResourcename());
-                resp.setCode(labelCode);
-                resp.setAddress(oldDeviceByLabelCode.getLocationex());
-                resp.setLocation(oldDeviceByLabelCode.getLocation());
-            }
         }
         return resp;
     }
 
-    @Slave  //从数据库
-    public OldOperationDeviceDO getOldDeviceByLabelCode(String labelCode) {
+    @Override
+    @Slave
+    public OperationDeviceRespVO getOldOperationDeviceByLabelCode(String labelCode) {
+        //先从新系统获取数据
+        OperationDeviceRespVO resp = new OperationDeviceRespVO();
         OldOperationDeviceDO oldOperationDeviceDO = oldOperationDeviceMapper.selectOne(new QueryWrapper<OldOperationDeviceDO>().lambda().eq(OldOperationDeviceDO::getBarcode, labelCode));
-        return oldOperationDeviceDO;
+        if (oldOperationDeviceDO != null) {
+            resp.setCode(oldOperationDeviceDO.getCiid() + "");
+            String deviceName = oldOperationDeviceMapper.selectDeviceByProductId(oldOperationDeviceDO.getProductid());
+            resp.setDeviceTypeName(deviceName);
+            String model = oldOperationDeviceMapper.selectModelById(oldOperationDeviceDO.getProductid());
+            resp.setModel(model);
+            resp.setSerialNumber(oldOperationDeviceDO.getSerialno());
+            resp.setMacAddress1(oldOperationDeviceDO.getMacaddress1());
+            resp.setMacAddress2(oldOperationDeviceDO.getMacaddress2());
+            resp.setId(oldOperationDeviceDO.getCiid());
+            resp.setCompany(oldOperationDeviceDO.getCorporationid().intValue());
+            resp.setEffectLevel(oldOperationDeviceDO.getImpactid());
+            resp.setAssetNumber(oldOperationDeviceDO.getAssettag());
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            String formattedDate = formatter.format(oldOperationDeviceDO.getProductdate());
+            resp.setManufactureDate(LocalDate.parse(formattedDate));
+            String productPhoto = oldOperationDeviceDO.getProductphoto();
+            String[] pic = productPhoto.split("￥");
+            String photoPath = "https://szh.jshkxcl.cn/hkjg-oldpic/";
+            List<OperationDevicePictureSaveReqVO> pictureSaveReqVOS = new ArrayList<>();
+            for (String p : pic) {
+                OperationDevicePictureSaveReqVO operationDevicePictureDO = new OperationDevicePictureSaveReqVO();
+                operationDevicePictureDO.setUrl(photoPath + p + ".jpg");
+                operationDevicePictureDO.setType("0");
+                pictureSaveReqVOS.add(operationDevicePictureDO);
+                resp.setDevicePictureList(pictureSaveReqVOS);
+            }
+            resp.setName(oldOperationDeviceDO.getResourcename());
+            resp.setLabelCode(labelCode);
+            resp.setAddress(oldOperationDeviceDO.getLocationex());
+            resp.setLocation(oldOperationDeviceDO.getLocation());
+        }
+        return resp;
     }
 
     @Override

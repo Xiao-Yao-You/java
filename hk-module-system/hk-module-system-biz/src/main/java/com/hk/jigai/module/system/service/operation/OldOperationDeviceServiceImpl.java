@@ -89,6 +89,8 @@ public class OldOperationDeviceServiceImpl implements OldOperationDeviceService 
         oldOperationDeviceDO.setPersonname(personName);
         OldOperationDeviceRespVO oldOperationDeviceRespVO = BeanUtils.toBean(oldOperationDeviceDO, OldOperationDeviceRespVO.class);
         String productphoto = oldOperationDeviceDO.getProductphoto();
+        String typeName = oldOperationDeviceMapper.selectDeviceByProductId(oldOperationDeviceRespVO.getProductid());
+        oldOperationDeviceRespVO.setTypeName(typeName);
         List<String> productPhotoList = new ArrayList<>();
 
         //使用￥分割历史图片字符串并组装城集合

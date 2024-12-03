@@ -3,8 +3,11 @@ package com.hk.jigai.module.system.controller.admin.operation;
 import com.hk.jigai.module.system.controller.admin.operationdevicehistory.vo.OperationDeviceHistoryPageReqVO;
 import com.hk.jigai.module.system.controller.admin.operationdevicehistory.vo.OperationDeviceHistoryRespVO;
 import com.hk.jigai.module.system.dal.dataobject.operation.OldOperationDeviceDO;
+import com.hk.jigai.module.system.dal.dataobject.operation.OperationAddressDO;
 import com.hk.jigai.module.system.dal.dataobject.operationdevicehistory.OperationDeviceHistoryDO;
 import com.hk.jigai.module.system.service.operation.OldOperationDeviceService;
+import com.hk.jigai.module.system.service.operation.OperationAddressService;
+import com.hk.jigai.module.system.service.operation.OperationAddressServiceImpl;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -46,6 +49,8 @@ public class OperationDeviceController {
 
     @Resource
     private OperationDeviceService operationDeviceService;
+    @Resource
+    private OperationAddressService operationAddressService;
 
 
     @Resource
@@ -80,7 +85,12 @@ public class OperationDeviceController {
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
 //    @PreAuthorize("@ss.hasPermission('hk:operation-device:query')")
     public CommonResult<OperationDeviceRespVO> getOperationDevice(@RequestParam("id") Long id) {
-        return success(operationDeviceService.getOperationDevice(id));
+
+        OperationDeviceRespVO operationDevice = operationDeviceService.getOperationDevice(id);
+//        if (operationDevice.getId() == null) {
+//            operationDevice = operationDeviceService.getOldOperationDevice(id);
+//        }
+        return success(operationDevice);
     }
 
     @GetMapping("/getOldDevice")
@@ -95,7 +105,22 @@ public class OperationDeviceController {
     @Operation(summary = "根据标签号获取设备信息")
 //    @PreAuthorize("@ss.hasPermission('hk:operation-device:query')")
     public CommonResult<OperationDeviceRespVO> getOperationDeviceByLabelCode(@RequestParam("labelCode") String labelCode) {
-        return success(operationDeviceService.getOperationDeviceByLabelCode(labelCode));
+        OperationDeviceRespVO operationDeviceByLabelCode = operationDeviceService.getOperationDeviceByLabelCode(labelCode);
+        if (operationDeviceByLabelCode.getId() == null) {
+            operationDeviceByLabelCode = operationDeviceService.getOldOperationDeviceByLabelCode(labelCode);
+            if (operationDeviceByLabelCode.getAddress() != null) {
+                OperationAddressDO operationAddressDO = operationAddressService.getAddressByAddress(operationDeviceByLabelCode.getAddress());
+                if (operationAddressDO != null) {
+                    List<Long> ids = new ArrayList<>();
+                    ids.add(operationAddressDO.getId());
+                    operationDeviceByLabelCode.setAddressId(ids);
+                }
+            }
+            operationDeviceByLabelCode.setFlag(2);
+        } else {
+            operationDeviceByLabelCode.setFlag(1);
+        }
+        return success(operationDeviceByLabelCode);
     }
 
     @GetMapping("/page")

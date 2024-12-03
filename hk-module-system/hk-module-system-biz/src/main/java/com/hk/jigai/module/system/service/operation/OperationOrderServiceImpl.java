@@ -10,10 +10,7 @@ import com.hk.jigai.framework.mybatis.core.dataobject.BaseDO;
 import com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils;
 import com.hk.jigai.module.system.controller.admin.notice.vo.WechatNoticeVO;
 import com.hk.jigai.module.system.controller.admin.operation.vo.*;
-import com.hk.jigai.module.system.dal.dataobject.operation.OperationOrderDO;
-import com.hk.jigai.module.system.dal.dataobject.operation.OperationOrderOperatePictureDO;
-import com.hk.jigai.module.system.dal.dataobject.operation.OperationOrderOperateRecordDO;
-import com.hk.jigai.module.system.dal.dataobject.operation.OperationQuestionTypeDO;
+import com.hk.jigai.module.system.dal.dataobject.operation.*;
 import com.hk.jigai.module.system.dal.dataobject.operationnoticeobject.OperationNoticeObjectDO;
 import com.hk.jigai.module.system.dal.dataobject.user.AdminUserDO;
 import com.hk.jigai.module.system.dal.mysql.operation.OperationOrderMapper;
@@ -81,6 +78,8 @@ public class OperationOrderServiceImpl implements OperationOrderService {
 
     @Resource
     private OperationDeviceService operationDeviceService;
+    @Resource
+    private OldOperationDeviceService oldOperationDeviceService;
 
     /**
      * 新建工单消息模板
@@ -234,7 +233,12 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         }
         if (operationOrderDO != null) {
             OperationDeviceRespVO operationDevice = operationDeviceService.getOperationDevice(operationOrderDO.getDeviceId());
-            operationOrderDO.setAddress(operationDevice.getAddress());
+            if (operationDevice == null) {
+                OldOperationDeviceRespVO oldOperationDevice = oldOperationDeviceService.getOldOperationDevice(operationOrderDO.getDeviceId());
+                operationOrderDO.setAddress(oldOperationDevice.getLocationex());
+            } else {
+                operationOrderDO.setAddress(operationDevice.getAddress());
+            }
         }
         return operationOrderDO;
     }

@@ -46,11 +46,11 @@ spring:
           url: jdbc:mysql://192.168.95.20:3306/hk_jigai_platform?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true # MySQL Connector/J 8.X 连接的示例
           username: root
           password: xxb123@hk.com
-        slave: # 模拟从库，可根据自己需要修改 # 模拟从库，可根据自己需要修改
+        slave: # 模拟从库，可根据自己需要修改
           lazy: true # 开启懒加载，保证启动速度
-          url: jdbc:mysql://192.168.95.20:3306/hk_jigai_platform?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true # MySQL Connector/J 8.X 连接的示例
-          username: root
-          password: xxb123@hk.com
+          url: jdbc:sqlserver://172.21.5.12:1433;DatabaseName=HKSDP;SelectMethod=cursor;encrypt=false;rewriteBatchedStatements=true;useUnicode=true;characterEncoding=utf-8
+          username: sa
+          password: Hlnt7812
 
   # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
   redis:

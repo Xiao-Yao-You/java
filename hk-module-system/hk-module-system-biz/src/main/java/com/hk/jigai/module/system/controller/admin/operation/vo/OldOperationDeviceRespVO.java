@@ -88,6 +88,8 @@ public class OldOperationDeviceRespVO {
 
     private String personname;
 
+    private String typeName;
+
     private List<String> displayPhotoList;
     private List<String> productPhotoList;
     private List<String> globalPhotoList;

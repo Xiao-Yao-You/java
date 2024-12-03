@@ -68,4 +68,6 @@ public interface OperationAddressService {
      * @return
      */
     AddressImportRespVO importAddressList(List<AddressImportExcelVO> list, Boolean updateSupport);
+
+    OperationAddressDO getAddressByAddress(String address);
 }

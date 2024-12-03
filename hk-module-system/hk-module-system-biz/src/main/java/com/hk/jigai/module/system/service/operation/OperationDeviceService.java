@@ -47,6 +47,7 @@ public interface OperationDeviceService {
      * @return 运维设备
      */
     OperationDeviceRespVO getOperationDevice(Long id);
+//    OperationDeviceRespVO getOldOperationDevice(Long id);
 
     /**
      * 根据标签号获得运维设备
@@ -55,6 +56,8 @@ public interface OperationDeviceService {
      * @return 运维设备
      */
     OperationDeviceRespVO getOperationDeviceByLabelCode(String labelCode);
+
+    OperationDeviceRespVO getOldOperationDeviceByLabelCode(String labelCode);
 
     /**
      * 获得运维设备分页

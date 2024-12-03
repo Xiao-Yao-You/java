@@ -154,6 +154,15 @@
         WHERE personNO = #{personNo}
     </select>
 
+    <select id="selectDeviceByProductId"
+            parameterType="java.lang.Long"
+            resultType="String">
+        select c2.TYPENAME
+        from CIProduct c1
+                 left join CIType c2 on c1.CITYPENO = c2.TYPEID
+        where c1.ProductID = #{productid}
+    </select>
+
     <resultMap id="oldOperationDeviceMap"
                type="com.hk.jigai.module.system.dal.dataobject.operation.OldOperationDeviceDO">
     </resultMap>

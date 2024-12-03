@@ -219,4 +219,9 @@ public class OperationAddressServiceImpl implements OperationAddressService {
         return respVO;
     }
 
+    @Override
+    public OperationAddressDO getAddressByAddress(String address) {
+        return operationAddressMapper.selectOne(new QueryWrapper<OperationAddressDO>().lambda().eq(OperationAddressDO::getAddressName, address));
+    }
+
 }
