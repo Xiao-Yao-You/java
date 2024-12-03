@@ -94,7 +94,4 @@ public class OldOperationDeviceRespVO {
     private List<String> productPhotoList;
     private List<String> globalPhotoList;
 
-
-
-
 }
