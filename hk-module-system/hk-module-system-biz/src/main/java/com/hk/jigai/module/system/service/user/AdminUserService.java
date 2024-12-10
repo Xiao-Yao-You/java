@@ -238,4 +238,8 @@ public interface AdminUserService {
      * @param openid
      */
     void updateUserOpenid(Long id, String openid);
+
+    AdminUserDO getUserByNickNameAndDept(String nickName,Long deptId);
+
+    AdminUserDO getUserByNickName(String nickName);
 }

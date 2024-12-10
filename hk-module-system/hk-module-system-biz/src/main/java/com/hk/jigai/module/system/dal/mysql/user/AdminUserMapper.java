@@ -30,5 +30,7 @@ public interface AdminUserMapper extends BaseMapperX<AdminUserDO> {
 
     Integer selectCount2();
 
+    Long getUserIdByNickNameAndDeptId(String nickName,Long deptId);
+
     Long queryMaxId();
 }

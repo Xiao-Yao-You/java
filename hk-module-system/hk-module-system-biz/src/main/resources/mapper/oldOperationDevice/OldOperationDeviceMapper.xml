@@ -49,6 +49,22 @@
         OFFSET (#{pageNo} - 1) * #{pageSize} ROWS FETCH NEXT #{pageSize} ROWS ONLY
     </select>
 
+    <select id="selectPageForSync"
+            parameterType="com.hk.jigai.module.system.controller.admin.operation.vo.OldOperationDevicePageReqVO"
+            resultMap="oldDeviceForSyncMap">
+        select *
+        from CI c1
+                 left join CIProduct c2 on c1.ProductId = c2.PRODUCTID
+                 left join Corporation c3 on C1.CorporationID =
+                                             c3.CorporationID
+                 left join Department d1 on d1.DepartmentID = c1.deptid
+                 left join CIType c4 on c2.CITYPENO = c4.TYPEID
+                 left join Person p on p.PersonNO = c1.userNo
+        where c1.deleted = 0
+        order by c1.RegisterDATE
+        OFFSET (#{pageNo} - 1) * #{pageSize} ROWS FETCH NEXT #{pageSize} ROWS ONLY
+    </select>
+
     <select id="selectTotal"
             parameterType="com.hk.jigai.module.system.controller.admin.operation.vo.OldOperationDevicePageReqVO"
             resultType="Long">
@@ -165,5 +181,39 @@
 
     <resultMap id="oldOperationDeviceMap"
                type="com.hk.jigai.module.system.dal.dataobject.operation.OldOperationDeviceDO">
+    </resultMap>
+
+    <resultMap id="oldDeviceForSyncMap"
+               type="com.hk.jigai.module.system.dal.dataobject.operation.OldOperationDeviceDTO">
+        <id property="id" column="CIID"/>
+        <result property="name" column="RESOURCENAME"/>
+        <result property="model" column="PRODUCTID"/>
+        <result property="code" column="CIID"/>
+        <result property="company" column="CorporationID"/>
+        <result property="assetNumber" column="ASSETTAG"/>
+        <result property="serialNumber" column="SERIALNO"/>
+        <result property="labelCode" column="BARCODE"/>
+        <result property="location" column="LOCATION"/>
+        <result property="addressId" column="SITEID"/>
+        <result property="address" column="LOCATIONEX"/>
+        <result property="effectLevel" column="IMPACTID"/>
+        <result property="deptId" column="DEPTID"/>
+        <result property="status" column="STATEID"/>
+        <result property="registerUserName" column="REGISETPERSON"/>
+        <result property="userId" column="USERNO"/>
+        <result property="registerDate" column="RegisterDATE"/>
+        <result property="displayPhoto" column="DisplayPhoto"/>
+        <result property="productPhoto" column="ProductPhoto"/>
+        <result property="gobalPhoto" column="GobalPhoto"/>
+        <result property="ip1" column="IPADDRESSES1"/>
+        <result property="ip2" column="IPADDRESSES2"/>
+        <result property="macAddress1" column="MACADDRESS1"/>
+        <result property="macAddress2" column="MACADDRESS2"/>
+        <result property="manufactureDate" column="ProductDATE"/>
+        <result property="typeName" column="TYPENAME"/>
+        <result property="departmentName" column="departmentNAME"/>
+        <result property="companyName" column="CorporationNAME"/>
+        <result property="modelName" column="ProductNAME"/>
+        <result property="usePersonName" column="PersonName"/>
     </resultMap>
 </mapper>

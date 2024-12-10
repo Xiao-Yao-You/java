@@ -72,4 +72,6 @@ public interface OperationDeviceModelService {
      * @return
      */
     List<OperationDeviceModelDO> getByDeviceTypeId(Long deviceId);
+
+    List<OperationDeviceModelDO> getAllModel();
 }

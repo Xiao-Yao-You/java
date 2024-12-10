@@ -2,11 +2,13 @@ package com.hk.jigai.module.system.dal.dataobject.operation;
 
 import com.hk.jigai.module.system.controller.admin.operation.vo.OperationDevicePictureSaveReqVO;
 import lombok.*;
+
 import java.util.*;
 import java.time.LocalDateTime;
 import java.time.LocalDateTime;
 import java.time.LocalDateTime;
 import java.time.LocalDateTime;
+
 import com.baomidou.mybatisplus.annotation.*;
 import com.hk.jigai.framework.mybatis.core.dataobject.BaseDO;
 
@@ -16,7 +18,8 @@ import com.hk.jigai.framework.mybatis.core.dataobject.BaseDO;
  * @author 超级管理员
  */
 @TableName("hk_operation_order_operate_record")
-@KeySequence("hk_operation_order_operate_record_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@KeySequence("hk_operation_order_operate_record_seq")
+// 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
@@ -74,5 +77,7 @@ public class OperationOrderOperateRecordDO extends BaseDO {
 
     @TableField(exist = false)
     private List<OperationDevicePictureSaveReqVO> picList;
+
+    private String picture;
 
 }

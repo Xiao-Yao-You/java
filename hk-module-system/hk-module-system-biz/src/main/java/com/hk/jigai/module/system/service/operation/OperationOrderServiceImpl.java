@@ -240,6 +240,8 @@ public class OperationOrderServiceImpl implements OperationOrderService {
                 operationOrderDO.setAddress(operationDevice.getAddress());
             }
         }
+        List<OperationOrderOperateRecordDO> operationOrderOperateRecordDOS = operationOrderOperateRecordMapper.selectList(new QueryWrapper<OperationOrderOperateRecordDO>().lambda().eq(OperationOrderOperateRecordDO::getOrderId, id));
+        operationOrderDO.setRecordList(operationOrderOperateRecordDOS);
         return operationOrderDO;
     }
 
@@ -397,6 +399,7 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         operateRecordDO.setOperateUserNickName(SecurityFrameworkUtils.getLoginUserNickname());
         operateRecordDO.setRemark(operationOrderReqVO.getRemark());
         operateRecordDO.setPicList(operationOrderReqVO.getPictureList());
+        operateRecordDO.setPicture(operationOrderReqVO.getPicture());
         //有操作对象的时候就存，没有的是时候就是当前登录人
         operateRecordDO.setUserId(operationOrderReqVO.getUserId() == null ? SecurityFrameworkUtils.getLoginUserId() : operationOrderReqVO.getUserId());
         AdminUserDO user = adminUserService.getUser(operateRecordDO.getUserId());

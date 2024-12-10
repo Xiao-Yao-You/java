@@ -5,6 +5,7 @@ import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.module.system.controller.admin.operation.vo.*;
 import com.hk.jigai.module.system.controller.admin.operationdevicehistory.vo.OperationDeviceHistoryPageReqVO;
 import com.hk.jigai.module.system.dal.dataobject.operation.OldOperationDeviceDO;
+import com.hk.jigai.module.system.dal.dataobject.operation.OldOperationDeviceDTO;
 import com.hk.jigai.module.system.dal.dataobject.operation.OperationDeviceDO;
 import com.hk.jigai.module.system.dal.dataobject.operationdevicehistory.OperationDeviceHistoryDO;
 
@@ -19,6 +20,8 @@ import java.util.List;
 public interface OldOperationDeviceService {
 
     PageResult<OldOperationDeviceDO> getOldOperationDevicePage(OldOperationDevicePageReqVO pageReqVO);
+
+    PageResult<OldOperationDeviceDTO> getOldOperationDevicePageForSync(OldOperationDevicePageReqVO pageReqVO);
 
     OldOperationDeviceRespVO getOldOperationDevice(Long id);
 

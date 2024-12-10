@@ -125,4 +125,9 @@ public class OperationDeviceModelServiceImpl implements OperationDeviceModelServ
         return operationDeviceModelDOS;
     }
 
+    @Override
+    public List<OperationDeviceModelDO> getAllModel() {
+        return operationDeviceModelMapper.selectList();
+    }
+
 }

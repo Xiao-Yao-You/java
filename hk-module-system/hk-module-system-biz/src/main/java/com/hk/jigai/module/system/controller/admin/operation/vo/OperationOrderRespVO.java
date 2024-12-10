@@ -1,5 +1,6 @@
 package com.hk.jigai.module.system.controller.admin.operation.vo;
 
+import com.hk.jigai.module.system.dal.dataobject.operation.OperationOrderOperateRecordDO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -154,6 +155,9 @@ public class OperationOrderRespVO {
     @Schema(description = "问题类型明文")
     private String questionTypeStr;
 
+    private String picture;
+
+    List<OperationOrderOperateRecordDO> recordList;
 
 
 }

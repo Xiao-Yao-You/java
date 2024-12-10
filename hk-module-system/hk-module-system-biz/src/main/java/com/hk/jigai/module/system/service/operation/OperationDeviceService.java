@@ -6,10 +6,14 @@ import javax.validation.*;
 import com.hk.jigai.framework.common.pojo.CommonResult;
 import com.hk.jigai.module.system.controller.admin.operation.vo.*;
 import com.hk.jigai.module.system.controller.admin.operationdevicehistory.vo.OperationDeviceHistoryPageReqVO;
+import com.hk.jigai.module.system.dal.dataobject.dict.DictDataDO;
+import com.hk.jigai.module.system.dal.dataobject.operation.OperationAddressDO;
 import com.hk.jigai.module.system.dal.dataobject.operation.OperationDeviceDO;
 import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.common.pojo.PageParam;
+import com.hk.jigai.module.system.dal.dataobject.operation.OperationDeviceTypeDO;
 import com.hk.jigai.module.system.dal.dataobject.operationdevicehistory.OperationDeviceHistoryDO;
+import com.hk.jigai.module.system.dal.dataobject.operationdevicemodel.OperationDeviceModelDO;
 
 /**
  * 运维设备 Service 接口
@@ -96,4 +100,16 @@ public interface OperationDeviceService {
      */
     CommonResult<List<OperationLabelCodeRespVO>> getUseableLabelCode();
 
+    List<OperationDeviceDO> syncOldDevice(OldOperationDevicePageReqVO oldOperationDevicePageReqVO);
+
+    /**
+     * 处理设备数据
+     *
+     * @param operationDeviceDOS
+     * @param dictDataList
+     * @param modelList
+     * @param typeList
+     * @return
+     */
+    List<OperationDeviceDO> handleData(List<OperationDeviceDO> operationDeviceDOS, List<DictDataDO> dictDataList, List<OperationDeviceModelDO> modelList, List<OperationDeviceTypeDO> typeList, List<OperationAddressDO> addressList);
 }

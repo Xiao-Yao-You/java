@@ -76,6 +76,33 @@ public class OldOperationDeviceServiceImpl implements OldOperationDeviceService 
 
     @Override
     @Slave  //从数据库
+    public PageResult<OldOperationDeviceDTO> getOldOperationDevicePageForSync(OldOperationDevicePageReqVO pageReqVO) {
+        PageResult pageResult = new PageResult();
+
+        if (StringUtils.isNotBlank(pageReqVO.getCitype())) {
+            List<Long> modelIds = oldOperationDeviceMapper.selectModelType(pageReqVO.getCitype());//根据设备类型查询所有的型号ID
+            if (CollectionUtil.isNotEmpty(modelIds)) {
+                pageReqVO.setModelIds(modelIds);
+            }
+        }
+
+        if (StringUtils.isNotBlank(pageReqVO.getProductname())) {
+            List<Long> modelIds = oldOperationDeviceMapper.selectModelIds(pageReqVO.getProductname());//根据设备类型查询所有的型号ID
+            if (CollectionUtil.isNotEmpty(modelIds)) {
+                pageReqVO.setModelIds(modelIds);
+            }
+        }
+
+        List<OldOperationDeviceDTO> oldOperationDeviceDOS = oldOperationDeviceMapper.selectPageForSync(pageReqVO);
+        Long count = oldOperationDeviceMapper.selectTotal(pageReqVO);
+        pageResult.setList(oldOperationDeviceDOS);
+        pageResult.setTotal(count);
+        return pageResult;
+    }
+
+
+    @Override
+    @Slave  //从数据库
     public OldOperationDeviceRespVO getOldOperationDevice(Long id) {
         String photoPath = "https://szh.jshkxcl.cn/hkjg-oldpic/";
         OldOperationDeviceDO oldOperationDeviceDO = oldOperationDeviceMapper.selectById(id);

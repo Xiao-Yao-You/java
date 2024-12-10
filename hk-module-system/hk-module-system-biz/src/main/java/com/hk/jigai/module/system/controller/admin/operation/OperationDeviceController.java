@@ -1,13 +1,18 @@
 package com.hk.jigai.module.system.controller.admin.operation;
 
+import cn.hutool.core.collection.CollectionUtil;
+import com.hk.jigai.module.system.controller.admin.dict.vo.data.DictDataPageReqVO;
 import com.hk.jigai.module.system.controller.admin.operationdevicehistory.vo.OperationDeviceHistoryPageReqVO;
 import com.hk.jigai.module.system.controller.admin.operationdevicehistory.vo.OperationDeviceHistoryRespVO;
+import com.hk.jigai.module.system.dal.dataobject.dict.DictDataDO;
 import com.hk.jigai.module.system.dal.dataobject.operation.OldOperationDeviceDO;
 import com.hk.jigai.module.system.dal.dataobject.operation.OperationAddressDO;
+import com.hk.jigai.module.system.dal.dataobject.operation.OperationDeviceTypeDO;
 import com.hk.jigai.module.system.dal.dataobject.operationdevicehistory.OperationDeviceHistoryDO;
-import com.hk.jigai.module.system.service.operation.OldOperationDeviceService;
-import com.hk.jigai.module.system.service.operation.OperationAddressService;
-import com.hk.jigai.module.system.service.operation.OperationAddressServiceImpl;
+import com.hk.jigai.module.system.dal.dataobject.operationdevicemodel.OperationDeviceModelDO;
+import com.hk.jigai.module.system.service.dict.DictDataService;
+import com.hk.jigai.module.system.service.operation.*;
+import com.hk.jigai.module.system.service.operationdevicemodel.OperationDeviceModelService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -39,7 +44,6 @@ import static com.hk.jigai.framework.apilog.core.enums.OperateTypeEnum.*;
 
 import com.hk.jigai.module.system.controller.admin.operation.vo.*;
 import com.hk.jigai.module.system.dal.dataobject.operation.OperationDeviceDO;
-import com.hk.jigai.module.system.service.operation.OperationDeviceService;
 
 @Tag(name = "管理后台 - 运维设备")
 @RestController
@@ -51,10 +55,14 @@ public class OperationDeviceController {
     private OperationDeviceService operationDeviceService;
     @Resource
     private OperationAddressService operationAddressService;
-
-
     @Resource
     private OldOperationDeviceService oldOperationDeviceService;
+    @Resource
+    private OperationDeviceModelService operationDeviceModelService;
+    @Resource
+    private OperationDeviceTypeService operationDeviceTypeService;
+    @Resource
+    private DictDataService dictDataService;
 
     @PostMapping("/create")
     @Operation(summary = "创建运维设备")
@@ -178,5 +186,44 @@ public class OperationDeviceController {
     public CommonResult<PageResult<OperationDeviceHistoryRespVO>> getDeviceHistory(@Valid OperationDeviceHistoryPageReqVO pageReqVO) {
         PageResult<OperationDeviceHistoryDO> pageResult = operationDeviceService.getOperationDeviceHistoryPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, OperationDeviceHistoryRespVO.class));
+    }
+
+    @PostMapping("/syncOldDevice")
+    @Operation(summary = "同步历史数据")
+//    public CommonResult<List<OperationDeviceDO>> syncOldDevice() {
+    public CommonResult<Boolean> syncOldDevice() {
+        //基础数据
+        //获取公司集合
+        DictDataPageReqVO dictDataPageReqVO = new DictDataPageReqVO();
+        dictDataPageReqVO.setDictType("assets_company");
+        dictDataPageReqVO.setPageNo(1);
+        dictDataPageReqVO.setPageSize(100);
+        List<DictDataDO> dictDataList = dictDataService.getDictDataPage(dictDataPageReqVO).getList();
+        //获取型号集合
+        List<OperationDeviceModelDO> modelList = operationDeviceModelService.getAllModel();
+        //获取类型集合
+        List<OperationDeviceTypeDO> typeList = operationDeviceTypeService.getAll();
+        //获取地点数据
+        List<OperationAddressDO> addressList = operationAddressService.getAllAddress();
+
+        OldOperationDevicePageReqVO oldOperationDevicePageReqVO = new OldOperationDevicePageReqVO();
+        Integer pageNo = 1;
+        Integer pageSize = 20;
+
+        Boolean flag = true;
+        //设备数据
+        while (flag) {
+            oldOperationDevicePageReqVO.setPageNo(pageNo);
+            oldOperationDevicePageReqVO.setPageSize(pageSize);
+            List<OperationDeviceDO> operationDeviceDOS = operationDeviceService.syncOldDevice(oldOperationDevicePageReqVO);
+            if (CollectionUtil.isNotEmpty(operationDeviceDOS)) {
+                //处理数据
+                operationDeviceService.handleData(operationDeviceDOS, dictDataList, modelList, typeList, addressList);
+                pageNo++;
+            } else {
+                flag = false;
+            }
+        }
+        return success(true);
     }
 }

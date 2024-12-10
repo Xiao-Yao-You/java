@@ -1,5 +1,6 @@
 package com.hk.jigai.module.system.controller.admin.operation.vo;
 
+import com.hk.jigai.module.system.dal.dataobject.operation.OperationOrderOperateRecordDO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -61,6 +62,10 @@ public class OperationOrderReqVO {
 
     @Schema(description = "紧急程度")
     private String level;
+
+    private List<OperationOrderOperateRecordDO> recordList;
+
+    private String picture;
 
 
 }

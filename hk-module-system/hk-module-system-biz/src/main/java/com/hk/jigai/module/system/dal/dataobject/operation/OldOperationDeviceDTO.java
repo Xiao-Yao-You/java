@@ -1,32 +1,26 @@
 package com.hk.jigai.module.system.dal.dataobject.operation;
 
-import com.hk.jigai.framework.mybatis.core.type.JsonLongSetTypeHandler;
-import io.swagger.v3.oas.annotations.media.Schema;
+import com.baomidou.mybatisplus.annotation.*;
+import com.hk.jigai.framework.mybatis.core.dataobject.BaseDO;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.*;
 import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-
-import com.baomidou.mybatisplus.annotation.*;
-import com.hk.jigai.framework.mybatis.core.dataobject.BaseDO;
+import java.util.Date;
 
 /**
  * 运维设备 DO
  *
  * @author 超级管理员
  */
-@TableName(value = "hk_operation_device", autoResultMap = true)
-@KeySequence("hk_operation_device_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName(value = "CI", autoResultMap = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OperationDeviceDO extends BaseDO {
-
+public class OldOperationDeviceDTO extends BaseDO {
     /**
      * 主键
      */
@@ -187,21 +181,14 @@ public class OperationDeviceDO extends BaseDO {
     private String productPhoto;
     @TableField(exist = false)
     private String gobalPhoto;
-
     //设备类型
-    @TableField(exist = false)
     private String typeName;
 
-    @TableField(exist = false)
     private String departmentName;
 
-    @TableField(exist = false)
     private String companyName;
 
-    @TableField(exist = false)
     private String modelName;
 
-    @TableField(exist = false)
     private String usePersonName;
-
 }

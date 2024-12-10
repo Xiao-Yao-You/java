@@ -60,6 +60,8 @@ public interface OperationAddressService {
      */
     List<OperationAddressDO> getAll(OperationAddressRespVO reqVO);
 
+    List<OperationAddressDO> getAllAddress();
+
     /**
      * 导入厂区地点
      *

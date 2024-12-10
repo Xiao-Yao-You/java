@@ -4,6 +4,7 @@ import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.mybatis.core.mapper.BaseMapperX;
 import com.hk.jigai.module.system.controller.admin.operation.vo.OldOperationDevicePageReqVO;
 import com.hk.jigai.module.system.dal.dataobject.operation.OldOperationDeviceDO;
+import com.hk.jigai.module.system.dal.dataobject.operation.OldOperationDeviceDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -16,6 +17,8 @@ import java.util.List;
 @Mapper
 public interface OldOperationDeviceMapper extends BaseMapperX<OldOperationDeviceDO> {
     List<OldOperationDeviceDO> selectPage(OldOperationDevicePageReqVO reqVO);
+
+    List<OldOperationDeviceDTO> selectPageForSync(OldOperationDevicePageReqVO reqVO);
 
     Long selectTotal(OldOperationDevicePageReqVO pageReqVO);
 

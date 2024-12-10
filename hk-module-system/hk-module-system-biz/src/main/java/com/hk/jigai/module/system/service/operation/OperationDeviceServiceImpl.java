@@ -3,25 +3,32 @@ package com.hk.jigai.module.system.service.operation;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.dynamic.datasource.annotation.Slave;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.github.yulichang.method.SqlMethod;
 import com.hk.jigai.framework.common.pojo.CommonResult;
 import com.hk.jigai.framework.common.util.date.LocalDateTimeUtils;
 import com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils;
 import com.hk.jigai.module.system.controller.admin.operationdevicehistory.vo.OperationDeviceHistoryPageReqVO;
+import com.hk.jigai.module.system.dal.dataobject.dept.DeptDO;
+import com.hk.jigai.module.system.dal.dataobject.dict.DictDataDO;
 import com.hk.jigai.module.system.dal.dataobject.operation.*;
 import com.hk.jigai.module.system.dal.dataobject.operationdeviceaccessoryhistory.OperationDeviceAccessoryHistoryDO;
 import com.hk.jigai.module.system.dal.dataobject.operationdevicehistory.OperationDeviceHistoryDO;
+import com.hk.jigai.module.system.dal.dataobject.operationdevicemodel.OperationDeviceModelDO;
 import com.hk.jigai.module.system.dal.dataobject.operationdevicepicturehistory.OperationDevicePictureHistoryDO;
 import com.hk.jigai.module.system.dal.dataobject.scenecode.SceneCodeDO;
 import com.hk.jigai.module.system.dal.dataobject.user.AdminUserDO;
+import com.hk.jigai.module.system.dal.mysql.dept.DeptMapper;
 import com.hk.jigai.module.system.dal.mysql.operation.*;
 import com.hk.jigai.module.system.dal.mysql.operationdeviceaccessoryhistory.OperationDeviceAccessoryHistoryMapper;
 import com.hk.jigai.module.system.dal.mysql.operationdevicehistory.OperationDeviceHistoryMapper;
 import com.hk.jigai.module.system.dal.mysql.operationdevicepicturehistory.OperationDevicePictureHistoryMapper;
 import com.hk.jigai.module.system.dal.mysql.user.AdminUserMapper;
+import com.hk.jigai.module.system.service.dept.DeptService;
 import com.hk.jigai.module.system.service.scenecode.SceneCodeService;
 import com.hk.jigai.module.system.service.user.AdminUserService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -40,6 +47,7 @@ import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.common.pojo.PageParam;
 import com.hk.jigai.framework.common.util.object.BeanUtils;
 
+import static com.github.yulichang.method.SqlMethod.collect;
 import static com.hk.jigai.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static com.hk.jigai.module.system.enums.ErrorCodeConstants.*;
 
@@ -87,6 +95,11 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
 
     @Resource
     private OldOperationDeviceMapper oldOperationDeviceMapper;
+
+    @Resource
+    private OldOperationDeviceService oldOperationDeviceService;
+    @Resource
+    private DeptMapper deptMapper;
 
     @Override
     @Transactional
@@ -266,10 +279,13 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
             List<OperationDeviceAccessorySaveReqVO> accessoryList = BeanUtils.toBean(operationDeviceAccessoryDOS, OperationDeviceAccessorySaveReqVO.class);
             resp.setAccessoryList(accessoryList);
             //编码名称
-            SceneCodeDO sceneCode = sceneCodeService.getSceneCode(operationDeviceDO.getNumberName().intValue());
-            if (sceneCode != null) {
-                resp.setNumberNameStr(sceneCode.getDescription());
+            if (operationDeviceDO.getNumberName() != null) {
+                SceneCodeDO sceneCode = sceneCodeService.getSceneCode(operationDeviceDO.getNumberName().intValue());
+                if (sceneCode != null) {
+                    resp.setNumberNameStr(sceneCode.getDescription());
+                }
             }
+
         }
         return resp;
     }
@@ -423,6 +439,157 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
         List<OperationLabelCodeDO> operationLabelCodeDOS = operationLabelCodeMapper.selectList(new QueryWrapper<OperationLabelCodeDO>().lambda().eq(OperationLabelCodeDO::getStatus, 0));
         List<OperationLabelCodeRespVO> operationLabelCodeRespVOS = BeanUtils.toBean(operationLabelCodeDOS, OperationLabelCodeRespVO.class);
         return CommonResult.success(operationLabelCodeRespVOS);
+    }
+
+    @Override
+    public List<OperationDeviceDO> syncOldDevice(OldOperationDevicePageReqVO oldOperationDevicePageReqVO) {
+        List<OperationDeviceDO> operationDeviceDOS = new ArrayList<>();
+
+        PageResult<OldOperationDeviceDTO> oldOperationDevicePages = oldOperationDeviceService.getOldOperationDevicePageForSync(oldOperationDevicePageReqVO);
+        List<OldOperationDeviceDTO> list = oldOperationDevicePages.getList();
+
+        if (CollectionUtil.isNotEmpty(list)) {
+            operationDeviceDOS = BeanUtils.toBean(list, OperationDeviceDO.class);
+        }
+        return operationDeviceDOS;
+
+    }
+
+    @Override
+    @Transactional
+    public List<OperationDeviceDO> handleData(List<OperationDeviceDO> operationDeviceDOS, List<DictDataDO> companyList, List<OperationDeviceModelDO> modelList, List<OperationDeviceTypeDO> typeList, List<OperationAddressDO> addressList) {
+        List<OperationDevicePictureDO> operationDevicePictureDOS = new ArrayList<>();
+        for (OperationDeviceDO device : operationDeviceDOS) {
+            //处理公司数据
+            if (StringUtils.isNotBlank(device.getCompanyName())) {
+                List<DictDataDO> collect = companyList.stream().filter(p -> device.getCompanyName().equals(p.getLabel())).collect(Collectors.toList());
+                if (CollectionUtil.isNotEmpty(collect)) {
+                    device.setCompany(Integer.parseInt(collect.get(0).getValue()));
+                }
+            }
+            //处理类型数据
+            if (StringUtils.isNotBlank(device.getTypeName())) {
+                List<OperationDeviceTypeDO> collect = typeList.stream().filter(p -> device.getTypeName().equals(p.getName())).collect(Collectors.toList());
+                if (CollectionUtil.isNotEmpty(collect)) {
+                    device.setDeviceType(collect.get(0).getId());
+                    device.setDeviceTypeName(device.getTypeName());
+                }
+            }
+            //处理型号数据
+            if (StringUtils.isNotBlank(device.getModelName())) {
+                List<OperationDeviceModelDO> collect = modelList.stream().filter(p -> device.getModelName().equals(p.getModel())).collect(Collectors.toList());
+                if (CollectionUtil.isNotEmpty(collect)) {
+                    device.setModel(collect.get(0).getId() + "");
+                }
+            }
+            //处理地点数据
+            if (StringUtils.isNotBlank(device.getAddress())) {
+                List<OperationAddressDO> collect = addressList.stream().filter(p -> device.getAddress().equals(p.getAddressName())).collect(Collectors.toList());
+                if (CollectionUtil.isNotEmpty(collect)) {
+                    device.setAddressId(collect.get(0).getId() + "");
+                    device.setAddress(device.getAddress());
+                }
+            }
+            //获取部门
+            List<DeptDO> deptDOS = deptMapper.selectList(new QueryWrapper<DeptDO>().lambda().eq(DeptDO::getName, device.getDepartmentName()));
+            if (CollectionUtil.isNotEmpty(deptDOS)) {
+                device.setDeptId(deptDOS.get(0).getId());
+                device.setDeptName(deptDOS.get(0).getName());
+            }
+            //使用人
+            if (StringUtils.isNotBlank(device.getUsePersonName()) && StringUtils.isNotBlank(device.getDeptId() + "")) {
+                AdminUserDO user = adminUserService.getUserByNickNameAndDept(device.getUsePersonName(), device.getDeptId());
+                if (user != null) {
+                    device.setUserId(user.getId());
+                    device.setUserNickName(user.getNickname());
+                } else {
+                    device.setUserNickName(device.getUsePersonName());
+                }
+
+            }
+            //登记人
+            if (StringUtils.isNotBlank(device.getRegisterUserName())) {
+                AdminUserDO userByNickName = adminUserService.getUserByNickName(device.getRegisterUserName());
+                device.setRegisterUserId(userByNickName.getId());
+                device.setRegisterUserName(userByNickName.getNickname());
+                if (userByNickName != null) {
+                    device.setRegisterUserName(device.getRegisterUserName());
+                }
+
+            }
+
+            //处理状态值
+            switch (device.getStatus()) {
+                case 1:
+                    device.setStatus(4);
+                    break;
+                case 2:
+                    device.setStatus(0);
+                    break;
+                case 3:
+                    device.setStatus(3);
+                    break;
+                case 4:
+                    device.setStatus(2);
+                    break;
+                case 5:
+                    device.setStatus(5);
+                    break;
+                case 6:
+                    device.setStatus(6);
+                    break;
+                default:
+                    device.setStatus(1);
+                    break;
+            }
+            //处理影响程度
+            switch (device.getEffectLevel()) {
+                case "1":
+                    device.setEffectLevel("0");
+                    break;
+                case "2":
+                    device.setEffectLevel("1");
+                    break;
+                case "3":
+                    device.setEffectLevel("2");
+                    break;
+                default:
+                    device.setEffectLevel("0");
+                    break;
+            }
+            //处理图片
+            String picPath = "https://szh.jshkxcl.cn/hkjg-oldpic/";
+            String displayPhoto = device.getDisplayPhoto();
+            String productPhoto = device.getProductPhoto(); // 0
+            String gobalPhoto = device.getGobalPhoto(); //  1
+            if (StringUtils.isNotBlank(productPhoto)) {
+                String[] p = productPhoto.split("￥");
+                for (String pStr : p) {
+                    OperationDevicePictureDO operationDevicePictureDO = new OperationDevicePictureDO();
+                    operationDevicePictureDO.setDeviceId(device.getId());
+                    operationDevicePictureDO.setType("0");
+                    operationDevicePictureDO.setUrl(picPath + pStr + ".jpg");
+                    operationDevicePictureDOS.add(operationDevicePictureDO);
+                }
+            }
+            if (StringUtils.isNotBlank(gobalPhoto)) {
+                String[] p = gobalPhoto.split("￥");
+                for (String pStr : p) {
+                    OperationDevicePictureDO operationDevicePictureDO = new OperationDevicePictureDO();
+                    operationDevicePictureDO.setDeviceId(device.getId());
+                    operationDevicePictureDO.setType("1");
+                    operationDevicePictureDO.setUrl(picPath + pStr + ".jpg");
+                    operationDevicePictureDOS.add(operationDevicePictureDO);
+                }
+            }
+
+
+        }
+        operationDeviceMapper.insertBatch(operationDeviceDOS);
+        operationDevicePictureMapper.insertBatch(operationDevicePictureDOS);
+
+
+        return operationDeviceDOS;
     }
 
 

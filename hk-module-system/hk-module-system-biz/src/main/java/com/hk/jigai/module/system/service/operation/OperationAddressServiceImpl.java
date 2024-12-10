@@ -120,6 +120,11 @@ public class OperationAddressServiceImpl implements OperationAddressService {
     }
 
     @Override
+    public List<OperationAddressDO> getAllAddress() {
+        return operationAddressMapper.selectList();
+    }
+
+    @Override
     public AddressImportRespVO importAddressList(List<AddressImportExcelVO> list, Boolean updateSupport) {
         //判空
         if (CollUtil.isEmpty(list)) {

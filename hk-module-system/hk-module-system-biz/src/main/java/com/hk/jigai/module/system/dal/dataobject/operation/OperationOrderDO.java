@@ -173,5 +173,8 @@ public class OperationOrderDO extends BaseDO {
      */
     private Integer completeResult;
 
+    @TableField(exist = false)
+    private List<OperationOrderOperateRecordDO> recordList;
+
 
 }

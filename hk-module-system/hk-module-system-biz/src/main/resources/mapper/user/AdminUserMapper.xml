@@ -3,123 +3,127 @@
 <mapper namespace="com.hk.jigai.module.system.dal.mysql.user.AdminUserMapper">
 
     <select id="selectById" resultMap="userMap">
-        SELECT  su.id,
-                su.username,
-                su.password,
-                su.nickname,
-                su.remark,
-                su.post_ids,
-                su.email,
-                su.mobile,
-                su.sex,
-                su.avatar,
-                su.status,
-                su.login_ip,
-                su.login_date,
-                su.create_time,
-                sd.id as deptId,
-                sd.name as deptName,
-                sd.parent_id as parentId,
-                su.openid
+        SELECT su.id,
+               su.username,
+               su.password,
+               su.nickname,
+               su.remark,
+               su.post_ids,
+               su.email,
+               su.mobile,
+               su.sex,
+               su.avatar,
+               su.status,
+               su.login_ip,
+               su.login_date,
+               su.create_time,
+               sd.id        as deptId,
+               sd.name      as deptName,
+               sd.parent_id as parentId,
+               su.openid
         FROM system_users su
-   LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
-   LEFT JOIN system_dept sd ON sud.dept_id=sd.id and sd.deleted = 0
-            WHERE su.id = #{id} and su.deleted = 0
+                 LEFT JOIN system_user_dept sud ON su.id = sud.user_id and sud.deleted = 0
+                 LEFT JOIN system_dept sd ON sud.dept_id = sd.id and sd.deleted = 0
+        WHERE su.id = #{id}
+          and su.deleted = 0
         ORDER BY su.id DESC
     </select>
 
     <select id="selectByUsername" resultMap="userMap">
-        SELECT  su.id,
-                su.username,
-                su.password,
-                su.nickname,
-                su.remark,
-                su.post_ids,
-                su.email,
-                su.mobile,
-                su.sex,
-                su.avatar,
-                su.status,
-                su.login_ip,
-                su.login_date,
-                sd.id as deptId,
-                sd.name as deptName,
-                sd.parent_id as parentId
+        SELECT su.id,
+               su.username,
+               su.password,
+               su.nickname,
+               su.remark,
+               su.post_ids,
+               su.email,
+               su.mobile,
+               su.sex,
+               su.avatar,
+               su.status,
+               su.login_ip,
+               su.login_date,
+               sd.id        as deptId,
+               sd.name      as deptName,
+               sd.parent_id as parentId
         FROM system_users su
-                 LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
-                 LEFT JOIN system_dept sd ON sud.dept_id=sd.id and sd.deleted = 0
-        WHERE su.username = #{username} and su.deleted = 0
+                 LEFT JOIN system_user_dept sud ON su.id = sud.user_id and sud.deleted = 0
+                 LEFT JOIN system_dept sd ON sud.dept_id = sd.id and sd.deleted = 0
+        WHERE su.username = #{username}
+          and su.deleted = 0
         ORDER BY su.id DESC
     </select>
 
     <select id="selectByEmail" resultMap="userMap">
-        SELECT  su.id,
-                su.username,
-                su.password,
-                su.nickname,
-                su.remark,
-                su.post_ids,
-                su.email,
-                su.mobile,
-                su.sex,
-                su.avatar,
-                su.status,
-                su.login_ip,
-                su.login_date,
-                sd.id as deptId,
-                sd.name as deptName,
-                sd.parent_id as parentId
+        SELECT su.id,
+               su.username,
+               su.password,
+               su.nickname,
+               su.remark,
+               su.post_ids,
+               su.email,
+               su.mobile,
+               su.sex,
+               su.avatar,
+               su.status,
+               su.login_ip,
+               su.login_date,
+               sd.id        as deptId,
+               sd.name      as deptName,
+               sd.parent_id as parentId
         FROM system_users su
-                 LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
-                 LEFT JOIN system_dept sd ON sud.dept_id=sd.id and sd.deleted = 0
-        WHERE su.email = #{email} and su.deleted = 0
+                 LEFT JOIN system_user_dept sud ON su.id = sud.user_id and sud.deleted = 0
+                 LEFT JOIN system_dept sd ON sud.dept_id = sd.id and sd.deleted = 0
+        WHERE su.email = #{email}
+          and su.deleted = 0
         ORDER BY su.id DESC
     </select>
 
     <select id="selectByMobile" resultMap="userMap">
-        SELECT  su.id,
-                su.username,
-                su.password,
-                su.nickname,
-                su.remark,
-                su.post_ids,
-                su.email,
-                su.mobile,
-                su.sex,
-                su.avatar,
-                su.status,
-                su.login_ip,
-                su.login_date,
-                sd.id as deptId,
-                sd.name as deptName,
-                sd.parent_id as parentId
+        SELECT su.id,
+               su.username,
+               su.password,
+               su.nickname,
+               su.remark,
+               su.post_ids,
+               su.email,
+               su.mobile,
+               su.sex,
+               su.avatar,
+               su.status,
+               su.login_ip,
+               su.login_date,
+               sd.id        as deptId,
+               sd.name      as deptName,
+               sd.parent_id as parentId
         FROM system_users su
-                 LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
-                 LEFT JOIN system_dept sd ON sud.dept_id=sd.id and sd.deleted = 0
-        WHERE su.mobile = #{mobile} and su.deleted = 0
+                 LEFT JOIN system_user_dept sud ON su.id = sud.user_id and sud.deleted = 0
+                 LEFT JOIN system_dept sd ON sud.dept_id = sd.id and sd.deleted = 0
+        WHERE su.mobile = #{mobile}
+          and su.deleted = 0
         ORDER BY su.id DESC
     </select>
 
     <select id="selectListByNickname" parameterType="map" resultMap="userMap">
-        SELECT  su.id,
-                su.username,
-                su.password,
-                su.nickname,
-                su.remark,
-                su.post_ids,
-                su.email,
-                su.mobile,
-                su.sex,
-                su.avatar,
-                su.status,
-                su.login_ip,
-                su.login_date,
-                sd.id as deptId,
-                sd.name as deptName,
-                sd.parent_id as parentId
+        SELECT su.id,
+        su.username,
+        su.password,
+        su.nickname,
+        su.remark,
+        su.post_ids,
+        su.email,
+        su.mobile,
+        su.sex,
+        su.avatar,
+        su.status,
+        su.login_ip,
+        su.login_date,
+        sd.id as deptId,
+        sd.name as deptName,
+        sd.parent_id as parentId
         FROM system_users su
-                 LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
-                 LEFT JOIN system_dept sd ON sud.dept_id=sd.id and sd.deleted = 0
+        LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
+        LEFT JOIN system_dept sd ON sud.dept_id=sd.id and sd.deleted = 0
         WHERE su.deleted = 0
         <if test="nickname != null  and nickname != ''">
             and su.nickname like CONCAT('%' , #{nickname} , '%')
@@ -135,12 +139,12 @@
     </select>
 
     <select id="selectPage" parameterType="map" resultMap="userMap">
-        SELECT  su.id,su.username,su.password,su.nickname,su.remark,su.post_ids,su.email,su.mobile,su.sex,
-               su.avatar,su.status,su.login_ip,su.login_date,su.create_time,sd.id as deptId,sd.name as deptName
-          FROM system_users su
-     LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
-     LEFT JOIN system_dept sd ON sud.dept_id=sd.id and su.deleted = 0
-         WHERE 1=1 and su.deleted = 0
+        SELECT su.id,su.username,su.password,su.nickname,su.remark,su.post_ids,su.email,su.mobile,su.sex,
+        su.avatar,su.status,su.login_ip,su.login_date,su.create_time,sd.id as deptId,sd.name as deptName
+        FROM system_users su
+        LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
+        LEFT JOIN system_dept sd ON sud.dept_id=sd.id and su.deleted = 0
+        WHERE 1=1 and su.deleted = 0
         <if test="username != null and username != ''">
             and su.username like CONCAT('%' , #{username} , '%')
         </if>
@@ -148,7 +152,7 @@
             and su.nickname like CONCAT('%' , #{nickname} , '%')
         </if>
         <if test="mobile != null and mobile != ''">
-            and su.mobile  like CONCAT('%' , #{mobile} , '%')
+            and su.mobile like CONCAT('%' , #{mobile} , '%')
         </if>
         <if test="status != null">
             and su.status = #{status}
@@ -168,59 +172,60 @@
 
 
     <select id="selectCount1" parameterType="map" resultType="Integer">
-        SELECT  count(1)
+        SELECT count(1)
         FROM system_users su
         LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
         LEFT JOIN system_dept sd ON sud.dept_id=sd.id and su.deleted = 0
         WHERE 1=1 and su.deleted = 0
-            <if test="username != null  and username != ''">
-                and su.username like CONCAT('%' , #{username} , '%')
-            </if>
-            <if test="nickname != null  and nickname != ''">
-                and su.nickname like CONCAT('%' , #{nickname} , '%')
-            </if>
-            <if test="mobile != null  and mobile != ''">
-                and su.mobile  like CONCAT('%' , #{mobile} , '%')
-            </if>
-            <if test="status != null">
-                and su.status = #{status}
-            </if>
-            <if test="createTimeArray != null and createTimeArray.length >1">
-                and su.create_time between #{createTimeArray[${0}]} and #{createTimeArray[${1}]}
-            </if>
-            <if test="deptList != null and deptList.size() > 0">
-                and sd.id IN
-                <foreach item="item" index="index" collection="deptList" open="(" separator="," close=")">
-                    #{item}
-                </foreach>
-            </if>
+        <if test="username != null  and username != ''">
+            and su.username like CONCAT('%' , #{username} , '%')
+        </if>
+        <if test="nickname != null  and nickname != ''">
+            and su.nickname like CONCAT('%' , #{nickname} , '%')
+        </if>
+        <if test="mobile != null  and mobile != ''">
+            and su.mobile like CONCAT('%' , #{mobile} , '%')
+        </if>
+        <if test="status != null">
+            and su.status = #{status}
+        </if>
+        <if test="createTimeArray != null and createTimeArray.length >1">
+            and su.create_time between #{createTimeArray[${0}]} and #{createTimeArray[${1}]}
+        </if>
+        <if test="deptList != null and deptList.size() > 0">
+            and sd.id IN
+            <foreach item="item" index="index" collection="deptList" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
     </select>
 
     <select id="selectListByStatus" resultMap="userMap">
-        SELECT  su.id,
-        su.username,
-        su.password,
-        su.nickname,
-        su.remark,
-        su.post_ids,
-        su.email,
-        su.mobile,
-        su.sex,
-        su.avatar,
-        su.status,
-        su.login_ip,
-        su.login_date,
-        sd.id as deptId,
-        sd.name as deptName
+        SELECT su.id,
+               su.username,
+               su.password,
+               su.nickname,
+               su.remark,
+               su.post_ids,
+               su.email,
+               su.mobile,
+               su.sex,
+               su.avatar,
+               su.status,
+               su.login_ip,
+               su.login_date,
+               sd.id   as deptId,
+               sd.name as deptName
         FROM system_users su
-   LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
-   LEFT JOIN system_dept sd ON sud.dept_id=sd.id and su.deleted = 0
-       WHERE su.status = #{status} and su.deleted = 0
-    ORDER BY su.id DESC
+                 LEFT JOIN system_user_dept sud ON su.id = sud.user_id and sud.deleted = 0
+                 LEFT JOIN system_dept sd ON sud.dept_id = sd.id and su.deleted = 0
+        WHERE su.status = #{status}
+          and su.deleted = 0
+        ORDER BY su.id DESC
     </select>
 
     <select id="selectListByDeptIds" resultMap="userMap">
-        SELECT  su.id,
+        SELECT su.id,
         su.username,
         su.password,
         su.nickname,
@@ -239,15 +244,15 @@
         LEFT JOIN system_user_dept sud ON su.id=sud.user_id and sud.deleted = 0
         LEFT JOIN system_dept sd ON sud.dept_id=sd.id and sd.deleted = 0
         WHERE sd.id IN
-            <foreach item="item" index="index" collection="deptIds" open="(" separator="," close=")">
-                #{item}
-            </foreach>
+        <foreach item="item" index="index" collection="deptIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
         and su.deleted = 0
         ORDER BY su.id DESC
     </select>
 
     <select id="selectCount2" resultType="Integer">
-        SELECT  count(1)
+        SELECT count(1)
         FROM system_users
     </select>
 
@@ -258,7 +263,8 @@
         <result property="password" column="password"/>
         <result property="nickname" column="nickname"/>
         <result property="remark" column="remark"/>
-        <result property="postIds" column="post_ids" typeHandler="com.hk.jigai.framework.mybatis.core.type.JsonLongSetTypeHandler"/>
+        <result property="postIds" column="post_ids"
+                typeHandler="com.hk.jigai.framework.mybatis.core.type.JsonLongSetTypeHandler"/>
         <result property="email" column="email"/>
         <result property="mobile" column="mobile"/>
         <result property="sex" column="sex"/>
@@ -268,7 +274,8 @@
         <result property="loginIp" column="login_ip"/>
         <result property="loginDate" column="login_date"/>
         <result property="createTime" column="create_time"/>
-        <collection property="deptList" ofType="com.hk.jigai.module.system.controller.admin.user.vo.user.UserDeptRespVO">
+        <collection property="deptList"
+                    ofType="com.hk.jigai.module.system.controller.admin.user.vo.user.UserDeptRespVO">
             <id property="id" column="deptId"/>
             <result property="name" column="deptName"/>
             <result property="parentId" column="parentId"/>
@@ -277,7 +284,18 @@
 
 
     <select id="queryMaxId" resultType="Long">
-        select id from system_users order by id desc limit 1
+        select id
+        from system_users
+        order by id desc limit 1
+    </select>
+
+    <select id="getUserIdByNickNameAndDeptId" resultType="Long">
+        select su.id
+        from system_users su
+                 left join system_user_dept sud on su.id = sud.user_id
+        where 1 = 1
+          and su.nickname = #{arg0}
+          and sud.dept_id = #{arg1}
     </select>
 
 </mapper>
