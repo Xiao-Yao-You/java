@@ -50,6 +50,7 @@ public interface OperationOrderMapper extends BaseMapperX<OperationOrderDO> {
                 .betweenIfPresent(OperationOrderDO::getCompleteTime, reqVO.getCompleteTime())
                 .eqIfPresent(OperationOrderDO::getCompleteConsume, reqVO.getCompleteConsume())
                 .betweenIfPresent(OperationOrderDO::getCreateTime, reqVO.getCreateTime())
+                .orderByAsc(OperationOrderDO::getStatus)
                 .orderByDesc(OperationOrderDO::getId));
     }
 
