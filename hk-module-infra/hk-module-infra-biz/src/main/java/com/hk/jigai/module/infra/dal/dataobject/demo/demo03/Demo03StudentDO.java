@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
  *
  * @author 恒科技改
  */
-@TableName("hk_demo03_student")
-@KeySequence("hk_demo03_student_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
+@TableName("yudao_demo03_student")
+@KeySequence("yudao_demo03_student") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

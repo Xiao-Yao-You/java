@@ -21,7 +21,7 @@ public class OperationDeviceSaveReqVO {
     private Long id;
 
     @Schema(description = "名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "赵六")
-    @NotEmpty(message = "名称不能为空")
+//    @NotEmpty(message = "名称不能为空")
     private String name;
 
     @Schema(description = "设备编码", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -29,15 +29,15 @@ public class OperationDeviceSaveReqVO {
     private String code;
 
     @Schema(description = "设备类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @NotNull(message = "设备类型不能为空")
+//    @NotNull(message = "设备类型不能为空")
     private Long deviceType;
 
     @Schema(description = "设备类型描述", requiredMode = Schema.RequiredMode.REQUIRED, example = "赵六")
-    @NotEmpty(message = "设备类型描述不能为空")
+//    @NotEmpty(message = "设备类型描述不能为空")
     private String deviceTypeName;
 
     @Schema(description = "型号", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotEmpty(message = "型号不能为空")
+//    @NotEmpty(message = "型号不能为空")
     private String model;
 
     @Schema(description = "标签code")
@@ -48,15 +48,15 @@ public class OperationDeviceSaveReqVO {
     private Integer status;
 
     @Schema(description = "所属单位 0:恒科,1:轩达,2:其他", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "所属单位 0:恒科,1:轩达,2:其他不能为空")
+//    @NotNull(message = "所属单位 0:恒科,1:轩达,2:其他不能为空")
     private Integer company;
 
     @Schema(description = "序列号", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotEmpty(message = "序列号不能为空")
+//    @NotEmpty(message = "序列号不能为空")
     private String serialNumber;
 
     @Schema(description = "影响程度", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotEmpty(message = "影响程度不能为空")
+//    @NotEmpty(message = "影响程度不能为空")
     private String effectLevel;
 
     @Schema(description = "编号名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "芋艿")
@@ -64,26 +64,26 @@ public class OperationDeviceSaveReqVO {
     private Long numberName;
 
     @Schema(description = "影响程度", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotEmpty(message = "影响程度不能为空")
+//    @NotEmpty(message = "影响程度不能为空")
     private String assetNumber;
 
     @Schema(description = "mac地址1", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotEmpty(message = "mac地址1不能为空")
+//    @NotEmpty(message = "mac地址1不能为空")
     private String macAddress1;
 
     @Schema(description = "mac地址2")
     private String macAddress2;
 
     @Schema(description = "生产日期", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "生产日期不能为空")
+//    @NotNull(message = "生产日期不能为空")
     private LocalDate manufactureDate;
 
     @Schema(description = "质保日期", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "质保日期不能为空")
+//    @NotNull(message = "质保日期不能为空")
     private LocalDate warrantyDate;
 
     @Schema(description = "是否需要巡检，0:是 1:否", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "是否需要巡检，0:是 1:否不能为空")
+//    @NotNull(message = "是否需要巡检，0:是 1:否不能为空")
     private Integer needCheckFlag;
 
     @Schema(description = "设备部门", example = "27960")

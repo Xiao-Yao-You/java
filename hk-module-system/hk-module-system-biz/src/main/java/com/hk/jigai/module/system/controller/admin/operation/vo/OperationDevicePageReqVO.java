@@ -131,4 +131,6 @@ public class OperationDevicePageReqVO extends PageParam {
     @Schema(description = "问题类型明文")
     private String questionTypeStr;
 
+    private String modelName;
+
 }

@@ -20,6 +20,7 @@ public interface OperationDeviceMapper extends BaseMapperX<OperationDeviceDO> {
     default PageResult<OperationDeviceDO> selectPage(OperationDevicePageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<OperationDeviceDO>()
                 .likeIfPresent(OperationDeviceDO::getName, reqVO.getName())
+                .likeIfPresent(OperationDeviceDO::getModelName, reqVO.getModelName())
                 .likeIfPresent(OperationDeviceDO::getCode, reqVO.getCode())
                 .eqIfPresent(OperationDeviceDO::getDeviceType, reqVO.getDeviceType())
                 .likeIfPresent(OperationDeviceDO::getDeviceTypeName, reqVO.getDeviceTypeName())

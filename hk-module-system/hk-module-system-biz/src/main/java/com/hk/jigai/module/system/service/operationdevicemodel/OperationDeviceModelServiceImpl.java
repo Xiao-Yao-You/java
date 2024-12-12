@@ -121,7 +121,8 @@ public class OperationDeviceModelServiceImpl implements OperationDeviceModelServ
 
     @Override
     public List<OperationDeviceModelDO> getByDeviceTypeId(Long deviceId) {
-        List<OperationDeviceModelDO> operationDeviceModelDOS = operationDeviceModelMapper.selectList(new QueryWrapper<OperationDeviceModelDO>().lambda().eq(OperationDeviceModelDO::getDeviceTypeId, deviceId));
+        List<OperationDeviceModelDO> operationDeviceModelDOS = operationDeviceModelMapper.selectList(new QueryWrapper<OperationDeviceModelDO>().lambda()
+                .eq(OperationDeviceModelDO::getDeviceTypeId, deviceId));
         return operationDeviceModelDOS;
     }
 

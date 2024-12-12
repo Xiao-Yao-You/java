@@ -198,7 +198,7 @@ public class OperationDeviceDO extends BaseDO {
     @TableField(exist = false)
     private String companyName;
 
-    @TableField(exist = false)
+//    @TableField(exist = false)
     private String modelName;
 
     @TableField(exist = false)

@@ -324,7 +324,7 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
             String deviceName = oldOperationDeviceMapper.selectDeviceByProductId(oldOperationDeviceDO.getProductid());
             resp.setDeviceTypeName(deviceName);
             String model = oldOperationDeviceMapper.selectModelById(oldOperationDeviceDO.getProductid());
-            resp.setModel(model);
+            resp.setModel(Long.parseLong(model));
             resp.setSerialNumber(oldOperationDeviceDO.getSerialno());
             resp.setMacAddress1(oldOperationDeviceDO.getMacaddress1());
             resp.setMacAddress2(oldOperationDeviceDO.getMacaddress2());
@@ -473,13 +473,16 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
                 if (CollectionUtil.isNotEmpty(collect)) {
                     device.setDeviceType(collect.get(0).getId());
                     device.setDeviceTypeName(device.getTypeName());
+                    device.setNumberName(collect.get(0).getSceneCodeId());
                 }
+
             }
             //处理型号数据
             if (StringUtils.isNotBlank(device.getModelName())) {
                 List<OperationDeviceModelDO> collect = modelList.stream().filter(p -> device.getModelName().equals(p.getModel())).collect(Collectors.toList());
                 if (CollectionUtil.isNotEmpty(collect)) {
                     device.setModel(collect.get(0).getId() + "");
+                    device.setModelName(collect.get(0).getModel());
                 }
             }
             //处理地点数据

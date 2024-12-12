@@ -40,7 +40,7 @@ public class OperationDeviceRespVO {
 
     @Schema(description = "型号", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("型号")
-    private String model;
+    private Long model;
 
     @Schema(description = "标签code")
     @ExcelProperty("标签code")
@@ -183,4 +183,6 @@ public class OperationDeviceRespVO {
 
     //1:新，2：旧
     private Integer flag;
+
+    private String modelName;
 }

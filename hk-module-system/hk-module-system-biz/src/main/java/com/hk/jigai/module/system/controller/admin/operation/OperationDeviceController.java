@@ -190,6 +190,7 @@ public class OperationDeviceController {
 
     @PostMapping("/syncOldDevice")
     @Operation(summary = "同步历史数据")
+    @PreAuthorize("@ss.hasPermission('hk:operation-device:sync')")
 //    public CommonResult<List<OperationDeviceDO>> syncOldDevice() {
     public CommonResult<Boolean> syncOldDevice() {
         //基础数据
