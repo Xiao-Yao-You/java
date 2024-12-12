@@ -2,13 +2,15 @@ package com.hk.jigai.module.system.service.operation;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.fasterxml.jackson.datatype.jsr310.ser.YearSerializer;
+import com.hk.jigai.framework.common.enums.UserTypeEnum;
 import com.hk.jigai.framework.common.pojo.CommonResult;
 import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.common.util.collection.CollectionUtils;
 import com.hk.jigai.framework.common.util.object.BeanUtils;
 import com.hk.jigai.framework.mybatis.core.dataobject.BaseDO;
 import com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils;
-import com.hk.jigai.module.system.controller.admin.notice.vo.WechatNoticeVO;
+import com.hk.jigai.module.infra.api.websocket.WebSocketSenderApi;
 import com.hk.jigai.module.system.controller.admin.operation.vo.*;
 import com.hk.jigai.module.system.dal.dataobject.operation.*;
 import com.hk.jigai.module.system.dal.dataobject.operationnoticeobject.OperationNoticeObjectDO;
@@ -80,6 +82,9 @@ public class OperationOrderServiceImpl implements OperationOrderService {
     private OperationDeviceService operationDeviceService;
     @Resource
     private OldOperationDeviceService oldOperationDeviceService;
+
+    @Resource
+    private WebSocketSenderApi webSocketSenderApi;
 
     /**
      * 新建工单消息模板
@@ -186,7 +191,8 @@ public class OperationOrderServiceImpl implements OperationOrderService {
                 e.printStackTrace();
             }
         }
-
+        //新增时发送新订单消息
+        sendOrderStatusChangeMsg();
         // 返回
         return operationOrder.getId();
     }
@@ -427,7 +433,6 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             e.printStackTrace();
             return CommonResult.error(500, "当前工单状态不可执行该操作");
         }
-
         return CommonResult.success(true);
     }
 
@@ -435,6 +440,20 @@ public class OperationOrderServiceImpl implements OperationOrderService {
     public CommonResult<Integer> getUnDealOrderCount() {
         Long count = operationOrderMapper.selectCount(new QueryWrapper<OperationOrderDO>().lambda().eq(OperationOrderDO::getStatus, OperateConstant.WAIT_ALLOCATION_STATUS));
         return CommonResult.success(count.intValue());
+    }
+
+    /**
+     * 发送订单状态变更消息
+     */
+    public void sendOrderStatusChangeMsg() {
+
+        Integer unDealOrderCount = getUnDealOrderCount().getData();
+
+        Map<String, Boolean> flagMap = new HashMap<>();
+
+        flagMap.put("NewOrder", unDealOrderCount > 0 ? true : false);
+
+        webSocketSenderApi.sendObject(UserTypeEnum.ADMIN.getValue(), "order-push", flagMap);
     }
 
 
@@ -529,6 +548,8 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             if (StringUtil.isNotBlank(repairerOpenId)) {
                 orderStatusChangeNotice(repairerOpenId, code, orderStatus, operatorName, time);
             }
+            //发送和订单处理消息
+            sendOrderStatusChangeMsg();
 
         }
 
@@ -571,6 +592,8 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             if (StringUtil.isNotBlank(repairerOpenId)) {
                 orderStatusChangeNotice(repairerOpenId, code, orderStatus, operatorName, time);
             }
+            //发送和订单处理消息
+            sendOrderStatusChangeMsg();
         }
 
         /**
