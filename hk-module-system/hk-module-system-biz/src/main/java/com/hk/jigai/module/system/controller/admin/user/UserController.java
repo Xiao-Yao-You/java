@@ -247,4 +247,5 @@ public class UserController {
         AdminUserDO user = userService.getUser(id);
         return success(BeanUtils.toBean(user, UserRespVO.class));
     }
+
 }

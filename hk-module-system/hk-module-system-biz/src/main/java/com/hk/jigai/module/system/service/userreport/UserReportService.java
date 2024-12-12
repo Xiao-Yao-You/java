@@ -58,6 +58,7 @@ public interface UserReportService {
 
     /**
      * 汇报统计
+     *
      * @param reqVO
      * @return
      */
@@ -65,6 +66,7 @@ public interface UserReportService {
 
     /**
      * 汇报汇总
+     *
      * @param reqVO
      * @return
      */
@@ -72,12 +74,14 @@ public interface UserReportService {
 
     /**
      * 关注下拉
+     *
      * @return
      */
     List<AttentionAlertRespVO> queryAttentionList();
 
     /**
      * 查询schdule详情
+     *
      * @param id
      * @return
      */
@@ -85,9 +89,17 @@ public interface UserReportService {
 
     /**
      * 其他信息
+     *
      * @return
      */
     OtherInfoRespVO queryOtherInfo();
 
-    List<AdminUserDO>  getLastReportObject();
+    /**
+     * 获取当前登录人最新的汇报对象
+     *
+     *
+     *
+     * @return
+     */
+    List<AdminUserDO> getLastReportObject();
 }
