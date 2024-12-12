@@ -6,6 +6,7 @@ import javax.validation.*;
 import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.common.pojo.PageParam;
 import com.hk.jigai.module.system.controller.admin.userreport.vo.*;
+import com.hk.jigai.module.system.dal.dataobject.user.AdminUserDO;
 import com.hk.jigai.module.system.dal.dataobject.userreport.ReportJobScheduleDO;
 import com.hk.jigai.module.system.dal.dataobject.userreport.UserReportDO;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -88,4 +89,5 @@ public interface UserReportService {
      */
     OtherInfoRespVO queryOtherInfo();
 
+    List<AdminUserDO>  getLastReportObject();
 }

@@ -160,4 +160,10 @@ public class UserReportController {
         return success(userReportService.queryOtherInfo());
     }
 
+    @GetMapping("/getLastReportObject")
+    @Operation(summary = "获取上一次回报的对象")
+    public CommonResult<List<AdminUserDO>> getLastReportObject() {
+        return success(userReportService.getLastReportObject());
+    }
+
 }

@@ -3,9 +3,13 @@ package com.hk.jigai.module.system.service.userreport;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hk.jigai.framework.common.util.collection.CollectionUtils;
+import com.hk.jigai.framework.mybatis.core.dataobject.BaseDO;
+import com.hk.jigai.framework.security.core.LoginUser;
 import com.hk.jigai.module.system.controller.admin.userreport.vo.*;
+import com.hk.jigai.module.system.dal.dataobject.user.AdminUserDO;
 import com.hk.jigai.module.system.dal.dataobject.userreport.*;
 import com.hk.jigai.module.system.dal.mysql.dept.DeptMapper;
+import com.hk.jigai.module.system.dal.mysql.user.AdminUserMapper;
 import com.hk.jigai.module.system.dal.mysql.userreport.ReportJobPlanMapper;
 import com.hk.jigai.module.system.dal.mysql.userreport.ReportJobScheduleMapper;
 import com.hk.jigai.module.system.dal.mysql.userreport.ReportAttentionMapper;
@@ -51,6 +55,9 @@ public class UserReportServiceImpl implements UserReportService {
     @Resource
     private DeptMapper deptMapper;
 
+    @Resource
+    private AdminUserMapper adminUserMapper;
+
     @Override
     @Transactional
     public Long createUserReport(UserReportSaveReqVO createReqVO) {
@@ -62,9 +69,9 @@ public class UserReportServiceImpl implements UserReportService {
         log.info("创建新的汇报，并判断当前汇报人当前日期是否已经汇报");
         if (CollectionUtil.isNotEmpty(userReportDOS)) {
             Set<Long> currentReportObject = userReport.getReportObject();
-            for(UserReportDO userReportDO : userReportDOS){
+            for (UserReportDO userReportDO : userReportDOS) {
                 //有交集
-                if(!Collections.disjoint(userReportDO.getReportObject(), currentReportObject)){
+                if (!Collections.disjoint(userReportDO.getReportObject(), currentReportObject)) {
                     throw exception(USER_REPORT_EXISTS);
                 }
             }
@@ -87,7 +94,7 @@ public class UserReportServiceImpl implements UserReportService {
         if (CollectionUtil.isNotEmpty(reportJobScheduleDOList)) {
             reportJobScheduleDOList.stream().forEach(p -> {
                 p.setUserReportId(userReport.getId());
-                if(p.getConnectId() != null){
+                if (p.getConnectId() != null) {
                     ReportAttentionDO reportAttentionDO = new ReportAttentionDO();
                     reportAttentionDO.setId(p.getConnectId());
                     reportAttentionDO.setJobScheduleId(p.getId());
@@ -98,7 +105,7 @@ public class UserReportServiceImpl implements UserReportService {
             });
             // 处理进度表数据
             reportJobScheduleMapper.insertBatch(reportJobScheduleDOList);
-            if(!CollectionUtils.isAnyEmpty(attentionDOList)){
+            if (!CollectionUtils.isAnyEmpty(attentionDOList)) {
                 reportAttentionMapper.updateBatch(attentionDOList);
             }
         }
@@ -126,9 +133,9 @@ public class UserReportServiceImpl implements UserReportService {
         log.info("更新汇报，并判断当前汇报人当前日期是否已经汇报");
         if (CollectionUtil.isNotEmpty(userReportDOS)) {
             Set<Long> currentReportObject = updateReqVO.getReportObject();
-            for(UserReportDO userReportDO : userReportDOS){
-                if(!Collections.disjoint(userReportDO.getReportObject(), currentReportObject)
-                        && !Long.valueOf(updateReqVO.getId()).equals(userReportDO.getId())){
+            for (UserReportDO userReportDO : userReportDOS) {
+                if (!Collections.disjoint(userReportDO.getReportObject(), currentReportObject)
+                        && !Long.valueOf(updateReqVO.getId()).equals(userReportDO.getId())) {
                     //Long.compare(long1, long2) != 0
                     log.info("更新汇报,已重复！" + updateReqVO.getId() + "," + userReportDO.getId());
                     throw exception(USER_REPORT_EXISTS);
@@ -149,27 +156,27 @@ public class UserReportServiceImpl implements UserReportService {
         Set<Long> scheduleUpdateId = new HashSet<>();
         List<ReportAttentionDO> attentionDOList = new ArrayList<>();
         if (CollectionUtil.isNotEmpty(reportJobScheduleDOList)) {
-            for(ReportJobScheduleDO reportJobScheduleDO : reportJobScheduleDOList){
+            for (ReportJobScheduleDO reportJobScheduleDO : reportJobScheduleDOList) {
                 reportJobScheduleDO.setUserReportId(updateObj.getId());
-                if(reportJobScheduleDO.getId() != null){
+                if (reportJobScheduleDO.getId() != null) {
                     scheduleUpdateId.add(reportJobScheduleDO.getId());
                 }
-                if(reportJobScheduleDO.getConnectId() != null){
+                if (reportJobScheduleDO.getConnectId() != null) {
                     ReportAttentionDO reportAttentionDO = new ReportAttentionDO();
                     reportAttentionDO.setId(reportJobScheduleDO.getConnectId());
                     reportAttentionDO.setJobScheduleId(reportJobScheduleDO.getId());
                     reportAttentionDO.setSituation(reportJobScheduleDO.getSituation());
                     reportAttentionDO.setReplyStatus("1");
                     attentionDOList.add(reportAttentionDO);
-                }else{
+                } else {
                     reportJobScheduleDO.setConnectId(null);
                 }
             }
         }
-        if(CollectionUtils.isAnyEmpty(scheduleUpdateId)){
+        if (CollectionUtils.isAnyEmpty(scheduleUpdateId)) {
             reportJobScheduleMapper.delete(new QueryWrapper<ReportJobScheduleDO>().lambda()
                     .eq(ReportJobScheduleDO::getUserReportId, updateObj.getId()));
-        }else{
+        } else {
             reportJobScheduleMapper.delete(new QueryWrapper<ReportJobScheduleDO>().lambda()
                     .eq(ReportJobScheduleDO::getUserReportId, updateObj.getId())
                     .notIn(ReportJobScheduleDO::getId, scheduleUpdateId));
@@ -177,34 +184,34 @@ public class UserReportServiceImpl implements UserReportService {
             map.put("jobIds", scheduleUpdateId);
             reportAttentionMapper.updateNotFollow(map);
         }
-        if(!CollectionUtils.isAnyEmpty(reportJobScheduleDOList)){
+        if (!CollectionUtils.isAnyEmpty(reportJobScheduleDOList)) {
             reportJobScheduleMapper.insertOrUpdateBatch(reportJobScheduleDOList);
         }
 
-        if(!CollectionUtils.isAnyEmpty(attentionDOList)){
+        if (!CollectionUtils.isAnyEmpty(attentionDOList)) {
             reportAttentionMapper.updateBatch(attentionDOList);
         }
         //处理plan
         List<ReportJobPlanDO> reportJobPlanDOList = updateObj.getReportJobPlanDOList();
         Set<Long> planUpdateId = new HashSet<>();
         if (CollectionUtil.isNotEmpty(reportJobPlanDOList)) {
-            for(ReportJobPlanDO reportJobPlanDO : reportJobPlanDOList){
+            for (ReportJobPlanDO reportJobPlanDO : reportJobPlanDOList) {
                 reportJobPlanDO.setUserReportId(updateObj.getId());
-                if(reportJobPlanDO.getId() != null){
+                if (reportJobPlanDO.getId() != null) {
                     planUpdateId.add(reportJobPlanDO.getId());
                 }
             }
         }
-        if(CollectionUtils.isAnyEmpty(planUpdateId)){
+        if (CollectionUtils.isAnyEmpty(planUpdateId)) {
             reportJobPlanMapper.delete(new QueryWrapper<ReportJobPlanDO>().lambda()
                     .eq(ReportJobPlanDO::getUserReportId, updateObj.getId()));
-        }else{
+        } else {
             reportJobPlanMapper.delete(new QueryWrapper<ReportJobPlanDO>().lambda()
                     .eq(ReportJobPlanDO::getUserReportId, updateObj.getId())
                     .notIn(ReportJobPlanDO::getId, planUpdateId));
         }
 
-        if(!CollectionUtils.isAnyEmpty(reportJobPlanDOList)) {
+        if (!CollectionUtils.isAnyEmpty(reportJobPlanDOList)) {
             reportJobPlanMapper.insertOrUpdateBatch(reportJobPlanDOList);
         }
         // 更新
@@ -316,15 +323,30 @@ public class UserReportServiceImpl implements UserReportService {
         reqVO.setDateReport(dateArr);
         //1.查询汇报记录 当天，当前登录人
         Integer count = userReportMapper.selectCount1(reqVO);
-        if(count.compareTo(new Integer("0"))>0){
+        if (count.compareTo(new Integer("0")) > 0) {
             response.setSummaryFlag(true);
         }
 
         //2.
         List<ReportAttentionDO> list = reportAttentionMapper.selectList();
-        if(!CollectionUtils.isAnyEmpty(list)){
+        if (!CollectionUtils.isAnyEmpty(list)) {
             response.setNeedFollow(list.size());
         }
         return response;
+    }
+
+    @Override
+    public List<AdminUserDO> getLastReportObject() {
+
+        UserReportDO userReportDO = userReportMapper.selectOne(new QueryWrapper<UserReportDO>().lambda()
+                .eq(BaseDO::getCreator, getLoginUserId())
+                .orderByDesc(BaseDO::getCreateTime)
+                .last(" LIMIT 1"));
+        List<AdminUserDO> adminUserDOs = new ArrayList<>();
+        if (userReportDO != null) {
+            adminUserDOs = adminUserMapper.selectList(new QueryWrapper<AdminUserDO>().lambda().in(AdminUserDO::getId, userReportDO.getReportObject()));
+        }
+
+        return adminUserDOs;
     }
 }
