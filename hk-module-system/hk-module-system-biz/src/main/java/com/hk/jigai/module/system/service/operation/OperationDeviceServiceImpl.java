@@ -490,7 +490,7 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
                 List<OperationAddressDO> collect = addressList.stream().filter(p -> device.getAddress().equals(p.getAddressName())).collect(Collectors.toList());
                 if (CollectionUtil.isNotEmpty(collect)) {
                     device.setAddressId(collect.get(0).getId() + "");
-                    device.setAddress(device.getAddress());
+                    device.setAddress(collect.get(0).getAddressName());
                 }
             }
             //获取部门

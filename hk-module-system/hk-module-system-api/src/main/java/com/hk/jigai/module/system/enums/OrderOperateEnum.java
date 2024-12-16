@@ -19,7 +19,9 @@ public enum OrderOperateEnum {
     GUAQI("hangUp"),//挂起
     WANCHENG("complete"),//已完成
     CHEXIAO("revoke"),//撤销
-    KAISHI("restart");
+    KAISHI("restart"),//重新开始
+    WEIWAI("outsourcing"),//委外维修
+    WEIWAICHONGQI("outsourcingRestart");//委外维修结束后重启
     private final String value;
 
 }

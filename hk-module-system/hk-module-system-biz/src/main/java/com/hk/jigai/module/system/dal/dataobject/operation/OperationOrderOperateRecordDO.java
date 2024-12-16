@@ -1,6 +1,7 @@
 package com.hk.jigai.module.system.dal.dataobject.operation;
 
 import com.hk.jigai.module.system.controller.admin.operation.vo.OperationDevicePictureSaveReqVO;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.util.*;
@@ -79,5 +80,22 @@ public class OperationOrderOperateRecordDO extends BaseDO {
     private List<OperationDevicePictureSaveReqVO> picList;
 
     private String picture;
+
+    /**
+     * 委外时间
+     */
+    private LocalDateTime outsourcingTime;
+    /**
+     * 预计委外返回时间
+     */
+    private LocalDateTime estimateReturnTime;
+    /**
+     * 委外对象
+     */
+    private String outsourcingObject;
+    /**
+     * 委外实际返回时间
+     */
+    private LocalDateTime returnTime;
 
 }

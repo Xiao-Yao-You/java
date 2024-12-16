@@ -397,7 +397,6 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         operationOrderDO.setRequestType(operationOrderReqVO.getRequestType());
         operationOrderDO.setQuestionType(operationOrderReqVO.getQuestionType());
         operationOrderDO.setLevel(operationOrderReqVO.getLevel());
-
         OperationOrderOperateRecordDO operateRecordDO = new OperationOrderOperateRecordDO();
         operateRecordDO.setOrderId(operationOrderDO.getId());
         operateRecordDO.setBeginTime(LocalDateTime.now());
@@ -406,6 +405,10 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         operateRecordDO.setRemark(operationOrderReqVO.getRemark());
         operateRecordDO.setPicList(operationOrderReqVO.getPictureList());
         operateRecordDO.setPicture(operationOrderReqVO.getPicture());
+        operateRecordDO.setOutsourcingTime(operationOrderReqVO.getOutsourcingTime());
+        operateRecordDO.setEstimateReturnTime(operationOrderReqVO.getEstimateReturnTime());
+        operateRecordDO.setReturnTime(operationOrderReqVO.getReturnTime());
+        operateRecordDO.setOutsourcingObject(operationOrderReqVO.getOutsourcingObject());
         //有操作对象的时候就存，没有的是时候就是当前登录人
         operateRecordDO.setUserId(operationOrderReqVO.getUserId() == null ? SecurityFrameworkUtils.getLoginUserId() : operationOrderReqVO.getUserId());
         AdminUserDO user = adminUserService.getUser(operateRecordDO.getUserId());
@@ -766,6 +769,77 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             String code = operationOrderDO.getCode();
             String orderStatus = "已挂起";
             String operatorName = operateRecordDO.getUserNickName() + "暂停了当前工单进度";
+            String time = operateRecordDO.getCreateTime().format(formatter);
+            if (StringUtil.isNotBlank(repairerOpenId)) {
+                orderStatusChangeNotice(repairerOpenId, code, orderStatus, operatorName, time);
+            }
+        }
+
+        /**
+         * 委外
+         */
+        @Transactional
+        public void outsourcing(OperationOrderDO operationOrderDO, OperationOrderOperateRecordDO operateRecordDO,
+                                OperationOrderOperateRecordDO lastOperateRecordDO) {
+
+            //非工单当前处理人无法操作工单
+            Long loginUserId = getLoginUserId();
+            if (!loginUserId.equals(operationOrderDO.getDealUserId())) {
+                throw exception(OPERATION_ORDER_NOT_BELONG);
+            }
+
+            if (OperateConstant.WAIT_DEAL_STATUS.equals(operationOrderDO.getStatus()) || OperateConstant.COMPLETE_STATUS.equals(operationOrderDO.getStatus())
+                    || OperateConstant.ALREADY_DEAL_STATUS.equals(operationOrderDO.getStatus())) {
+                throw exception(OPERATION_ORDER_OPERATE_ERROR);
+            }
+            //更新状态为委外
+            operationOrderDO.setStatus(OperateConstant.OUTSOURCING_STATUS);
+            operationOrderMapper.updateById(operationOrderDO);
+            operateRecordDO.setOperateType(OperateConstant.OUTSOURCING_TYPE);
+            operationOrderOperateRecordMapper.insert(operateRecordDO);
+            //发送微信公众号消息--信息部内部消息
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            //给报修人的状态反馈
+            AdminUserDO repairer = adminUserService.getUser(Long.valueOf(operationOrderDO.getCreator()));
+            String repairerOpenId = repairer.getOpenid();
+            String code = operationOrderDO.getCode();
+            String orderStatus = "委外维修中";
+            String operatorName = operateRecordDO.getUserNickName() + "将当前工单进行了委外维修";
+            String time = operateRecordDO.getCreateTime().format(formatter);
+            if (StringUtil.isNotBlank(repairerOpenId)) {
+                orderStatusChangeNotice(repairerOpenId, code, orderStatus, operatorName, time);
+            }
+        }
+
+        /**
+         * 委外后重启
+         */
+        @Transactional
+        public void outsourcingRestart(OperationOrderDO operationOrderDO, OperationOrderOperateRecordDO operateRecordDO,
+                                       OperationOrderOperateRecordDO lastOperateRecordDO) {
+
+            //非工单当前处理人无法操作工单
+            Long loginUserId = getLoginUserId();
+            if (!loginUserId.equals(operationOrderDO.getDealUserId())) {
+                throw exception(OPERATION_ORDER_NOT_BELONG);
+            }
+
+            if (!OperateConstant.OUTSOURCING_STATUS.equals(operationOrderDO.getStatus())) {
+                throw exception(OPERATION_ORDER_OPERATE_ERROR);
+            }
+            //更新状态为维修中
+            operationOrderDO.setStatus(OperateConstant.IN_GOING_STATUS);
+            operationOrderMapper.updateById(operationOrderDO);
+            operateRecordDO.setOperateType(OperateConstant.OUTSOURCING_RESTART_TYPE);
+            operationOrderOperateRecordMapper.insert(operateRecordDO);
+            //发送微信公众号消息--信息部内部消息
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            //给报修人的状态反馈
+            AdminUserDO repairer = adminUserService.getUser(Long.valueOf(operationOrderDO.getCreator()));
+            String repairerOpenId = repairer.getOpenid();
+            String code = operationOrderDO.getCode();
+            String orderStatus = "处理中";
+            String operatorName = "委外结束" + operateRecordDO.getUserNickName() + "将继续处理工单";
             String time = operateRecordDO.getCreateTime().format(formatter);
             if (StringUtil.isNotBlank(repairerOpenId)) {
                 orderStatusChangeNotice(repairerOpenId, code, orderStatus, operatorName, time);

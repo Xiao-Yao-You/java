@@ -52,6 +52,7 @@
     <select id="selectPageForSync"
             parameterType="com.hk.jigai.module.system.controller.admin.operation.vo.OldOperationDevicePageReqVO"
             resultMap="oldDeviceForSyncMap">
+        --         select c1.*,c2.ProductName,c3.CorporationNAME,d1.DepartmentNAME,c4.TYPENAME,p.PersonName,s.SiteNAME
         select *
         from CI c1
                  left join CIProduct c2 on c1.ProductId = c2.PRODUCTID
@@ -59,6 +60,7 @@
                                              c3.CorporationID
                  left join Department d1 on d1.DepartmentID = c1.deptid
                  left join CIType c4 on c2.CITYPENO = c4.TYPEID
+                 left join Site s on s.SiteID = c1.SITEID
                  left join Person p on p.PersonNO = c1.userNo
         where c1.deleted = 0
         order by c1.RegisterDATE
@@ -194,8 +196,9 @@
         <result property="serialNumber" column="SERIALNO"/>
         <result property="labelCode" column="BARCODE"/>
         <result property="location" column="LOCATION"/>
-        <result property="addressId" column="SITEID"/>
-        <result property="address" column="LOCATIONEX"/>
+        <!--        <result property="addressId" column="SITEID"/>-->
+        <result property="address" column="SiteNAME"/>
+        <result property="sitename" column="SiteNAME"/>
         <result property="effectLevel" column="IMPACTID"/>
         <result property="deptId" column="DEPTID"/>
         <result property="status" column="STATEID"/>

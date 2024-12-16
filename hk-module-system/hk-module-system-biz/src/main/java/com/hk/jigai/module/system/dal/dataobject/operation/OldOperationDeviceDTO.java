@@ -124,6 +124,8 @@ public class OldOperationDeviceDTO extends BaseDO {
      */
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private String address;
+
+    private String sitename;
     /**
      * 设备位置
      */

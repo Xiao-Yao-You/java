@@ -123,6 +123,7 @@ public class OperationDeviceDO extends BaseDO {
      * 使用地点
      */
     @TableField(fill = FieldFill.INSERT_UPDATE)
+//    private Set<Long> addressId;
     private String addressId;
 
     /**
@@ -130,6 +131,9 @@ public class OperationDeviceDO extends BaseDO {
      */
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private String address;
+
+    @TableField(exist = false)
+    private String sitename;
     /**
      * 设备位置
      */

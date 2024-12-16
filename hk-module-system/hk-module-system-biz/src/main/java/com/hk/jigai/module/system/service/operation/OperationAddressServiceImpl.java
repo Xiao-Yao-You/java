@@ -116,6 +116,7 @@ public class OperationAddressServiceImpl implements OperationAddressService {
 
     @Override
     public List<OperationAddressDO> getAll(OperationAddressRespVO reqVO) {
+        reqVO.setStatus(0);
         return operationAddressMapper.selectList(reqVO);
     }
 

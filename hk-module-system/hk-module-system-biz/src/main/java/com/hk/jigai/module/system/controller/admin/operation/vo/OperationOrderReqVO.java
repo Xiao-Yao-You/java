@@ -67,5 +67,14 @@ public class OperationOrderReqVO {
 
     private String picture;
 
+    @Schema(description = "委外时间")
+    private LocalDateTime outsourcingTime;
+    @Schema(description = "预计委外返回时间")
+    private LocalDateTime estimateReturnTime;
+    @Schema(description = "委外对象")
+    private String outsourcingObject;
+    @Schema(description = "委婉返回时间")
+    private LocalDateTime returnTime;
+
 
 }
