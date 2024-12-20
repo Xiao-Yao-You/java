@@ -15,6 +15,10 @@ public interface ErrorCodeConstants {
     ErrorCode AUTH_THIRD_LOGIN_NOT_BIND = new ErrorCode(1_002_000_005, "未绑定账号，需要进行绑定");
     ErrorCode AUTH_TOKEN_EXPIRED = new ErrorCode(1_002_000_006, "Token 已经过期");
     ErrorCode AUTH_MOBILE_NOT_EXISTS = new ErrorCode(1_002_000_007, "手机号不存在");
+    ErrorCode MINI_APP_CODE_NOT_SEND = new ErrorCode(1_002_000_008, "小程序code未传递");
+    ErrorCode MINI_APP_OPEN_ID_ERROR = new ErrorCode(1_002_000_009, "获取小程序openId失败");
+    ErrorCode MINI_APP_ADMIN_ERROR = new ErrorCode(1_002_000_010, "超级管理员请使用账号密码登录");
+    ErrorCode OPEN_ID_NOT_MATCH_ACCOUNT = new ErrorCode(1_002_000_011, "微信和系统账号不匹配");
 
     // ========== 菜单模块 1-002-001-000 ==========
     ErrorCode MENU_NAME_DUPLICATE = new ErrorCode(1_002_001_000, "已经存在该名字的菜单");
@@ -211,4 +215,8 @@ public interface ErrorCodeConstants {
     ErrorCode OPERATION_SUB_ADDRESS_EXISTS = new ErrorCode(1_002_033_015, "当前地点下存在启用的子级地点，无法删除");
     ErrorCode OPERATION_DEVICE_MODEL_NOT_EXISTS = new ErrorCode(1_002_033_016, "设备型号不存在");
     ErrorCode OPERATION_DEVICE_MODEL_EXISTS = new ErrorCode(1_002_033_017, "设备型号已存在");
+    ErrorCode INSPECTION_PROJECT_NOT_EXISTS = new ErrorCode(1_002_033_018, "巡检项目指标不存在");
+    ErrorCode INSPECTION_RECORD_NOT_EXISTS = new ErrorCode(1_002_033_019, "设备巡检记录不存在");
+    ErrorCode INSPECTION_RECORD_DETAIL_NOT_EXISTS = new ErrorCode(1_002_033_020, "巡检记录详情不存在");
+
 }

@@ -72,6 +72,13 @@ public class AuthController {
         return success(authService.login(reqVO));
     }
 
+    @PostMapping("/weChatAppLogin")
+    @PermitAll
+    @Operation(summary = "使用微信登录")
+    public CommonResult<AuthLoginRespVO> weChatAppLogin(@RequestBody @Valid WeChatMiniAppAuthLoginReqVO reqVO) {
+        return success(authService.weChartMiniAppLogin(reqVO));
+    }
+
     @PostMapping("/logout")
     @PermitAll
     @Operation(summary = "登出系统")

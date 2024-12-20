@@ -1,12 +1,12 @@
 package com.hk.jigai.module.system.service.auth;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.hk.jigai.framework.common.enums.CommonStatusEnum;
 import com.hk.jigai.framework.common.enums.UserTypeEnum;
 import com.hk.jigai.framework.common.util.monitor.TracerUtils;
 import com.hk.jigai.framework.common.util.servlet.ServletUtils;
 import com.hk.jigai.framework.common.util.validation.ValidationUtils;
-import com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils;
 import com.hk.jigai.module.system.api.logger.dto.LoginLogCreateReqDTO;
 import com.hk.jigai.module.system.api.sms.SmsCodeApi;
 import com.hk.jigai.module.system.api.social.dto.SocialUserBindReqDTO;
@@ -15,6 +15,7 @@ import com.hk.jigai.module.system.controller.admin.auth.vo.*;
 import com.hk.jigai.module.system.convert.auth.AuthConvert;
 import com.hk.jigai.module.system.dal.dataobject.oauth2.OAuth2AccessTokenDO;
 import com.hk.jigai.module.system.dal.dataobject.user.AdminUserDO;
+import com.hk.jigai.module.system.dal.mysql.user.AdminUserMapper;
 import com.hk.jigai.module.system.enums.logger.LoginLogTypeEnum;
 import com.hk.jigai.module.system.enums.logger.LoginResultEnum;
 import com.hk.jigai.module.system.enums.oauth2.OAuth2ClientConstants;
@@ -25,10 +26,12 @@ import com.hk.jigai.module.system.service.oauth2.OAuth2TokenService;
 import com.hk.jigai.module.system.service.social.SocialUserService;
 import com.hk.jigai.module.system.service.user.AdminUserService;
 import com.google.common.annotations.VisibleForTesting;
+import com.hk.jigai.module.system.service.wechat.MeetingReminderService;
 import com.xingyuv.captcha.model.common.ResponseModel;
 import com.xingyuv.captcha.model.vo.CaptchaVO;
 import com.xingyuv.captcha.service.CaptchaService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -65,6 +68,10 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     private CaptchaService captchaService;
     @Resource
     private SmsCodeApi smsCodeApi;
+    @Resource
+    private MeetingReminderService meetingReminderService;
+    @Resource
+    private AdminUserMapper adminUserMapper;
 
     /**
      * 验证码的开关，默认为 true
@@ -108,6 +115,58 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         }
         // 创建 Token 令牌，记录登录日志
         return createTokenAfterLoginSuccess(user.getId(), reqVO.getUsername(), LoginLogTypeEnum.LOGIN_USERNAME);
+    }
+
+
+    @Override
+    public AuthLoginRespVO weChartMiniAppLogin(WeChatMiniAppAuthLoginReqVO reqVO) {
+        final LoginLogTypeEnum logTypeEnum = LoginLogTypeEnum.LOGIN_USERNAME;
+        if ("admin".equals(reqVO.getUsername())) {
+            throw exception(MINI_APP_ADMIN_ERROR);
+        }
+        AdminUserDO user = userService.getUserByUsername(reqVO.getUsername());
+        String currentUserOpenId = user.getRemark();
+        //校验账号是否存在
+        if (user == null) {
+            createLoginLog(null, reqVO.getUsername(), logTypeEnum, LoginResultEnum.BAD_CREDENTIALS);
+            throw exception(AUTH_THIRD_LOGIN_NOT_BIND);
+        }
+        //校验账号是否绑定微信openId
+        String openId = "";
+        if (StringUtils.isNotBlank(reqVO.getCode())) {
+            openId = meetingReminderService.wechatMiniAppGetOpenid(reqVO.getCode());
+            //获取小程序openId失败
+            if (StringUtils.isBlank(openId)) {
+                throw exception(MINI_APP_OPEN_ID_ERROR);
+            }
+        } else {
+            throw exception(MINI_APP_CODE_NOT_SEND);
+        }
+        AuthLoginRespVO tokenAfterLoginSuccess = new AuthLoginRespVO();
+        if (StringUtils.isNotBlank(currentUserOpenId)) {
+            //小程序和账号绑定不匹配
+            if (!openId.equals(currentUserOpenId)) {
+                throw exception(OPEN_ID_NOT_MATCH_ACCOUNT);
+            }
+        }
+        //当前用户openID为空或者openID匹配，尝试登录
+        AuthLoginReqVO authLoginReqVO = BeanUtil.toBean(reqVO, AuthLoginReqVO.class);
+        // 校验验证码
+        validateCaptcha(authLoginReqVO);
+
+        // 如果 socialType 非空，说明需要绑定社交用户
+        if (authLoginReqVO.getSocialType() != null) {
+            socialUserService.bindSocialUser(new SocialUserBindReqDTO(user.getId(), getUserType().getValue(),
+                    authLoginReqVO.getSocialType(), authLoginReqVO.getSocialCode(), authLoginReqVO.getSocialState()));
+        }
+        // 创建 Token 令牌，记录登录日志
+        tokenAfterLoginSuccess = createTokenAfterLoginSuccess(user.getId(), authLoginReqVO.getUsername(), LoginLogTypeEnum.LOGIN_USERNAME);
+        //当前用户openID为空时，绑定openID
+        if (StringUtils.isBlank(currentUserOpenId)) {
+            user.setRemark(openId);
+            adminUserMapper.updateById(user);
+        }
+        return tokenAfterLoginSuccess;
     }
 
     @Override

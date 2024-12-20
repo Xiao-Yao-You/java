@@ -25,7 +25,7 @@ public class OperationOrderSaveReqVO {
     private String status;
 
     @Schema(description = "设备id", requiredMode = Schema.RequiredMode.REQUIRED, example = "15840")
-    @NotNull(message = "设备id不能为空")
+//    @NotNull(message = "设备id不能为空")
     private Long deviceId;
 
     @Schema(description = "标签code")

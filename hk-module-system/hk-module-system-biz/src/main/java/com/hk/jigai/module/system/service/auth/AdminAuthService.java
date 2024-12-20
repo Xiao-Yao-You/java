@@ -30,6 +30,13 @@ public interface AdminAuthService {
      * @return 登录结果
      */
     AuthLoginRespVO login(@Valid AuthLoginReqVO reqVO);
+    /**
+     * 微信小程序登录
+     *
+     * @param reqVO 登录信息
+     * @return 登录结果
+     */
+    AuthLoginRespVO weChartMiniAppLogin(@Valid WeChatMiniAppAuthLoginReqVO reqVO);
 
     /**
      * 基于 token 退出登录

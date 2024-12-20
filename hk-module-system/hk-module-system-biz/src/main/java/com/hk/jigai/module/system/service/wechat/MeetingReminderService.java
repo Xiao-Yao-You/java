@@ -24,6 +24,8 @@ public interface MeetingReminderService {
      */
     String wechatQueryOpenid(String code);
 
+    String wechatMiniAppGetOpenid(String code);
+
     void sendReminder(Long meetingId);
 
 }

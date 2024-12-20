@@ -239,10 +239,13 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         }
         if (operationOrderDO != null) {
             OperationDeviceRespVO operationDevice = operationDeviceService.getOperationDevice(operationOrderDO.getDeviceId());
-            if (operationDevice == null) {
-                OldOperationDeviceRespVO oldOperationDevice = oldOperationDeviceService.getOldOperationDevice(operationOrderDO.getDeviceId());
-                operationOrderDO.setAddress(oldOperationDevice.getLocationex());
-            } else {
+//            if (operationDevice == null) {
+//                OldOperationDeviceRespVO oldOperationDevice = oldOperationDeviceService.getOldOperationDevice(operationOrderDO.getDeviceId());
+//                operationOrderDO.setAddress(oldOperationDevice.getLocationex());
+//            } else {
+//                operationOrderDO.setAddress(operationDevice.getAddress());
+//            }
+            if (operationDevice != null){
                 operationOrderDO.setAddress(operationDevice.getAddress());
             }
         }
@@ -999,6 +1002,8 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             if (StringUtil.isNotBlank(dealerOpenId)) {
                 orderStatusChangeNotice(dealerOpenId, code, orderStatus, operatorName, time);
             }
+            //发送和订单处理消息
+            sendOrderStatusChangeMsg();
         }
     }
 
