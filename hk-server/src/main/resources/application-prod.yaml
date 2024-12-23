@@ -192,8 +192,8 @@ wx:
   miniapp: # 小程序配置（必填），参见 https://github.com/Wechat-Group/WxJava/blob/develop/spring-boot-starters/wx-java-miniapp-spring-boot-starter/README.md 文档
     #    appid: wx62056c0d5e8db250 # 测试号（牛希尧提供的）
     #    secret: 333ae72f41552af1e998fe1f54e1584a
-    appid: wx145112d98bdbfbfe # hk
-    secret: 3d82310d78a1a2e54b2232ca97bbfdb7
+    appid: wx49590d619c10f743 # hk
+    secret: aed35eb95d9c6e032f05a76c83d6b514
     #    appid: wxc4598c446f8a9cb3 # 测试号（Kongdy 提供的）
     #    secret: 4a1a04e07f6a4a0751b39c3064a92c8b
     config-storage:

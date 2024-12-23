@@ -299,6 +299,8 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         if (userId == null) {
             return null;
         }
+
+
         AdminUserDO user = userService.getUser(userId);
         return user != null ? user.getUsername() : null;
     }

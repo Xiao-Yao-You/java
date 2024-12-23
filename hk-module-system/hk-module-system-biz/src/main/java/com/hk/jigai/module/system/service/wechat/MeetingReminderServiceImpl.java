@@ -112,7 +112,7 @@ public class MeetingReminderServiceImpl implements MeetingReminderService {
     @Override
     public String wechatMiniAppGetOpenid(String code) {
         String authStr = restTemplate.exchange(
-                "https://api.weixin.qq.com/sns/oauth2/access_token?appid=wx145112d98bdbfbfe&secret=3d82310d78a1a2e54b2232ca97bbfdb7&code="
+                "https://api.weixin.qq.com/sns/jscode2session?appid=wx49590d619c10f743&secret=aed35eb95d9c6e032f05a76c83d6b514&js_code="
                         + code + "&grant_type=authorization_code", HttpMethod.GET, null,
                 new ParameterizedTypeReference<String>() {
                 }).getBody();
@@ -121,7 +121,6 @@ public class MeetingReminderServiceImpl implements MeetingReminderService {
             return null;
         }
         String openid = (String) authMap.get("openid");
-        adminUserService.updateUserOpenid(SecurityFrameworkUtils.getLoginUser().getId(), openid);
         return openid;
     }
 
@@ -207,4 +206,6 @@ public class MeetingReminderServiceImpl implements MeetingReminderService {
             log.info("发送会议模板消息异常！", e);
         }
     }
+
+
 }
