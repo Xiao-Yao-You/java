@@ -56,6 +56,8 @@ public interface OperationOrderService {
      */
     PageResult<OperationOrderDO> getOperationOrderPage(OperationOrderPageReqVO pageReqVO);
 
+    PageResult<OperationOrderDO> getOperationOrderPageForApp(OperationOrderPageReqVO pageReqVO);
+
     /**
      * 运维组操作工单
      *

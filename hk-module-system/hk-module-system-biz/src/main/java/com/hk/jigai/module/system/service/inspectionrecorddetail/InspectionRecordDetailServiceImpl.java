@@ -1,21 +1,15 @@
 package com.hk.jigai.module.system.service.inspectionrecorddetail;
 
+import com.hk.jigai.framework.common.pojo.PageResult;
+import com.hk.jigai.framework.common.util.object.BeanUtils;
 import com.hk.jigai.module.system.controller.admin.inspectionrecorddetail.vo.InspectionRecordDetailPageReqVO;
 import com.hk.jigai.module.system.controller.admin.inspectionrecorddetail.vo.InspectionRecordDetailSaveReqVO;
 import com.hk.jigai.module.system.dal.dataobject.inspectionrecorddetail.InspectionRecordDetailDO;
 import com.hk.jigai.module.system.dal.mysql.inspectionrecorddetail.InspectionRecordDetailMapper;
 import org.springframework.stereotype.Service;
-import javax.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-
-import com.hk.jigai.framework.common.pojo.PageResult;
-import com.hk.jigai.framework.common.pojo.PageParam;
-import com.hk.jigai.framework.common.util.object.BeanUtils;
-
-
+import javax.annotation.Resource;
 
 import static com.hk.jigai.framework.common.exception.util.ServiceExceptionUtil.exception;
 import static com.hk.jigai.module.system.enums.ErrorCodeConstants.INSPECTION_RECORD_DETAIL_NOT_EXISTS;

@@ -84,6 +84,14 @@ public class OperationOrderController {
         return success(BeanUtils.toBean(pageResult, OperationOrderRespVO.class));
     }
 
+    @GetMapping("/pageForApp")
+    @Operation(summary = "获得工单分页")
+//    @PreAuthorize("@ss.hasPermission('hk:operation-order:query')")
+    public CommonResult<PageResult<OperationOrderRespVO>> getOperationOrderPageForApp(@Valid OperationOrderPageReqVO pageReqVO) {
+        PageResult<OperationOrderDO> pageResult = operationOrderService.getOperationOrderPageForApp(pageReqVO);
+        return success(BeanUtils.toBean(pageResult, OperationOrderRespVO.class));
+    }
+
     @GetMapping("/export-excel")
     @Operation(summary = "导出工单 Excel")
 //    @PreAuthorize("@ss.hasPermission('hk:operation-order:export')")

@@ -245,7 +245,7 @@ public class OperationOrderServiceImpl implements OperationOrderService {
 //            } else {
 //                operationOrderDO.setAddress(operationDevice.getAddress());
 //            }
-            if (operationDevice != null){
+            if (operationDevice != null) {
                 operationOrderDO.setAddress(operationDevice.getAddress());
             }
         }
@@ -259,6 +259,24 @@ public class OperationOrderServiceImpl implements OperationOrderService {
 
         List<OperationQuestionTypeDO> operationQuestionTypeDOS = operationQuestionTypeMapper.selectAllQuestionType();
         PageResult<OperationOrderDO> operationOrderDOPageResult = operationOrderMapper.selectPage(pageReqVO);
+        List<OperationOrderDO> orderList = operationOrderDOPageResult.getList();
+        if (CollectionUtil.isNotEmpty(orderList) && CollectionUtil.isNotEmpty(operationQuestionTypeDOS)) {
+            for (OperationOrderDO operationOrderDO : orderList) {
+                OperationQuestionTypeDO operationQuestionTypeDO = operationQuestionTypeDOS.stream().filter(p -> p.getId().equals(operationOrderDO.getQuestionType())).findAny().orElse(null);
+                if (operationQuestionTypeDO != null) {
+                    operationOrderDO.setQuestionTypeStr(operationQuestionTypeDO.getName());
+                }
+            }
+        }
+        operationOrderDOPageResult.setList(orderList);
+        return operationOrderDOPageResult;
+    }
+
+    @Override
+    public PageResult<OperationOrderDO> getOperationOrderPageForApp(OperationOrderPageReqVO pageReqVO) {
+        pageReqVO.setDealUserId(getLoginUserId());
+        List<OperationQuestionTypeDO> operationQuestionTypeDOS = operationQuestionTypeMapper.selectAllQuestionType();
+        PageResult<OperationOrderDO> operationOrderDOPageResult = operationOrderMapper.selectPageForApp(pageReqVO);
         List<OperationOrderDO> orderList = operationOrderDOPageResult.getList();
         if (CollectionUtil.isNotEmpty(orderList) && CollectionUtil.isNotEmpty(operationQuestionTypeDOS)) {
             for (OperationOrderDO operationOrderDO : orderList) {
