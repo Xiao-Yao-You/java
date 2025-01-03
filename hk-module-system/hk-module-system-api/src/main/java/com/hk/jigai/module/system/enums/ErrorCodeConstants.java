@@ -219,4 +219,14 @@ public interface ErrorCodeConstants {
     ErrorCode INSPECTION_RECORD_NOT_EXISTS = new ErrorCode(1_002_033_019, "设备巡检记录不存在");
     ErrorCode INSPECTION_RECORD_DETAIL_NOT_EXISTS = new ErrorCode(1_002_033_020, "巡检记录详情不存在");
 
+    //抽奖
+    ErrorCode PRIZE_DRAW_ACTIVITY_NOT_EXISTS = new ErrorCode(1_002_034_001, "抽奖活动已失效或不存在");
+    ErrorCode PRIZE_DRAW_USER_NOT_EXISTS = new ErrorCode(1_002_034_002, "抽奖用户不存在");
+    ErrorCode PRIZE_DRAW_USER_EXISTS = new ErrorCode(1_002_034_005, "您已参与本次活动");
+    ErrorCode PRIZE_DRAW_USER_NOT_ENOUGH = new ErrorCode(1_002_034_006, "参与人数不足");
+    ErrorCode PRIZE_DRAW_TOKEN = new ErrorCode(1_002_034_007, "token获取失败");
+    ErrorCode PRIZE_DRAW_NOT_INFO = new ErrorCode(1_002_034_008, "信息获取失败");
+    ErrorCode PRIZE_NOT_EXISTS = new ErrorCode(1_002_034_003, "奖品信息不存在");
+    ErrorCode PRIZE_DRAW_OUT_USER_NOT_EXISTS = new ErrorCode(1_002_034_004, "场外参与人员不存在");
+
 }

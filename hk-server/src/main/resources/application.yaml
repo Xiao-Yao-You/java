@@ -200,6 +200,12 @@ hk:
       - /admin-api/system/dict-data/pageIgnoreLogin #针对字典查询接口
       - /admin-api/system/user/queryUserTenantByName #针对首页，用户名查询租户信息
       - /admin-api/wechat/open/** #微信公众号开放平台，微信回调接口，无法携带租户编号
+      - /admin-api/prize-draw-user/prizeDraw #场内人员抽奖接口
+      - /admin-api/prize-draw-user/create #签到
+      - /admin-api/prize-draw-user/getTokenByRefreshToken #刷新用户token
+      - /admin-api/prize-draw-user/getAllWinner #获取所有场内中奖用户
+      - /admin-api/prize-draw-out-user/prizeDraw #场外人员抽奖
+      - /admin-api/prize-draw-out-user/getAllWinner #获取所有场外中奖用户
     ignore-tables:
       - system_users
       - system_tenant
@@ -248,6 +254,9 @@ hk:
       - rep_demo_jianpiao
       - tmp_report_data_1
       - tmp_report_data_income
+      - hk_prize
+      - hk_prize_draw_activity
+      - hk_prize_draw_user
   sms-code: # 短信验证码相关的配置项
     expire-times: 10m
     send-frequency: 1m
