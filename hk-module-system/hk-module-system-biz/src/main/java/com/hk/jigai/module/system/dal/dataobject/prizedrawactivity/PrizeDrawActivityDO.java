@@ -36,14 +36,21 @@ public class PrizeDrawActivityDO extends BaseDO {
     /**
      * 开始时间
      */
-    private LocalDateTime beginTime;
+    private Date beginTime;
     /**
      * 结束时间
      */
-    private LocalDateTime endTime;
+    private Date endTime;
     /**
      * 参与人数
      */
     private Integer participantsQuantity;
+
+    /**
+     * 二维码ticket
+     */
+    private String ticket;
+    @TableField(exist = false)
+    private String status;
 
 }

@@ -88,4 +88,10 @@ public class PrizeController {
                         BeanUtils.toBean(list, PrizeRespVO.class));
     }
 
+    @GetMapping("/getAllPrizeByActivityId")
+    @Operation(summary = "根据活动ID查询活动缉奖品")
+    public CommonResult<List<PrizeDO>> getAllPrizeByActivityId(@RequestParam("activityId") Long activityId){
+        return success(prizeService.getAllPrizeByActivityId(activityId));
+    }
+
 }

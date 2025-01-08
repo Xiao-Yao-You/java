@@ -20,10 +20,11 @@ public class PrizeDrawActivityPageReqVO extends PageParam {
 
     @Schema(description = "开始时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private LocalDateTime[] beginTime;
+    private Date beginTime;
 
     @Schema(description = "结束时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
-    private LocalDateTime[] endTime;
-
+    private Date endTime;
+    private String status;
+    private String ticket;
 }

@@ -18,12 +18,16 @@ public class PrizeDrawActivitySaveReqVO {
     private String activityName;
 
     @Schema(description = "开始时间")
-    private LocalDateTime beginTime;
+    private Date beginTime;
 
     @Schema(description = "结束时间")
-    private LocalDateTime endTime;
+    private Date endTime;
 
     @Schema(description = "参与人数")
     private Integer participantsQuantity;
+
+    private String status;
+
+    private String ticket;
 
 }

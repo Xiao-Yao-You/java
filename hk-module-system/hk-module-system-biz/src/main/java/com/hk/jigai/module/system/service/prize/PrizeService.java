@@ -53,4 +53,10 @@ public interface PrizeService {
      */
     PageResult<PrizeDO> getPrizePage(PrizePageReqVO pageReqVO);
 
+    /**
+     * 根据活动Id查询活动下的奖品
+     * @param activityId
+     * @return
+     */
+    List<PrizeDO> getAllPrizeByActivityId(Long activityId);
 }

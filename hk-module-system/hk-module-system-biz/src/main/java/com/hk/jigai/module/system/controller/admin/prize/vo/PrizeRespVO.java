@@ -41,7 +41,8 @@ public class PrizeRespVO {
     private LocalDateTime createTime;
 
     @Schema(description = "奖品等级")
-    @ExcelProperty("创建时间")
     private int level;
+
+    private String activityName;
 
 }

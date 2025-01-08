@@ -1,14 +1,23 @@
 package com.hk.jigai.module.system.service.prizedrawoutuser;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hk.jigai.module.system.controller.admin.operationdevicemodel.vo.ModelImportExcelVO;
+import com.hk.jigai.module.system.controller.admin.operationdevicemodel.vo.ModelImportRespVO;
+import com.hk.jigai.module.system.controller.admin.prizedrawoutuser.vo.PrizeDrawOutUserImportExcelVO;
+import com.hk.jigai.module.system.controller.admin.prizedrawoutuser.vo.PrizeDrawOutUserImportRespVO;
 import com.hk.jigai.module.system.controller.admin.prizedrawoutuser.vo.PrizeDrawOutUserPageReqVO;
 import com.hk.jigai.module.system.controller.admin.prizedrawoutuser.vo.PrizeDrawOutUserSaveReqVO;
+import com.hk.jigai.module.system.dal.dataobject.operation.OperationDeviceTypeDO;
+import com.hk.jigai.module.system.dal.dataobject.operationdevicemodel.OperationDeviceModelDO;
 import com.hk.jigai.module.system.dal.dataobject.prizedrawoutuser.PrizeDrawOutUserDO;
 import com.hk.jigai.module.system.dal.dataobject.prizedrawuser.PrizeDrawUserDO;
 import com.hk.jigai.module.system.dal.mysql.prizedrawoutuser.PrizeDrawOutUserMapper;
 import org.springframework.stereotype.Service;
+
 import javax.annotation.Resource;
+
 import org.springframework.validation.annotation.Validated;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,8 +30,7 @@ import com.hk.jigai.framework.common.util.object.BeanUtils;
 
 
 import static com.hk.jigai.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static com.hk.jigai.module.system.enums.ErrorCodeConstants.PRIZE_DRAW_OUT_USER_NOT_EXISTS;
-import static com.hk.jigai.module.system.enums.ErrorCodeConstants.PRIZE_DRAW_USER_NOT_ENOUGH;
+import static com.hk.jigai.module.system.enums.ErrorCodeConstants.*;
 
 /**
  * 场外参与人员 Service 实现类
@@ -42,13 +50,13 @@ public class PrizeDrawOutUserServiceImpl implements PrizeDrawOutUserService {
         List<PrizeDrawOutUserDO> prizeDrawOutUserDOS = prizeDrawOutUserMapper.selectList(new QueryWrapper<PrizeDrawOutUserDO>().lambda()
                 .eq(PrizeDrawOutUserDO::getActivityBatch, activityId)
                 .eq(PrizeDrawOutUserDO::getStatus, 1)
-                .and(wrapper->wrapper.isNull(PrizeDrawOutUserDO::getPrizePool).or().eq(PrizeDrawOutUserDO::getPrizePool , prizePool)));
+                .and(wrapper -> wrapper.isNull(PrizeDrawOutUserDO::getPrizePool).or().eq(PrizeDrawOutUserDO::getPrizePool, prizePool)));
         if (CollectionUtil.isEmpty(prizeDrawOutUserDOS) || prizeDrawOutUserDOS.size() < winNum) {
             throw exception(PRIZE_DRAW_USER_NOT_ENOUGH);
         }
         //开始抽奖
         List<PrizeDrawOutUserDO> winners = drawWinners(prizeDrawOutUserDOS, winNum);
-        winners.stream().map(p->{
+        winners.stream().map(p -> {
             p.setStatus(2);
             p.setPrizeLevel(prizePool.intValue());
             return p;
@@ -64,6 +72,30 @@ public class PrizeDrawOutUserServiceImpl implements PrizeDrawOutUserService {
                 .eq(PrizeDrawOutUserDO::getPrizeLevel, prizeLevel));
 
         return prizeDrawOutUserDOS;
+    }
+
+    @Override
+    public PrizeDrawOutUserImportRespVO importPrizeDrawOutUserList(List<PrizeDrawOutUserImportExcelVO> list, Boolean updateSupport) {
+        if (CollUtil.isEmpty(list)) {
+            throw exception(IMPORT_LIST_IS_EMPTY);
+        }
+        PrizeDrawOutUserImportRespVO respVO = PrizeDrawOutUserImportRespVO.builder().createList(new ArrayList<>())
+                .updateList(new ArrayList<>()).failureList(new LinkedHashMap<>()).build();
+        //处理数据
+        if (CollectionUtil.isNotEmpty(list)) {
+
+            List<PrizeDrawOutUserDO> prizeDrawOutUserDOS = new ArrayList<>();
+            list.forEach(item -> {
+                PrizeDrawOutUserDO prizeDrawOutUserDO = BeanUtils.toBean(item, PrizeDrawOutUserDO.class);
+//                    prizeDrawOutUserMapper.insert(prizeDrawOutUserMapper);
+                prizeDrawOutUserDO.setStatus(1);
+                prizeDrawOutUserDOS.add(prizeDrawOutUserDO);
+                respVO.getCreateList().add(prizeDrawOutUserDO.getNickname());
+            });
+            prizeDrawOutUserMapper.insertBatch(prizeDrawOutUserDOS);
+
+        }
+        return respVO;
     }
 
     public static List<PrizeDrawOutUserDO> drawWinners(List<PrizeDrawOutUserDO> participants, int numberOfWinners) {
@@ -109,4 +141,11 @@ public class PrizeDrawOutUserServiceImpl implements PrizeDrawOutUserService {
         }
         return low;
     }
+
+
+    @Override
+    public PageResult<PrizeDrawOutUserDO> getPrizeDrawOutUserPage(PrizeDrawOutUserPageReqVO pageReqVO) {
+        return prizeDrawOutUserMapper.selectPage(pageReqVO);
+    }
+
 }

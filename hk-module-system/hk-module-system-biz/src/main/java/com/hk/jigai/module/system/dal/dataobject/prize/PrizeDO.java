@@ -53,4 +53,9 @@ public class PrizeDO extends BaseDO {
      */
     private int level;
 
+    /**
+     * 活动名称
+     */
+    private String activityName;
+
 }

@@ -1,42 +1,36 @@
 package com.hk.jigai.module.system.controller.admin.prizedrawoutuser;
 
+import com.hk.jigai.framework.common.pojo.CommonResult;
+import com.hk.jigai.framework.common.pojo.PageResult;
+import com.hk.jigai.framework.common.util.object.BeanUtils;
+import com.hk.jigai.framework.excel.core.util.ExcelUtils;
 import com.hk.jigai.framework.tenant.core.aop.TenantIgnore;
+import com.hk.jigai.module.system.controller.admin.operation.vo.QuestionTypeImportExcelVO;
+import com.hk.jigai.module.system.controller.admin.operation.vo.QuestionTypeImportRespVO;
+import com.hk.jigai.module.system.controller.admin.prizedrawoutuser.vo.PrizeDrawOutUserImportExcelVO;
+import com.hk.jigai.module.system.controller.admin.prizedrawoutuser.vo.PrizeDrawOutUserImportRespVO;
 import com.hk.jigai.module.system.controller.admin.prizedrawoutuser.vo.PrizeDrawOutUserPageReqVO;
 import com.hk.jigai.module.system.controller.admin.prizedrawoutuser.vo.PrizeDrawOutUserRespVO;
-import com.hk.jigai.module.system.controller.admin.prizedrawoutuser.vo.PrizeDrawOutUserSaveReqVO;
-import com.hk.jigai.module.system.controller.admin.prizedrawuser.vo.PrizeDrawUserRespVO;
 import com.hk.jigai.module.system.dal.dataobject.prizedrawoutuser.PrizeDrawOutUserDO;
-import com.hk.jigai.module.system.dal.dataobject.prizedrawuser.PrizeDrawUserDO;
 import com.hk.jigai.module.system.service.prizedrawoutuser.PrizeDrawOutUserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-
-import org.springframework.validation.annotation.Validated;
-import org.springframework.security.access.prepost.PreAuthorize;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Operation;
-
 import javax.annotation.security.PermitAll;
-import javax.validation.constraints.*;
-import javax.validation.*;
-import javax.servlet.http.*;
-import java.util.*;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
-
-import com.hk.jigai.framework.common.pojo.PageParam;
-import com.hk.jigai.framework.common.pojo.PageResult;
-import com.hk.jigai.framework.common.pojo.CommonResult;
-import com.hk.jigai.framework.common.util.object.BeanUtils;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static com.hk.jigai.framework.common.pojo.CommonResult.success;
-
-import com.hk.jigai.framework.excel.core.util.ExcelUtils;
-
-import com.hk.jigai.framework.apilog.core.annotation.ApiAccessLog;
-
-import static com.hk.jigai.framework.apilog.core.enums.OperateTypeEnum.*;
 
 
 @Tag(name = "管理后台 - 场外参与人员")
@@ -65,6 +59,30 @@ public class PrizeDrawOutUserController {
     public CommonResult<List<PrizeDrawOutUserRespVO>> getAllWinnerList(@RequestParam("activityId") Long activityId,@RequestParam("prizeLevel") Long prizeLevel){
         List<PrizeDrawOutUserDO> list = prizeDrawOutUserService.getAllWinnerList(activityId,prizeLevel);
         return success(BeanUtils.toBean(list, PrizeDrawOutUserRespVO.class));
+    }
+
+    @GetMapping("/get-import-template")
+    @Operation(summary = "获得导入模板")
+    public void importTemplate(HttpServletResponse response) throws IOException {
+        // 手动创建导出 空白表单
+        List<PrizeDrawOutUserImportExcelVO> list = Arrays.asList();
+        // 输出
+        ExcelUtils.write(response, "场外人员导入模板.xls", "场外人员", PrizeDrawOutUserImportExcelVO.class, list);
+    }
+
+    @PostMapping("/import-excel")
+    @Operation(summary = "场外人员导入导入")
+    public CommonResult<PrizeDrawOutUserImportRespVO> importExcel(@RequestParam("file") MultipartFile file,
+                                                                  @RequestParam(value = "updateSupport", required = false, defaultValue = "false") Boolean updateSupport) throws Exception {
+        List<PrizeDrawOutUserImportExcelVO> list = ExcelUtils.read(file, PrizeDrawOutUserImportExcelVO.class);
+        return success(prizeDrawOutUserService.importPrizeDrawOutUserList(list, updateSupport));
+    }
+
+    @GetMapping("/page")
+    @Operation(summary = "获得场外参与人员分页")
+    public CommonResult<PageResult<PrizeDrawOutUserRespVO>> getPrizeDrawOutUserPage(@Valid PrizeDrawOutUserPageReqVO pageReqVO) {
+        PageResult<PrizeDrawOutUserDO> pageResult = prizeDrawOutUserService.getPrizeDrawOutUserPage(pageReqVO);
+        return success(BeanUtils.toBean(pageResult, PrizeDrawOutUserRespVO.class));
     }
 
 }

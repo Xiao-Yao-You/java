@@ -20,8 +20,6 @@ public interface PrizeDrawActivityMapper extends BaseMapperX<PrizeDrawActivityDO
     default PageResult<PrizeDrawActivityDO> selectPage(PrizeDrawActivityPageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<PrizeDrawActivityDO>()
                 .likeIfPresent(PrizeDrawActivityDO::getActivityName, reqVO.getActivityName())
-                .betweenIfPresent(PrizeDrawActivityDO::getBeginTime, reqVO.getBeginTime())
-                .betweenIfPresent(PrizeDrawActivityDO::getEndTime, reqVO.getEndTime())
                 .orderByDesc(PrizeDrawActivityDO::getId));
     }
 

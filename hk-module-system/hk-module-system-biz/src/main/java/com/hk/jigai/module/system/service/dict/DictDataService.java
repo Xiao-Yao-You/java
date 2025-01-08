@@ -107,4 +107,5 @@ public interface DictDataService {
      */
     List<DictDataDO> getDictDataListByDictType(String dictType);
 
+    List<DictDataDO> getPrizeLevel();
 }

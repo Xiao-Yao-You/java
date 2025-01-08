@@ -1,6 +1,7 @@
 package com.hk.jigai.module.system.service.dict;
 
 import cn.hutool.core.collection.CollUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hk.jigai.framework.common.enums.CommonStatusEnum;
 import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.common.util.collection.CollectionUtils;
@@ -174,6 +175,11 @@ public class DictDataServiceImpl implements DictDataService {
         List<DictDataDO> list = dictDataMapper.selectList(DictDataDO::getDictType, dictType);
         list.sort(Comparator.comparing(DictDataDO::getSort));
         return list;
+    }
+
+    @Override
+    public List<DictDataDO> getPrizeLevel() {
+        return dictDataMapper.selectList(new QueryWrapper<DictDataDO>().lambda().eq(DictDataDO::getDictType, "prize_level"));
     }
 
 }

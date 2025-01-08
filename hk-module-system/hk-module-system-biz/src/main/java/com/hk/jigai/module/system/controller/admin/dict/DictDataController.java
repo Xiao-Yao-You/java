@@ -7,6 +7,7 @@ import com.hk.jigai.framework.common.pojo.PageParam;
 import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.common.util.object.BeanUtils;
 import com.hk.jigai.framework.excel.core.util.ExcelUtils;
+import com.hk.jigai.framework.tenant.core.aop.TenantIgnore;
 import com.hk.jigai.module.system.controller.admin.dict.vo.data.DictDataPageReqVO;
 import com.hk.jigai.module.system.controller.admin.dict.vo.data.DictDataRespVO;
 import com.hk.jigai.module.system.controller.admin.dict.vo.data.DictDataSaveReqVO;
@@ -118,4 +119,12 @@ public class DictDataController {
         PageResult<DictDataDO> pageResult = dictDataService.getDictDataPage(pageReqVO);
         return success(BeanUtils.toBean(pageResult, DictDataRespVO.class));
     }
+
+    @GetMapping("/getPrizeLevel")
+    @PermitAll
+    @TenantIgnore
+    public CommonResult<List<DictDataDO>> getPrizeLevel(){
+        return success(dictDataService.getPrizeLevel());
+    }
+
 }

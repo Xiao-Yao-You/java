@@ -23,11 +23,11 @@ public class PrizeDrawActivityRespVO {
 
     @Schema(description = "开始时间")
     @ExcelProperty("开始时间")
-    private LocalDateTime beginTime;
+    private Date beginTime;
 
     @Schema(description = "结束时间")
     @ExcelProperty("结束时间")
-    private LocalDateTime endTime;
+    private Date endTime;
 
     @Schema(description = "参与人数")
     @ExcelProperty("参与人数")
@@ -36,5 +36,7 @@ public class PrizeDrawActivityRespVO {
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
+    private String status;
+    private String ticket;
 
 }

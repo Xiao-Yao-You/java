@@ -53,4 +53,9 @@ public interface PrizeDrawActivityService {
      */
     PageResult<PrizeDrawActivityDO> getPrizeDrawActivityPage(PrizeDrawActivityPageReqVO pageReqVO);
 
+    /**
+     * 获取所有活动
+     * @return
+     */
+    List<PrizeDrawActivityDO> getAllActivities();
 }

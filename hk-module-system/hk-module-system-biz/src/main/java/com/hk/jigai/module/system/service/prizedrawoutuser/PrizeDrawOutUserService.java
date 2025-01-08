@@ -5,6 +5,8 @@ import javax.validation.*;
 
 import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.common.pojo.PageParam;
+import com.hk.jigai.module.system.controller.admin.prizedrawoutuser.vo.PrizeDrawOutUserImportExcelVO;
+import com.hk.jigai.module.system.controller.admin.prizedrawoutuser.vo.PrizeDrawOutUserImportRespVO;
 import com.hk.jigai.module.system.controller.admin.prizedrawoutuser.vo.PrizeDrawOutUserPageReqVO;
 import com.hk.jigai.module.system.controller.admin.prizedrawoutuser.vo.PrizeDrawOutUserSaveReqVO;
 import com.hk.jigai.module.system.dal.dataobject.prizedrawoutuser.PrizeDrawOutUserDO;
@@ -32,4 +34,21 @@ public interface PrizeDrawOutUserService {
      * @return
      */
     List<PrizeDrawOutUserDO> getAllWinnerList(Long activityId, Long prizeLevel);
+
+    /**
+     * 导入场外人员
+     * @param list
+     * @param updateSupport
+     * @return
+     */
+    PrizeDrawOutUserImportRespVO importPrizeDrawOutUserList(List<PrizeDrawOutUserImportExcelVO> list, Boolean updateSupport);
+
+
+    /**
+     * 获得场外参与人员分页
+     *
+     * @param pageReqVO 分页查询
+     * @return 场外参与人员分页
+     */
+    PageResult<PrizeDrawOutUserDO> getPrizeDrawOutUserPage(PrizeDrawOutUserPageReqVO pageReqVO);
 }

@@ -33,4 +33,6 @@ public class PrizePageReqVO extends PageParam {
     @Schema(description = "奖品等级")
     private int level;
 
+    private String activityName;
+
 }

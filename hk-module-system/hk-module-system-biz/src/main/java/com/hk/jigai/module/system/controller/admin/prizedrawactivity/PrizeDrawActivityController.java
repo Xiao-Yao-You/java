@@ -80,6 +80,11 @@ public class PrizeDrawActivityController {
         return success(BeanUtils.toBean(pageResult, PrizeDrawActivityRespVO.class));
     }
 
+    @GetMapping("/getAllActivities")
+    public  CommonResult<List<PrizeDrawActivityDO>>  getAllActivities(){
+        return success(prizeDrawActivityService.getAllActivities());
+    }
+
     @GetMapping("/export-excel")
     @Operation(summary = "导出抽奖活动 Excel")
     @ApiAccessLog(operateType = EXPORT)

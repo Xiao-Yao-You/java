@@ -17,8 +17,8 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER # 解决 SpringFox 与 SpringBoot 2.6.x 不兼容的问题，参见 SpringFoxHandlerProviderBeanPostProcessor 类
-#    throw-exception-if-no-handler-found: true # 404 错误时抛出异常，方便统一处理
-#    static-path-pattern: /static/** # 静态资源路径; 注意：如果不配置，则 throw-exception-if-no-handler-found 不生效！！！ TODO 芋艿：不能配置，会导致 swagger 不生效
+  #    throw-exception-if-no-handler-found: true # 404 错误时抛出异常，方便统一处理
+  #    static-path-pattern: /static/** # 静态资源路径; 注意：如果不配置，则 throw-exception-if-no-handler-found 不生效！！！ TODO 芋艿：不能配置，会导致 swagger 不生效
 
   # Jackson 配置项
   jackson:
@@ -69,9 +69,9 @@ mybatis-plus:
   global-config:
     db-config:
       id-type: NONE # “智能”模式，基于 IdTypeEnvironmentPostProcessor + 数据源的类型，自动适配成 AUTO、INPUT 模式。
-#      id-type: AUTO # 自增 ID，适合 MySQL 等直接自增的数据库
-#      id-type: INPUT # 用户输入 ID，适合 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库
-#      id-type: ASSIGN_ID # 分配 ID，默认使用雪花算法。注意，Oracle、PostgreSQL、Kingbase、DB2、H2 数据库时，需要去除实体类上的 @KeySequence 注解
+      #      id-type: AUTO # 自增 ID，适合 MySQL 等直接自增的数据库
+      #      id-type: INPUT # 用户输入 ID，适合 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库
+      #      id-type: ASSIGN_ID # 分配 ID，默认使用雪花算法。注意，Oracle、PostgreSQL、Kingbase、DB2、H2 数据库时，需要去除实体类上的 @KeySequence 注解
       logic-delete-value: 1 # 逻辑已删除值(默认为 1)
       logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
     banner: false # 关闭控制台的 Banner 打印
@@ -206,6 +206,9 @@ hk:
       - /admin-api/prize-draw-user/getAllWinner #获取所有场内中奖用户
       - /admin-api/prize-draw-out-user/prizeDraw #场外人员抽奖
       - /admin-api/prize-draw-out-user/getAllWinner #获取所有场外中奖用户
+      - /admin-api/prize-draw-user/event #公众号事件处理
+      - /admin-api/prize/getAllPrizeByActivityId #根据活动ID查询活动奖品
+      - /system/dict-data/getPrizeLevel #获取奖品等级
     ignore-tables:
       - system_users
       - system_tenant
