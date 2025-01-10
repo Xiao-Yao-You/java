@@ -55,6 +55,8 @@ public class PrizeDrawUserDO extends BaseDO {
 
     private Integer prizeLevel;
 
+    private Long currentNum;
+
 
 
 }

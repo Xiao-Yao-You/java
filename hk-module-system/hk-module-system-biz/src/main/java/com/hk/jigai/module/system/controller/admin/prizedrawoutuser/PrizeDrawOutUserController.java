@@ -85,4 +85,11 @@ public class PrizeDrawOutUserController {
         return success(BeanUtils.toBean(pageResult, PrizeDrawOutUserRespVO.class));
     }
 
+    @GetMapping("/getRandOutUser")
+    @PermitAll
+    @TenantIgnore
+    public CommonResult<List<PrizeDrawOutUserDO>> getRandOutUser(@RequestParam("activityId") Long activityId){
+        return success(prizeDrawOutUserService.getRandOutUser(activityId));
+    }
+
 }

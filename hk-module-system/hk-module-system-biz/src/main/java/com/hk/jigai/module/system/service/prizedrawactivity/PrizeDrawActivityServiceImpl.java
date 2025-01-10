@@ -65,8 +65,8 @@ public class PrizeDrawActivityServiceImpl implements PrizeDrawActivityService {
         }
         String token = (String) authMap.get("access_token");
 
-//        long between = ChronoUnit.MILLIS.between(createReqVO.getBeginTime(), createReqVO.getEndTime());
-        long between = 100l;
+//        long between =  ChronoUnit.MILLIS.between(createReqVO.getBeginTime().toInstant(), createReqVO.getEndTime().toInstant());
+        long between = 259200l;
 
         // 准备请求参数，通常是一个Map
         Map params = new HashMap<>();

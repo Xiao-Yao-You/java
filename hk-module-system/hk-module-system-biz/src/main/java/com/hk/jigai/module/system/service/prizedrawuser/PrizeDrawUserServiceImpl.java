@@ -8,10 +8,13 @@ import com.hk.jigai.module.system.controller.admin.prizedrawuser.vo.PrizeDrawUse
 import com.hk.jigai.module.system.controller.admin.prizedrawuser.vo.PrizeDrawUserRespVO;
 import com.hk.jigai.module.system.controller.admin.prizedrawuser.vo.PrizeDrawUserSaveReqVO;
 import com.hk.jigai.module.system.controller.admin.prizedrawuser.vo.TextMessage;
+import com.hk.jigai.module.system.dal.dataobject.dict.DictDataDO;
 import com.hk.jigai.module.system.dal.dataobject.prizedrawactivity.PrizeDrawActivityDO;
 import com.hk.jigai.module.system.dal.dataobject.prizedrawuser.PrizeDrawUserDO;
 import com.hk.jigai.module.system.dal.mysql.prizedrawactivity.PrizeDrawActivityMapper;
 import com.hk.jigai.module.system.dal.mysql.prizedrawuser.PrizeDrawUserMapper;
+import com.hk.jigai.module.system.service.dict.DictDataService;
+import org.checkerframework.checker.units.qual.A;
 import org.dom4j.*;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -59,6 +62,9 @@ public class PrizeDrawUserServiceImpl implements PrizeDrawUserService {
 
     @Resource
     private RestTemplate restTemplate;
+
+    @Resource
+    private DictDataService dictDataService;
 
     private final String appId = "wx145112d98bdbfbfe";
 
@@ -117,12 +123,12 @@ public class PrizeDrawUserServiceImpl implements PrizeDrawUserService {
             stringRedisTemplate.opsForValue().set("GZH_EWM_PREFIX" + ticket, gzhOpenid, Duration.ofSeconds(280));
             if ("event".equals(msgType)) {
                 if ("subscribe".equals(eventType)) { // 如果是订阅消息
-                    String subscribeContent = "感谢关注,点击链接：<a style='color:#007ecc;'href='https://map.jshkxcl.cn?activityId=' + " + activityId + ">参与抽奖</a>";
+                    String subscribeContent = "感谢关注,点击链接：<a style='color:#007ecc;' href='szh.jshkxcl.cn:8000/user/authorize?activityId=' + " + activityId + ">参与抽奖</a>";
                     stringRedisTemplate.opsForValue().set("GZH_GUAN_ZHU" + ticket, "0", Duration.ofSeconds(280));
                     return getWxReturnMsg(resXml, subscribeContent);
                 }
                 if ("SCAN".equals(eventType)) { // 如果是扫码消息
-                    String scanContent = "感谢关注,点击链接：<a style='color:#007ecc;'href='https://map.jshkxcl.cn?activityId=' + " + activityId + ">参与抽奖</a>";
+                    String scanContent = "感谢关注,点击链接：<a style='color:#007ecc;' href='szh.jshkxcl.cn:8000/user/authorize?activityId=' + " + activityId + ">参与抽奖</a>";
                     stringRedisTemplate.opsForValue().set("GZH_SAO_MA" + ticket, "1", Duration.ofSeconds(280));
                     return getWxReturnMsg(resXml, scanContent);
                 }
@@ -132,6 +138,26 @@ public class PrizeDrawUserServiceImpl implements PrizeDrawUserService {
             e.printStackTrace();
         }
         return "";
+    }
+
+    @Override
+    public String checkWinner(String openId, String activityId) {
+
+        PrizeDrawUserDO prizeDrawUserDO = prizeDrawUserMapper.selectOne(new QueryWrapper<PrizeDrawUserDO>().lambda().eq(PrizeDrawUserDO::getOpenid, openId).eq(PrizeDrawUserDO::getActivityBatch, activityId));
+        if (prizeDrawUserDO.getStatus() == 1) {
+            return "很遗憾,您尚未中奖.";
+        }
+        Integer prizeLevel = prizeDrawUserDO.getPrizeLevel();
+        List<DictDataDO> prizeLevels = dictDataService.getPrizeLevel();
+        List<DictDataDO> collect = prizeLevels.stream().filter(p -> Integer.parseInt(p.getValue()) == prizeLevel).collect(Collectors.toList());
+        String prize = collect.get(0).getLabel();
+        return "恭喜您,获得'" + prize + "'";
+    }
+
+    @Override
+    public List<PrizeDrawUserDO> getAllPrizeDraUser(Long activityId) {
+        List<PrizeDrawUserDO> prizeDrawUserDOS = prizeDrawUserMapper.selectList(new QueryWrapper<PrizeDrawUserDO>().lambda().eq(PrizeDrawUserDO::getActivityBatch, activityId).eq(PrizeDrawUserDO::getStatus, 1));
+        return prizeDrawUserDOS;
     }
 
     public static String readRequest(HttpServletRequest request) throws IOException {
@@ -261,7 +287,7 @@ public class PrizeDrawUserServiceImpl implements PrizeDrawUserService {
     }
 
     @Override
-    public PrizeDrawUserRespVO createPrizeDrawUser(String code, String activityId) {
+    public PrizeDrawUserRespVO createPrizeDrawUser(String code, Long activityId) {
         PrizeDrawUserRespVO prizeDrawUserRespVO = new PrizeDrawUserRespVO();
         String authStr = restTemplate.exchange("https://api.weixin.qq.com/sns/oauth2/access_token?appid=wx145112d98bdbfbfe&secret=3d82310d78a1a2e54b2232ca97bbfdb7&code="
                         + code + "&grant_type=authorization_code", HttpMethod.GET, null,
@@ -298,19 +324,24 @@ public class PrizeDrawUserServiceImpl implements PrizeDrawUserService {
         if (infoMap == null) {
             throw exception(PRIZE_DRAW_NOT_INFO);
         }
-        prizeDrawUser.setOpenid((String) authMap.get("openid"));
-        prizeDrawUserRespVO.setOpenid((String) authMap.get("openid"));
-        prizeDrawUser.setNickname((String) authMap.get("nickname"));
-        prizeDrawUserRespVO.setNickname((String) authMap.get("nickname"));
-        prizeDrawUser.setHeadimgurl((String) authMap.get("headimgurl"));
-        prizeDrawUserRespVO.setHeadimgurl((String) authMap.get("headimgurl"));
+        prizeDrawUser.setOpenid((String) infoMap.get("openid"));
+        prizeDrawUserRespVO.setOpenid((String) infoMap.get("openid"));
+        prizeDrawUser.setNickname((String) infoMap.get("nickname"));
+        prizeDrawUserRespVO.setNickname((String) infoMap.get("nickname"));
+        prizeDrawUser.setHeadimgurl((String) infoMap.get("headimgurl"));
+        prizeDrawUserRespVO.setHeadimgurl((String) infoMap.get("headimgurl"));
+        prizeDrawUser.setActivityBatch(activityId);
         prizeDrawUser.setStatus(1); //默认“1”未中奖
         prizeDrawUser.setWinningRate(1.00);//默认权重为1
 
         prizeDrawUserMapper.insert(prizeDrawUser);
         Long aLong = prizeDrawUserMapper.selectCount(new QueryWrapper<PrizeDrawUserDO>().lambda().eq(PrizeDrawUserDO::getActivityBatch, activityId));
+        if (aLong != null && aLong.equals(0L)) {
+            aLong++;
+        }
         prizeDrawUserRespVO.setCreateTime(prizeDrawUser.getCreateTime());
         prizeDrawUserRespVO.setCurrentNum(aLong);
+        prizeDrawUser.setCurrentNum(aLong);
         // 返回
         return prizeDrawUserRespVO;
     }
@@ -334,6 +365,12 @@ public class PrizeDrawUserServiceImpl implements PrizeDrawUserService {
             return p;
         }).collect(Collectors.toList());
         prizeDrawUserMapper.updateBatch(winners);
+
+        for (PrizeDrawUserDO winner : winners) {
+
+
+        }
+
         return winners;
     }
 

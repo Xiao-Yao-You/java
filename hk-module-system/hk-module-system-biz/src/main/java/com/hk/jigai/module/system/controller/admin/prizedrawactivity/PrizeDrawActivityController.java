@@ -1,5 +1,6 @@
 package com.hk.jigai.module.system.controller.admin.prizedrawactivity;
 
+import com.hk.jigai.framework.tenant.core.aop.TenantIgnore;
 import com.hk.jigai.module.system.controller.admin.prizedrawactivity.vo.PrizeDrawActivityPageReqVO;
 import com.hk.jigai.module.system.controller.admin.prizedrawactivity.vo.PrizeDrawActivityRespVO;
 import com.hk.jigai.module.system.controller.admin.prizedrawactivity.vo.PrizeDrawActivitySaveReqVO;
@@ -15,6 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
 
+import javax.annotation.security.PermitAll;
 import javax.validation.constraints.*;
 import javax.validation.*;
 import javax.servlet.http.*;
@@ -67,6 +69,8 @@ public class PrizeDrawActivityController {
 
     @GetMapping("/get")
     @Operation(summary = "获得抽奖活动")
+    @TenantIgnore
+    @PermitAll
     @Parameter(name = "id", description = "编号", required = true, example = "1024")
     public CommonResult<PrizeDrawActivityRespVO> getPrizeDrawActivity(@RequestParam("id") Long id) {
         PrizeDrawActivityDO prizeDrawActivity = prizeDrawActivityService.getPrizeDrawActivity(id);

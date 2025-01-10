@@ -37,6 +37,7 @@ public class PrizeDrawActivityRespVO {
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
     private String status;
+    @Schema(description = "二维码ticket")
     private String ticket;
 
 }

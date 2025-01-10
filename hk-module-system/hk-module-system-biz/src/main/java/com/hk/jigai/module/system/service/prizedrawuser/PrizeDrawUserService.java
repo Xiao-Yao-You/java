@@ -23,7 +23,7 @@ public interface PrizeDrawUserService {
      * @param activityId
      * @return 编号
      */
-    PrizeDrawUserRespVO createPrizeDrawUser(String code, String activityId);
+    PrizeDrawUserRespVO createPrizeDrawUser(String code, Long activityId);
 
 
     /**
@@ -62,4 +62,20 @@ public interface PrizeDrawUserService {
      * @return
      */
     String receive(String signature, String timestamp, String nonce, String echostr, HttpServletRequest request);
+
+    /**
+     * 查询中奖结果
+     *
+     * @param openId
+     * @param activityId
+     * @return
+     */
+    String checkWinner(String openId,String activityId);
+
+    /**
+     * 获取所有场内抽奖人
+     * @param activityId
+     * @return
+     */
+    List<PrizeDrawUserDO> getAllPrizeDraUser(Long activityId);
 }

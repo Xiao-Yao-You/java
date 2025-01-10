@@ -20,6 +20,7 @@ public interface PrizeDrawOutUserService {
 
     /**
      * 场外参与抽奖
+     *
      * @param activityId
      * @param prizePool
      * @param winNum
@@ -29,6 +30,7 @@ public interface PrizeDrawOutUserService {
 
     /**
      * 场外人员中奖名单
+     *
      * @param activityId
      * @param prizeLevel
      * @return
@@ -37,6 +39,7 @@ public interface PrizeDrawOutUserService {
 
     /**
      * 导入场外人员
+     *
      * @param list
      * @param updateSupport
      * @return
@@ -51,4 +54,12 @@ public interface PrizeDrawOutUserService {
      * @return 场外参与人员分页
      */
     PageResult<PrizeDrawOutUserDO> getPrizeDrawOutUserPage(PrizeDrawOutUserPageReqVO pageReqVO);
+
+    /**
+     * 获得所有场外人员
+     *
+     * @param activityId
+     * @return
+     */
+    List<PrizeDrawOutUserDO> getRandOutUser(Long activityId);
 }

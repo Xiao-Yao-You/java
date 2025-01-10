@@ -89,6 +89,7 @@ public class PrizeDrawOutUserServiceImpl implements PrizeDrawOutUserService {
                 PrizeDrawOutUserDO prizeDrawOutUserDO = BeanUtils.toBean(item, PrizeDrawOutUserDO.class);
 //                    prizeDrawOutUserMapper.insert(prizeDrawOutUserMapper);
                 prizeDrawOutUserDO.setStatus(1);
+                prizeDrawOutUserDO.setWinningRate(1.00);
                 prizeDrawOutUserDOS.add(prizeDrawOutUserDO);
                 respVO.getCreateList().add(prizeDrawOutUserDO.getNickname());
             });
@@ -142,10 +143,17 @@ public class PrizeDrawOutUserServiceImpl implements PrizeDrawOutUserService {
         return low;
     }
 
-
     @Override
     public PageResult<PrizeDrawOutUserDO> getPrizeDrawOutUserPage(PrizeDrawOutUserPageReqVO pageReqVO) {
         return prizeDrawOutUserMapper.selectPage(pageReqVO);
+    }
+
+    @Override
+    public List<PrizeDrawOutUserDO> getRandOutUser(Long activityId) {
+        List<PrizeDrawOutUserDO> prizeDrawOutUserDOS = prizeDrawOutUserMapper.selectList(new QueryWrapper<PrizeDrawOutUserDO>().lambda()
+                .eq(PrizeDrawOutUserDO::getActivityBatch, activityId).eq(PrizeDrawOutUserDO::getStatus, 1)
+                .last("ORDER BY RAND() LIMIT 100"));
+        return prizeDrawOutUserDOS;
     }
 
 }

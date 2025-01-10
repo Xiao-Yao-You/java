@@ -65,7 +65,7 @@ public class PrizeDrawUserController {
     @PostMapping("/create")
     @PermitAll
     @Operation(summary = "活动签到，创建微信签到用户，微信code，活动批次activityId")
-    public CommonResult<PrizeDrawUserRespVO> createPrizeDrawUser(@RequestParam("code") String code, @RequestParam("activityId") String activityId) {
+    public CommonResult<PrizeDrawUserRespVO> createPrizeDrawUser(@RequestParam("code") String code, @RequestParam("activityId") Long activityId) {
         rateLimiter.acquire();
         return success(prizeDrawUserService.createPrizeDrawUser(code, activityId));
     }
@@ -80,12 +80,20 @@ public class PrizeDrawUserController {
     @GetMapping("/prizeDraw")
     @PermitAll
     @TenantIgnore
-    @Operation(summary = "现场人员抽奖,activityId活动批次，prizeLevel奖品等级,winNum中奖数量")
+    @Operation(summary = "现场人员抽奖,activityId活动批次，prizePool奖品等级,winNum中奖数量")
     public CommonResult<Set<PrizeDrawUserRespVO>> prizeDraw(@RequestParam("activityId") Long activityId, @RequestParam("prizePool") Long prizePool, @RequestParam("winNum") Integer winNum) {
         List<PrizeDrawUserDO> list = prizeDrawUserService.prizeDraw(activityId, prizePool, winNum);
         List<PrizeDrawUserRespVO> prizeDrawUserRespVOS = BeanUtils.toBean(list, PrizeDrawUserRespVO.class);
         Set<PrizeDrawUserRespVO> drawResult = new HashSet<PrizeDrawUserRespVO>(prizeDrawUserRespVOS);
         return success(drawResult);
+    }
+
+    @GetMapping("/getAllPrizeDraUser")
+    @PermitAll
+    @TenantIgnore
+    public CommonResult<List<PrizeDrawUserDO>> getAllPrizeDraUser(@RequestParam("activityId") Long activityId) {
+        List<PrizeDrawUserDO> list = prizeDrawUserService.getAllPrizeDraUser(activityId);
+        return success(list);
     }
 
     @GetMapping("/getAllWinner")
@@ -94,6 +102,14 @@ public class PrizeDrawUserController {
     public CommonResult<List<PrizeDrawUserRespVO>> getAllWinnerList(@RequestParam("activityId") Long activityId, @RequestParam("prizeLevel") Long prizeLevel) {
         List<PrizeDrawUserDO> list = prizeDrawUserService.getAllWinnerList(activityId, prizeLevel);
         return success(BeanUtils.toBean(list, PrizeDrawUserRespVO.class));
+    }
+
+    @GetMapping("/checkWinner")
+    @PermitAll
+    @Operation(summary = "获取所有现场中奖人员,activityId活动批次，prizeLevel奖品等级")
+    public CommonResult<String> checkWinner(@RequestParam("openId") String openId,@RequestParam("activityId") String activityId) {
+        String winnerResult = prizeDrawUserService.checkWinner(openId,activityId);
+        return success(winnerResult);
     }
 
 }

@@ -25,5 +25,8 @@ public class PrizeDrawOutUserImportExcelVO {
     @ExcelProperty("手机号")
     private String mobile;
 
+    @ExcelProperty("活动编号")
+    private String activityBatch;
+
 
 }
