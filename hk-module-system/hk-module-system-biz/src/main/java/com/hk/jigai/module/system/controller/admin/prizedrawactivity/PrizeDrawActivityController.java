@@ -85,6 +85,8 @@ public class PrizeDrawActivityController {
     }
 
     @GetMapping("/getAllActivities")
+    @TenantIgnore
+    @PermitAll
     public  CommonResult<List<PrizeDrawActivityDO>>  getAllActivities(){
         return success(prizeDrawActivityService.getAllActivities());
     }

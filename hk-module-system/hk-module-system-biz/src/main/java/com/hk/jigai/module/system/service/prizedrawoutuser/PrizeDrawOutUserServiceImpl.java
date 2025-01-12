@@ -69,7 +69,8 @@ public class PrizeDrawOutUserServiceImpl implements PrizeDrawOutUserService {
     public List<PrizeDrawOutUserDO> getAllWinnerList(Long activityId, Long prizeLevel) {
         List<PrizeDrawOutUserDO> prizeDrawOutUserDOS = prizeDrawOutUserMapper.selectList(new QueryWrapper<PrizeDrawOutUserDO>().lambda()
                 .eq(PrizeDrawOutUserDO::getActivityBatch, activityId)
-                .eq(PrizeDrawOutUserDO::getPrizeLevel, prizeLevel));
+                .eq(PrizeDrawOutUserDO::getPrizeLevel, prizeLevel)
+                .eq(PrizeDrawOutUserDO::getStatus, 2));
 
         return prizeDrawOutUserDOS;
     }
@@ -154,6 +155,11 @@ public class PrizeDrawOutUserServiceImpl implements PrizeDrawOutUserService {
                 .eq(PrizeDrawOutUserDO::getActivityBatch, activityId).eq(PrizeDrawOutUserDO::getStatus, 1)
                 .last("ORDER BY RAND() LIMIT 100"));
         return prizeDrawOutUserDOS;
+    }
+
+    @Override
+    public Long getPrizeDrawOutUserCount(Long activityId) {
+        return prizeDrawOutUserMapper.selectCount(new QueryWrapper<PrizeDrawOutUserDO>().lambda().eq(PrizeDrawOutUserDO::getActivityBatch, activityId));
     }
 
 }

@@ -92,4 +92,11 @@ public class PrizeDrawOutUserController {
         return success(prizeDrawOutUserService.getRandOutUser(activityId));
     }
 
+    @GetMapping("/getPrizeDrawOutUserCount")
+    @PermitAll
+    @TenantIgnore
+    @Operation(summary = "查询场外参与人数")
+    public CommonResult<Long> getPrizeDrawOutUserCount(@RequestParam("activityId") Long activityId) {
+        return success(prizeDrawOutUserService.getPrizeDrawOutUserCount(activityId));
+    }
 }

@@ -37,7 +37,7 @@ public class PrizeDrawUserController {
     @Resource
     private PrizeDrawUserService prizeDrawUserService;
 
-    private final RateLimiter rateLimiter = RateLimiter.create(150.0);
+    private final RateLimiter rateLimiter = RateLimiter.create(80.0);
 
     @GetMapping(path = "/event", produces = "text/plain;charset=utf-8")
     @PermitAll
@@ -46,7 +46,7 @@ public class PrizeDrawUserController {
                                  @RequestParam(value = "nonce", required = false) String nonce,
                                  @RequestParam(value = "echostr", required = false) String echostr,
                                  HttpServletRequest request) {
-        String result = prizeDrawUserService.receive(signature, timestamp, nonce, echostr,request);
+        String result = prizeDrawUserService.receive(signature, timestamp, nonce, echostr, request);
         return result;
     }
 
@@ -58,7 +58,7 @@ public class PrizeDrawUserController {
                                   @RequestParam(value = "nonce", required = false) String nonce,
                                   @RequestParam(value = "echostr", required = false) String echostr,
                                   HttpServletRequest request) {
-        String result = prizeDrawUserService.receive(signature, timestamp, nonce, echostr,request);
+        String result = prizeDrawUserService.receive(signature, timestamp, nonce, echostr, request);
         return result;
     }
 
@@ -98,6 +98,7 @@ public class PrizeDrawUserController {
 
     @GetMapping("/getAllWinner")
     @PermitAll
+    @TenantIgnore
     @Operation(summary = "获取所有现场中奖人员,activityId活动批次，prizeLevel奖品等级")
     public CommonResult<List<PrizeDrawUserRespVO>> getAllWinnerList(@RequestParam("activityId") Long activityId, @RequestParam("prizeLevel") Long prizeLevel) {
         List<PrizeDrawUserDO> list = prizeDrawUserService.getAllWinnerList(activityId, prizeLevel);
@@ -106,10 +107,30 @@ public class PrizeDrawUserController {
 
     @GetMapping("/checkWinner")
     @PermitAll
+    @TenantIgnore
     @Operation(summary = "获取所有现场中奖人员,activityId活动批次，prizeLevel奖品等级")
-    public CommonResult<String> checkWinner(@RequestParam("openId") String openId,@RequestParam("activityId") String activityId) {
-        String winnerResult = prizeDrawUserService.checkWinner(openId,activityId);
+    public CommonResult<String> checkWinner(@RequestParam("openId") String openId, @RequestParam("activityId") String activityId) {
+        rateLimiter.acquire();
+        String winnerResult = prizeDrawUserService.checkWinner(openId, activityId);
         return success(winnerResult);
+    }
+
+
+    @PostMapping("/deleteWinner")
+    @PermitAll
+    @TenantIgnore
+    @Operation(summary = "剔除未在现场的人员")
+    public CommonResult<Boolean> deleteWinner(@RequestParam("userId") Long userId) {
+        return success(prizeDrawUserService.deleteWinner(userId));
+    }
+
+
+    @GetMapping("/getPrizeDrawUserCount")
+    @PermitAll
+    @TenantIgnore
+    @Operation(summary = "查询签到人数")
+    public CommonResult<Long> getPrizeDrawUserCount(@RequestParam("activityId") Long activityId) {
+        return success(prizeDrawUserService.getPrizeDrawUserCount(activityId));
     }
 
 }

@@ -62,4 +62,11 @@ public interface PrizeDrawOutUserService {
      * @return
      */
     List<PrizeDrawOutUserDO> getRandOutUser(Long activityId);
+
+    /**
+     * 查询场外参与人数
+     * @param activityId
+     * @return
+     */
+    Long getPrizeDrawOutUserCount(Long activityId);
 }

@@ -78,4 +78,18 @@ public interface PrizeDrawUserService {
      * @return
      */
     List<PrizeDrawUserDO> getAllPrizeDraUser(Long activityId);
+
+    /**
+     * 删除未到场的中奖人员
+     * @param userId
+     * @return
+     */
+    Boolean deleteWinner(Long userId);
+
+    /**
+     * 查询签到人数
+     * @param activityId
+     * @return
+     */
+    Long getPrizeDrawUserCount(Long activityId);
 }
