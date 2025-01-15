@@ -16,21 +16,21 @@ import java.sql.SQLException;
  * @Date 2025/1/12 16:51
  */
 @RestController
-@RequestMapping()
+//@RequestMapping()
 @Validated
 public class CheckHealthController {
 
-    @GetMapping("/health")
+//    @GetMapping("/health")
     @PermitAll
     @TenantIgnore
     public Integer checkHealth() {
-        String jdbcUrl = "jdbc:mysql://192.168.95.20:3306/hk_jigai_platform";
-        String username = "root";
-        String password = "xxb123@hk.com";
-
-//        String jdbcUrl = "jdbc:mysql://172.21.5.52:3306/hk_jigai_platform";
+//        String jdbcUrl = "jdbc:mysql://192.168.95.20:3306/hk_jigai_platform";
 //        String username = "root";
-//        String password = "Xxb123@hk.com";
+//        String password = "xxb123@hk.com";
+
+        String jdbcUrl = "jdbc:mysql://172.21.5.52:3306/hk_jigai_platform";
+        String username = "root";
+        String password = "Xxb123@hk.com";
         try {
             // 加载数据库驱动
             Class.forName("com.mysql.cj.jdbc.Driver");
