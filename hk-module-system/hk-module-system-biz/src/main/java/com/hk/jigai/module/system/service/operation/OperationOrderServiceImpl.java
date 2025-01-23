@@ -15,10 +15,7 @@ import com.hk.jigai.module.system.controller.admin.operation.vo.*;
 import com.hk.jigai.module.system.dal.dataobject.operation.*;
 import com.hk.jigai.module.system.dal.dataobject.operationnoticeobject.OperationNoticeObjectDO;
 import com.hk.jigai.module.system.dal.dataobject.user.AdminUserDO;
-import com.hk.jigai.module.system.dal.mysql.operation.OperationOrderMapper;
-import com.hk.jigai.module.system.dal.mysql.operation.OperationOrderOperatePictureMapper;
-import com.hk.jigai.module.system.dal.mysql.operation.OperationOrderOperateRecordMapper;
-import com.hk.jigai.module.system.dal.mysql.operation.OperationQuestionTypeMapper;
+import com.hk.jigai.module.system.dal.mysql.operation.*;
 import com.hk.jigai.module.system.enums.OrderOperateEnum;
 import com.hk.jigai.module.system.service.notice.WeChatSendMessageService;
 import com.hk.jigai.module.system.service.operationnoticeobject.OperationNoticeObjectService;
@@ -34,6 +31,7 @@ import javax.annotation.Resource;
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -86,6 +84,9 @@ public class OperationOrderServiceImpl implements OperationOrderService {
     @Resource
     private WebSocketSenderApi webSocketSenderApi;
 
+    @Resource
+    private OperationDeviceMapper operationDeviceMapper;
+
     /**
      * 新建工单消息模板
      */
@@ -98,8 +99,14 @@ public class OperationOrderServiceImpl implements OperationOrderService {
     @Override
     @Transactional
     public Long createOperationOrder(OperationOrderSaveReqVO createReqVO) {
+
+        LocalTime currentTime = LocalTime.now();
+        LocalTime startTime = LocalTime.of(8, 0);
+        LocalTime endTime = LocalTime.of(17, 0);
+        boolean isWithinRange = !currentTime.isBefore(startTime) && !currentTime.isAfter(endTime);
         // 插入
         OperationOrderDO operationOrder = BeanUtils.toBean(createReqVO, OperationOrderDO.class);
+        operationOrder.setDayNight(isWithinRange ? 1 : 3);//1日间3夜间
         if (createReqVO.getAddressIdList() != null) {
             List<Long> addressIdList = createReqVO.getAddressIdList();
             String result = addressIdList.stream()
@@ -418,6 +425,17 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         operationOrderDO.setRequestType(operationOrderReqVO.getRequestType());
         operationOrderDO.setQuestionType(operationOrderReqVO.getQuestionType());
         operationOrderDO.setLevel(operationOrderReqVO.getLevel());
+        if (StringUtil.isNotBlank(operationOrderReqVO.getLabelCode())) {
+            OperationDeviceDO operationDeviceDO = operationDeviceMapper.selectOne(new QueryWrapper<OperationDeviceDO>().lambda().eq(OperationDeviceDO::getLabelCode, operationOrderReqVO.getOperateType()));
+            if (operationDeviceDO != null) {
+                operationOrderDO.setDeviceId(operationDeviceDO.getId());
+                operationOrderDO.setLabelCode(operationDeviceDO.getLabelCode());
+                operationOrderDO.setDeviceName(operationDeviceDO.getName());
+                operationOrderDO.setAddressId(operationDeviceDO.getAddressId());
+                operationOrderDO.setLocation(operationDeviceDO.getLocation());
+            }
+        }
+
         OperationOrderOperateRecordDO operateRecordDO = new OperationOrderOperateRecordDO();
         operateRecordDO.setOrderId(operationOrderDO.getId());
         operateRecordDO.setBeginTime(LocalDateTime.now());

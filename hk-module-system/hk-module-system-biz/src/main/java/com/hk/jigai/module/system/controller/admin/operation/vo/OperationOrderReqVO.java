@@ -76,5 +76,10 @@ public class OperationOrderReqVO {
     @Schema(description = "委婉返回时间")
     private LocalDateTime returnTime;
 
+    private Integer dayNight;
+
+    @Schema(description = "二维码标签")
+    private String labelCode;
+
 
 }

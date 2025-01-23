@@ -1,6 +1,7 @@
 package com.hk.jigai.module.system.controller.admin.operation;
 
 import com.hk.jigai.framework.excel.core.util.ExcelUtils;
+import io.swagger.v3.oas.annotations.Parameters;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -87,6 +88,10 @@ public class OperationQuestionTypeController {
     }
 
     @PostMapping("/import-excel")
+    @Parameters({
+            @Parameter(name = "file", description = "Excel 文件", required = true),
+            @Parameter(name = "updateSupport", description = "是否支持更新，默认为 false", example = "true")
+    })
     @Operation(summary = "问题类型导入")
     public CommonResult<QuestionTypeImportRespVO> importExcel(@RequestParam("file") MultipartFile file,
                                                               @RequestParam(value = "updateSupport", required = false, defaultValue = "false") Boolean updateSupport) throws Exception {

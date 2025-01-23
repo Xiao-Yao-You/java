@@ -36,6 +36,7 @@ public interface OperationAddressMapper extends BaseMapperX<OperationAddressDO> 
     default List<OperationAddressDO> selectList(OperationAddressRespVO reqVO) {
         return selectList(new LambdaQueryWrapperX<OperationAddressDO>()
                 .likeIfPresent(OperationAddressDO::getAddressName, reqVO.getAddressName())
+                .eqIfPresent(OperationAddressDO::getStatus, reqVO.getStatus())
         );
     }
 }

@@ -176,5 +176,10 @@ public class OperationOrderDO extends BaseDO {
     @TableField(exist = false)
     private List<OperationOrderOperateRecordDO> recordList;
 
+    /**
+     * 日间还是夜间
+     */
+    private Integer dayNight;
+
 
 }

@@ -42,6 +42,9 @@ public class AuthPermissionInfoRespVO {
         @Schema(description = "用户昵称", requiredMode = Schema.RequiredMode.REQUIRED, example = "恒科技改")
         private String nickname;
 
+        @Schema(description = "账号/工号", requiredMode = Schema.RequiredMode.REQUIRED, example = "恒科技改")
+        private String username;
+
         @Schema(description = "用户头像", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.iocoder.cn/xx.jpg")
         private String avatar;
 

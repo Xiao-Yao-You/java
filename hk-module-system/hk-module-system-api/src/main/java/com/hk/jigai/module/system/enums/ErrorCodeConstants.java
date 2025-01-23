@@ -230,5 +230,7 @@ public interface ErrorCodeConstants {
     ErrorCode PRIZE_NOT_EXISTS = new ErrorCode(1_002_034_003, "奖品信息不存在");
     ErrorCode PRIZE_DRAW_OUT_USER_NOT_EXISTS = new ErrorCode(1_002_034_004, "场外参与人员不存在");
     ErrorCode  PRIZE_DRAW_CHECK = new ErrorCode(1_002_034_009, "获取微信回调失败");
+    //合理化建议
+    ErrorCode REASONABLE_SUGGESTION_NOT_EXISTS = new ErrorCode(1_002_035_001, "合理化建议不存在");
 
 }

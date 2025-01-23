@@ -159,5 +159,8 @@ public class OperationOrderRespVO {
 
     List<OperationOrderOperateRecordDO> recordList;
 
+    @Schema(description = "工单产生时间")
+    private Integer dayNight;
+
 
 }

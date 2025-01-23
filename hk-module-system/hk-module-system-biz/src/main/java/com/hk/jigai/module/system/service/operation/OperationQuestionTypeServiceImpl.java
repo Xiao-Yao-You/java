@@ -187,8 +187,10 @@ public class OperationQuestionTypeServiceImpl implements OperationQuestionTypeSe
                             subQuestionDO.setType("0");
                         } else if ("硬件".equals(item.getQuestionType())) {
                             subQuestionDO.setType("1");
-                        } else if ("其他".equals(item.getQuestionType())) {
+                        } else if ("监控".equals(item.getQuestionType())) {
                             subQuestionDO.setType("2");
+                        } else if ("其他".equals(item.getQuestionType())) {
+                            subQuestionDO.setType("3");
                         }
                         deviceType.ifPresent(p -> {
                             subQuestionDO.setDeviceTypeId(p.getId());

@@ -117,4 +117,10 @@ public class OperationOrderPageReqVO extends PageParam {
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
 
+    /**
+     * 日间还是夜间
+     */
+    @Schema(description = "日间还是夜间")
+    private Integer dayNight;
+
 }

@@ -109,4 +109,7 @@ public class OperationOrderSaveReqVO {
     @Schema(description = "完成耗时")
     private Long completeConsume;
 
+    private Integer dayNight;
+
+
 }
