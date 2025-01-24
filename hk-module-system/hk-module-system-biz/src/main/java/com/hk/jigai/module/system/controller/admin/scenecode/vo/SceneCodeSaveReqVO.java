@@ -51,4 +51,7 @@ public class SceneCodeSaveReqVO {
     @Schema(description = "使用状态,0:未使用,1:已使用")
     private Integer useStatus;
 
+    @Schema(description = "编码类型")
+    private Integer codeType;
+
 }

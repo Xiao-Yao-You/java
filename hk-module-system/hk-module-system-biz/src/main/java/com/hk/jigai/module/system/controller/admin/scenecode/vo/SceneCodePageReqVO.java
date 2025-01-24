@@ -1,10 +1,13 @@
 package com.hk.jigai.module.system.controller.admin.scenecode.vo;
 
 import lombok.*;
+
 import java.util.*;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import com.hk.jigai.framework.common.pojo.PageParam;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
 
 import static com.hk.jigai.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
@@ -44,4 +47,7 @@ public class SceneCodePageReqVO extends PageParam {
 
     @Schema(description = "使用状态,0:未使用,1:已使用")
     private Integer useStatus;
+
+    @Schema(description = "编码类型")
+    private Integer codeType;
 }

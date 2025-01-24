@@ -76,4 +76,17 @@ public interface SceneCodeService {
      * @return
      */
     SceneCodeImportRespVO importSceneCodeList(List<SceneCodeImportExcelVO> list, Boolean updateSupport);
+
+    /**
+     * 获取所有的设备类型
+     * @return
+     */
+    List<SceneCodeDO> getDeviceType();
+
+
+    /**
+     * 获取所有的设备标签
+     * @return
+     */
+    List<SceneCodeDO> getDeviceLabel();
 }

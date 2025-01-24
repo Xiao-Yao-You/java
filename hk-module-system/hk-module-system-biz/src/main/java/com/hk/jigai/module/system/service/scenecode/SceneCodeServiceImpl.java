@@ -2,6 +2,7 @@ package com.hk.jigai.module.system.service.scenecode;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hk.jigai.framework.common.exception.ServiceException;
 import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.common.util.object.BeanUtils;
@@ -163,6 +164,16 @@ public class SceneCodeServiceImpl implements SceneCodeService {
     @Override
     public List<SceneCodeDO> getSceneCodeList() {
         return sceneCodeMapper.selectList();
+    }
+
+    @Override
+    public List<SceneCodeDO> getDeviceType() {
+        return sceneCodeMapper.selectList(new QueryWrapper<SceneCodeDO>().lambda().eq(SceneCodeDO::getCodeType, 1));
+    }
+
+    @Override
+    public List<SceneCodeDO> getDeviceLabel() {
+        return sceneCodeMapper.selectList(new QueryWrapper<SceneCodeDO>().lambda().eq(SceneCodeDO::getCodeType, 3));
     }
 
     @Override

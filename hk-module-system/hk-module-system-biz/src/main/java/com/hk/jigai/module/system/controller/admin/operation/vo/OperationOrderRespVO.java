@@ -46,9 +46,9 @@ public class OperationOrderRespVO {
     @ExcelProperty("设备名称")
     private String deviceName;
 
-    @Schema(description = "设备地点", example = "9013")
-    @ExcelProperty("设备地点")
-    private List<Long> addressId;
+//    @Schema(description = "设备地点", example = "9013")
+//    @ExcelProperty("设备地点")
+//    private List<Long> addressId;
 
     private String address;
 
@@ -56,9 +56,9 @@ public class OperationOrderRespVO {
     @ExcelProperty("设备位置")
     private String location;
 
-    @Schema(description = "提交人id", example = "31223")
-    @ExcelProperty("提交人id")
-    private Long submitUserId;
+//    @Schema(description = "提交人id", example = "31223")
+//    @ExcelProperty("提交人id")
+//    private Long submitUserId;
 
     @Schema(description = "提交人姓名", example = "王五")
     @ExcelProperty("提交人姓名")
@@ -92,17 +92,17 @@ public class OperationOrderRespVO {
     @ExcelProperty("来源,1 线上报修,2 线下报修")
     private Integer sourceType;
 
-    @Schema(description = "处理人id", example = "31854")
-    @ExcelProperty("处理人id")
-    private Long dealUserId;
+//    @Schema(description = "处理人id", example = "31854")
+//    @ExcelProperty("处理人id")
+//    private Long dealUserId;
 
     @Schema(description = "处理人名称", example = "芋艿")
     @ExcelProperty("处理人名称")
     private String dealUserNickName;
 
-    @Schema(description = "分配人员id", example = "22442")
-    @ExcelProperty("分配人员id")
-    private Long allocationUserId;
+//    @Schema(description = "分配人员id", example = "22442")
+//    @ExcelProperty("分配人员id")
+//    private Long allocationUserId;
 
     @Schema(description = "分配人员昵称", example = "芋艿")
     @ExcelProperty("分配人员昵称")

@@ -42,4 +42,7 @@ public class SceneCodeImportExcelVO {
     @ExcelProperty("步长")
     private Integer step;
 
+    @ExcelProperty("类型")
+    private Integer codeType;
+
 }

@@ -61,4 +61,7 @@ public class SceneCodeRespVO {
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 
+    @Schema(description = "编码类型")
+    private Integer codeType;
+
 }

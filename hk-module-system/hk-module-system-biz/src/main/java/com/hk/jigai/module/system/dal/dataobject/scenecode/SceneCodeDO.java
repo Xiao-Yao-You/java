@@ -1,9 +1,12 @@
 package com.hk.jigai.module.system.dal.dataobject.scenecode;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+
 import java.util.*;
 import java.time.LocalDateTime;
 import java.time.LocalDateTime;
+
 import com.baomidou.mybatisplus.annotation.*;
 import com.hk.jigai.framework.mybatis.core.dataobject.BaseDO;
 
@@ -68,5 +71,10 @@ public class SceneCodeDO extends BaseDO {
      * 状态
      */
     private Integer useStatus;
+
+    /**
+     * 编码类型
+     */
+    private Integer codeType;
 
 }

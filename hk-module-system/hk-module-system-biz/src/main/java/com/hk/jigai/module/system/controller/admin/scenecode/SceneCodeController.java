@@ -87,6 +87,22 @@ public class SceneCodeController {
         return success(BeanUtils.toBean(list, SceneCodeRespVO.class));
     }
 
+    @GetMapping("/getDeviceType")
+    @Operation(summary = "获得单据编码类型配置列表")
+//    @PreAuthorize("@ss.hasPermission('system:scene-code:query')")
+    public CommonResult<List<SceneCodeRespVO>> getDeviceType() {
+        List<SceneCodeDO> list = sceneCodeService.getDeviceType();
+        return success(BeanUtils.toBean(list, SceneCodeRespVO.class));
+    }
+
+    @GetMapping("/getDeviceLabel")
+    @Operation(summary = "获得单据编码类型配置列表")
+//    @PreAuthorize("@ss.hasPermission('system:scene-code:query')")
+    public CommonResult<List<SceneCodeRespVO>> getDeviceLabel() {
+        List<SceneCodeDO> list = sceneCodeService.getDeviceLabel();
+        return success(BeanUtils.toBean(list, SceneCodeRespVO.class));
+    }
+
     @GetMapping("/page")
     @Operation(summary = "获得单据编码类型配置分页")
     @PreAuthorize("@ss.hasPermission('system:scene-code:query')")
