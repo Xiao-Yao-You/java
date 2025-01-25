@@ -1,22 +1,18 @@
 package com.hk.jigai.module.system.controller.admin.operation.vo;
 
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
 import com.hk.jigai.module.system.dal.dataobject.operation.OperationOrderOperateRecordDO;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-
-import java.util.*;
-import java.util.*;
-
-import org.springframework.format.annotation.DateTimeFormat;
+import lombok.Data;
 
 import java.time.LocalDateTime;
-
-import com.alibaba.excel.annotation.*;
+import java.util.List;
 
 @Schema(description = "管理后台 - 工单 Response VO")
 @Data
 @ExcelIgnoreUnannotated
-public class OperationOrderRespVO {
+public class OperationOrderRespExportVO {
 
     @Schema(description = "主键", requiredMode = Schema.RequiredMode.REQUIRED, example = "22882")
     @ExcelProperty("主键")
@@ -34,10 +30,6 @@ public class OperationOrderRespVO {
     @ExcelProperty("状态,00 待分配,01 待处理,02 进行中,03 挂起中,04 已处理,05 已完成,0501:无需处理,0502:无法排除故障,06 已撤销")
     private String status;
 
-    @Schema(description = "设备id", requiredMode = Schema.RequiredMode.REQUIRED, example = "15840")
-    @ExcelProperty("设备id")
-    private Long deviceId;
-
     @Schema(description = "标签code")
     @ExcelProperty("标签code")
     private String labelCode;
@@ -46,9 +38,6 @@ public class OperationOrderRespVO {
     @ExcelProperty("设备名称")
     private String deviceName;
 
-    @Schema(description = "设备地点", example = "9013")
-    @ExcelProperty("设备地点")
-    private List<Long> addressId;
 
     private String address;
 
@@ -56,9 +45,6 @@ public class OperationOrderRespVO {
     @ExcelProperty("设备位置")
     private String location;
 
-    @Schema(description = "提交人id", example = "31223")
-    @ExcelProperty("提交人id")
-    private Long submitUserId;
 
     @Schema(description = "提交人姓名", example = "王五")
     @ExcelProperty("提交人姓名")
@@ -92,17 +78,11 @@ public class OperationOrderRespVO {
     @ExcelProperty("来源,1 线上报修,2 线下报修")
     private Integer sourceType;
 
-    @Schema(description = "处理人id", example = "31854")
-    @ExcelProperty("处理人id")
-    private Long dealUserId;
 
     @Schema(description = "处理人名称", example = "芋艿")
     @ExcelProperty("处理人名称")
     private String dealUserNickName;
 
-    @Schema(description = "分配人员id", example = "22442")
-    @ExcelProperty("分配人员id")
-    private Long allocationUserId;
 
     @Schema(description = "分配人员昵称", example = "芋艿")
     @ExcelProperty("分配人员昵称")
@@ -152,15 +132,6 @@ public class OperationOrderRespVO {
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 
-    @Schema(description = "问题类型明文")
-    private String questionTypeStr;
-
-    private String picture;
-
-    List<OperationOrderOperateRecordDO> recordList;
-
-    @Schema(description = "工单产生时间")
-    private Integer dayNight;
 
 
 }

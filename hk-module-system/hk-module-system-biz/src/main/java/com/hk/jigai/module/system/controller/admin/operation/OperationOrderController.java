@@ -101,8 +101,8 @@ public class OperationOrderController {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<OperationOrderDO> list = operationOrderService.getOperationOrderPage(pageReqVO).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "工单.xls", "数据", OperationOrderRespVO.class,
-                BeanUtils.toBean(list, OperationOrderRespVO.class));
+        ExcelUtils.write(response, "工单.xls", "数据", OperationOrderRespExportVO.class,
+                BeanUtils.toBean(list, OperationOrderRespExportVO.class));
     }
 
     @PutMapping("/operateOrder")
