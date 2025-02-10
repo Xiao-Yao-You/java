@@ -2,6 +2,7 @@ package com.hk.jigai.module.system.service.wechat;
 
 import com.alibaba.fastjson.JSON;
 import com.hk.jigai.framework.common.util.collection.CollectionUtils;
+import com.hk.jigai.framework.security.core.LoginUser;
 import com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils;
 import com.hk.jigai.module.system.dal.dataobject.meetingroominfo.MeetingPersonAttendRecordDO;
 import com.hk.jigai.module.system.dal.dataobject.meetingroominfo.MeetingRoomInfoDO;
@@ -105,7 +106,10 @@ public class MeetingReminderServiceImpl implements MeetingReminderService {
             return null;
         }
         String openid = (String) authMap.get("openid");
-        adminUserService.updateUserOpenid(SecurityFrameworkUtils.getLoginUser().getId(), openid);
+        LoginUser loginUser = SecurityFrameworkUtils.getLoginUser();
+        if (loginUser != null) {
+            adminUserService.updateUserOpenid(SecurityFrameworkUtils.getLoginUser().getId(), openid);
+        }
         return openid;
     }
 

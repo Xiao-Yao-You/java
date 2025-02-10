@@ -52,4 +52,11 @@ public interface ReasonableSuggestionService {
      */
     PageResult<ReasonableSuggestionDO> getPage(ReasonableSuggestionPageReqVO pageReqVO);
 
+    /**
+     * 审核合理化建议
+     *
+     * @param id
+     * @param examineType
+     */
+    void examine(Long id, Integer examineType);
 }

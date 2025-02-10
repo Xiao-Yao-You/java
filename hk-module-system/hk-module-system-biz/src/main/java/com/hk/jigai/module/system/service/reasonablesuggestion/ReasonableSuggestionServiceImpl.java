@@ -47,6 +47,7 @@ public class ReasonableSuggestionServiceImpl implements ReasonableSuggestionServ
     public Long create(ReasonableSuggestionSaveReqVO createReqVO) {
         // 插入
         ReasonableSuggestionDO reasonableSuggestionDO = BeanUtils.toBean(createReqVO, ReasonableSuggestionDO.class);
+        reasonableSuggestionDO.setStatus(1);//未审核
         List<OperationDevicePictureSaveReqVO> fileList = createReqVO.getFileList();
         if (CollectionUtils.isNotEmpty(fileList)) {
             List<String> urls = fileList.stream().map(p -> p.getUrl()).collect(Collectors.toList());
@@ -90,6 +91,15 @@ public class ReasonableSuggestionServiceImpl implements ReasonableSuggestionServ
         if (reasonableSuggestionMapper.selectById(id) == null) {
             throw exception(REASONABLE_SUGGESTION_NOT_EXISTS);
         }
+    }
+
+    @Override
+    public void examine(Long id, Integer examineType) {
+        // 校验存在
+        validateExists(id);
+        ReasonableSuggestionDO reasonableSuggestionDO = reasonableSuggestionMapper.selectById(id);
+        reasonableSuggestionDO.setStatus(examineType);
+        reasonableSuggestionMapper.updateById(reasonableSuggestionDO);
     }
 
     @Override

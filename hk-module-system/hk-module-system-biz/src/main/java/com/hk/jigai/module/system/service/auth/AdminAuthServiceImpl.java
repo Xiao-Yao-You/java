@@ -131,6 +131,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             throw exception(MINI_APP_ADMIN_ERROR);
         }
         AdminUserDO user = userService.getUserByUsername(reqVO.getUsername());
+
         String currentUserOpenId = user.getRemark();
         //校验账号是否存在
         if (user == null) {
@@ -172,6 +173,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             user.setRemark(openId);
             adminUserMapper.updateById(user);
         }
+        tokenAfterLoginSuccess.setOpenId(user.getOpenid());
         return tokenAfterLoginSuccess;
     }
 

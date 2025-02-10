@@ -69,6 +69,15 @@ public class ReasonableSuggestionController {
         return success(true);
     }
 
+
+    @PostMapping("/examine")
+    @Operation(summary = "审核合理化建议")
+    @PreAuthorize("@ss.hasPermission('reasonableSuggestion::examine')")
+    public CommonResult<Boolean> examine(@RequestParam("id") Long id,@RequestParam("examineType") Integer examineType) {
+        reasonableSuggestionService.examine(id,examineType);
+        return success(true);
+    }
+
     @GetMapping("/get")
     @Operation(summary = "获得合理化建议")
     @Parameter(name = "id", description = "编号", required = true, example = "1024")

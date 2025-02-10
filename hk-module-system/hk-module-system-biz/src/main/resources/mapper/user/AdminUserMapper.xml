@@ -45,7 +45,8 @@
                su.login_date,
                sd.id        as deptId,
                sd.name      as deptName,
-               sd.parent_id as parentId
+               sd.parent_id as parentId,
+               su.openid
         FROM system_users su
                  LEFT JOIN system_user_dept sud ON su.id = sud.user_id and sud.deleted = 0
                  LEFT JOIN system_dept sd ON sud.dept_id = sd.id and sd.deleted = 0

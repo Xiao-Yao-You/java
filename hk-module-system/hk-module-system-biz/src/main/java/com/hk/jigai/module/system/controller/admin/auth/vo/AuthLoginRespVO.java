@@ -30,4 +30,7 @@ public class AuthLoginRespVO {
     @Schema(description = "校验弱口令")
     private Boolean checkPwdRule;
 
+    @Schema(description = "服务号openId")
+    private String openId;
+
 }
