@@ -111,5 +111,7 @@ public class OperationOrderSaveReqVO {
 
     private Integer dayNight;
 
+    private String picture;
+
 
 }

@@ -181,5 +181,8 @@ public class OperationOrderDO extends BaseDO {
      */
     private Integer dayNight;
 
+    @TableField(exist = false)
+    private String picture;
+
 
 }

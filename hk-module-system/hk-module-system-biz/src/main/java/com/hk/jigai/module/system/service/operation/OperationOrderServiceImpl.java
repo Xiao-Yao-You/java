@@ -130,6 +130,8 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         operationOrderOperateRecordDO.setOperateType(OperateConstant.CREATE_TYPE);
         operationOrderOperateRecordDO.setUserId(submitUser.getId());
         operationOrderOperateRecordDO.setUserNickName(submitUser.getNickname());
+        operationOrderOperateRecordDO.setPicture(operationOrder.getPicture());
+
         operationOrderOperateRecordMapper.insert(operationOrderOperateRecordDO);
 
         List<String> openIdList = new ArrayList<>();
@@ -257,6 +259,7 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             }
         }
         List<OperationOrderOperateRecordDO> operationOrderOperateRecordDOS = operationOrderOperateRecordMapper.selectList(new QueryWrapper<OperationOrderOperateRecordDO>().lambda().eq(OperationOrderOperateRecordDO::getOrderId, id));
+
         operationOrderDO.setRecordList(operationOrderOperateRecordDOS);
         return operationOrderDO;
     }
