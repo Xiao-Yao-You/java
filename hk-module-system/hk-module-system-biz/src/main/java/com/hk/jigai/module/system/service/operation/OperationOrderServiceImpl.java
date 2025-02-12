@@ -1028,9 +1028,13 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             //给报修人的状态反馈
             AdminUserDO repairer = adminUserService.getUser(Long.valueOf(operationOrderDO.getCreator()));
-            AdminUserDO dealer = adminUserService.getUser(Long.valueOf(operationOrderDO.getDealUserId()));
+
+            String dealerOpenId = "";
+            if (operationOrderDO.getDealUserId() != null) {
+                AdminUserDO dealer = adminUserService.getUser(Long.valueOf(operationOrderDO.getDealUserId()));
+                dealerOpenId = dealer.getOpenid();
+            }
             String repairerOpenId = repairer.getOpenid();
-            String dealerOpenId = dealer.getOpenid();
             String code = operationOrderDO.getCode();
             String orderStatus = "已撤销";
             String operatorName = operateRecordDO.getUserNickName() + "撤销了工单";
