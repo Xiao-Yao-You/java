@@ -440,12 +440,14 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         operationOrderDO.setRequestType(operationOrderReqVO.getRequestType());
         operationOrderDO.setQuestionType(operationOrderReqVO.getQuestionType());
         operationOrderDO.setLevel(operationOrderReqVO.getLevel());
+
         if (StringUtil.isNotBlank(operationOrderReqVO.getLabelCode())) {
-            OperationDeviceDO operationDeviceDO = operationDeviceMapper.selectOne(new QueryWrapper<OperationDeviceDO>().lambda().eq(OperationDeviceDO::getLabelCode, operationOrderReqVO.getOperateType()));
+            OperationDeviceDO operationDeviceDO = operationDeviceMapper.selectOne(new QueryWrapper<OperationDeviceDO>().lambda().eq(OperationDeviceDO::getLabelCode, operationOrderReqVO.getLabelCode()));
             if (operationDeviceDO != null) {
-                operationOrderDO.setDeviceId(operationDeviceDO.getId());
                 operationOrderDO.setLabelCode(operationDeviceDO.getLabelCode());
+                operationOrderDO.setDeviceId(operationDeviceDO.getId());
                 operationOrderDO.setDeviceName(operationDeviceDO.getName());
+                operationOrderDO.setAddress(operationDeviceDO.getAddress());
                 operationOrderDO.setAddressId(operationDeviceDO.getAddressId());
                 operationOrderDO.setLocation(operationDeviceDO.getLocation());
             }
