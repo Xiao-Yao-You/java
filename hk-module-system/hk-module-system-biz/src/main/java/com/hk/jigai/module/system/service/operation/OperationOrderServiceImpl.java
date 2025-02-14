@@ -169,35 +169,47 @@ public class OperationOrderServiceImpl implements OperationOrderService {
 //            wechatNoticeVO.setData(dataMap);
 //            wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram(appId, path + operationOrder.getId()));
 
-            Map wechatNoticeVO = new HashMap();
-            wechatNoticeVO.put("template_id", templateId);
-            Map dataMap = new HashMap<>();
-            Map cs = new HashMap<>();
-            cs.put("value", operationOrder.getCode());
-            dataMap.put("character_string2", cs);    //工单编号
-            Map t5 = new HashMap<>();
-            t5.put("value", operationOrder.getSubmitUserNickName());
-            dataMap.put("thing5", t5);    //报修人员
-            Map t3 = new HashMap<>();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            t3.put("value", operationOrder.getCreateTime().format(formatter));
-            dataMap.put("time3", t3);//报修时间
-            Map p13 = new HashMap<>();
-            p13.put("value", operationOrder.getSubmitUserMobile());
-            dataMap.put("phone_number13", p13);//联系电话
-            Map t6 = new HashMap<>();
-            t6.put("value", operationOrder.getDescription());
-            dataMap.put("thing6", t6);//故障描述
-            wechatNoticeVO.put("data", dataMap);
-            Map appIdMap = new HashMap<>();
-            appIdMap.put("appid", appId);
-            appIdMap.put("pagepath", path + operationOrder.getId());
-            wechatNoticeVO.put("miniprogram", appIdMap);
+            LocalTime now = LocalTime.now();
 
-            try {
-                weChatSendMessageService.sendModelMessage(openIdList, wechatNoticeVO);
-            } catch (Exception e) {
-                e.printStackTrace();
+            LocalTime start = LocalTime.of(8, 0);
+
+            LocalTime end = LocalTime.of(17, 0);
+
+            boolean isBetween = !now.isBefore(start) && !now.isAfter(end);
+
+            //上午八点-下午五点，发送新工单通知
+            if (isBetween) {
+
+                Map wechatNoticeVO = new HashMap();
+                wechatNoticeVO.put("template_id", templateId);
+                Map dataMap = new HashMap<>();
+                Map cs = new HashMap<>();
+                cs.put("value", operationOrder.getCode());
+                dataMap.put("character_string2", cs);    //工单编号
+                Map t5 = new HashMap<>();
+                t5.put("value", operationOrder.getSubmitUserNickName());
+                dataMap.put("thing5", t5);    //报修人员
+                Map t3 = new HashMap<>();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                t3.put("value", operationOrder.getCreateTime().format(formatter));
+                dataMap.put("time3", t3);//报修时间
+                Map p13 = new HashMap<>();
+                p13.put("value", operationOrder.getSubmitUserMobile());
+                dataMap.put("phone_number13", p13);//联系电话
+                Map t6 = new HashMap<>();
+                t6.put("value", operationOrder.getDescription());
+                dataMap.put("thing6", t6);//故障描述
+                wechatNoticeVO.put("data", dataMap);
+                Map appIdMap = new HashMap<>();
+                appIdMap.put("appid", appId);
+                appIdMap.put("pagepath", path + operationOrder.getId());
+                wechatNoticeVO.put("miniprogram", appIdMap);
+
+                try {
+                    weChatSendMessageService.sendModelMessage(openIdList, wechatNoticeVO);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
         //新增时发送新订单消息
@@ -533,9 +545,9 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             List<String> openIdList = new ArrayList<>();
             AdminUserDO user = adminUserService.getUser(operateRecordDO.getUserId());
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
             if (user != null) {
                 openIdList.add(user.getOpenid());
-
                 String templateId = "moCz5xqQZooEghuw2D_EU57tmilMtnACDeEYjraRD1I";  //工单派工消息模板
 //                wechatNoticeVO.setTemplate_id(templateId); //模板Id,templateId
 //                Map dataMap = new HashMap<>();
@@ -586,12 +598,30 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             //给报修人的状态反馈
             AdminUserDO repairer = adminUserService.getUser(Long.valueOf(operationOrderDO.getCreator()));
             String repairerOpenId = repairer.getOpenid();
+//
+            List<OperationNoticeObjectDO> allUsers = operationNoticeObjectService.getAllUsers();
+            LocalTime now = LocalTime.now();
+            LocalTime start = LocalTime.of(8, 0);
+            LocalTime end = LocalTime.of(17, 0);
+            boolean isBetween = !now.isBefore(start) && !now.isAfter(end);
+            List<String> openIds = new ArrayList<>();
+            if (CollectionUtil.isNotEmpty(allUsers) && isBetween) {
+                List<Long> collect = allUsers.stream().map(p -> p.getUserId()).collect(Collectors.toList());
+                for (Long aLong : collect) {
+                    AdminUserDO u = adminUserService.getUser(aLong);
+                    if (u != null) {
+                        openIds.add(u.getOpenid());
+                    }
+                }
+            }
+
             String code = operationOrderDO.getCode();
             String orderStatus = "待处理";
             String operatorName = "工单由" + operateRecordDO.getOperateUserNickName() + "指派给" + operateRecordDO.getUserNickName();
             String time = operateRecordDO.getCreateTime().format(formatter);
             if (StringUtil.isNotBlank(repairerOpenId)) {
-                orderStatusChangeNotice(repairerOpenId, code, orderStatus, operatorName, time);
+                openIds.add(repairerOpenId);
+                orderStatusChangeNotice(openIds, code, orderStatus, operatorName, time);
             }
             //发送和订单处理消息
             sendOrderStatusChangeMsg();
@@ -634,8 +664,25 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             String orderStatus = "待处理";
             String operatorName = operateRecordDO.getUserNickName() + "认领了工单";
             String time = operateRecordDO.getCreateTime().format(formatter);
+
+            List<OperationNoticeObjectDO> allUsers = operationNoticeObjectService.getAllUsers();
+            LocalTime now = LocalTime.now();
+            LocalTime start = LocalTime.of(8, 0);
+            LocalTime end = LocalTime.of(17, 0);
+            boolean isBetween = !now.isBefore(start) && !now.isAfter(end);
+            List<String> openIds = new ArrayList<>();
+            if (CollectionUtil.isNotEmpty(allUsers) && isBetween) {
+                List<Long> collect = allUsers.stream().map(p -> p.getUserId()).collect(Collectors.toList());
+                for (Long aLong : collect) {
+                    AdminUserDO u = adminUserService.getUser(aLong);
+                    if (u != null) {
+                        openIds.add(u.getOpenid());
+                    }
+                }
+            }
             if (StringUtil.isNotBlank(repairerOpenId)) {
-                orderStatusChangeNotice(repairerOpenId, code, orderStatus, operatorName, time);
+                openIds.add(repairerOpenId);
+                orderStatusChangeNotice(openIds, code, orderStatus, operatorName, time);
             }
             //发送和订单处理消息
             sendOrderStatusChangeMsg();
@@ -729,8 +776,10 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             String orderStatus = "待处理";
             String operatorName = "工单由" + operateRecordDO.getOperateUserNickName() + "转交给" + operateRecordDO.getUserNickName();
             String time = operateRecordDO.getCreateTime().format(formatter);
+            List<String> openIds = new ArrayList<>();
             if (StringUtil.isNotBlank(repairerOpenId)) {
-                orderStatusChangeNotice(repairerOpenId, code, orderStatus, operatorName, time);
+                openIds.add(repairerOpenId);
+                orderStatusChangeNotice(openIds, code, orderStatus, operatorName, time);
             }
 
         }
@@ -777,8 +826,10 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             String orderStatus = "处理中";
             String operatorName = operateRecordDO.getUserNickName() + "进行了工单现场确认";
             String time = operateRecordDO.getCreateTime().format(formatter);
+            List<String> openIds = new ArrayList<>();
             if (StringUtil.isNotBlank(repairerOpenId)) {
-                orderStatusChangeNotice(repairerOpenId, code, orderStatus, operatorName, time);
+                openIds.add(repairerOpenId);
+                orderStatusChangeNotice(openIds, code, orderStatus, operatorName, time);
             }
         }
 
@@ -812,8 +863,10 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             String orderStatus = "已挂起";
             String operatorName = operateRecordDO.getUserNickName() + "暂停了当前工单进度";
             String time = operateRecordDO.getCreateTime().format(formatter);
+            List<String> openIds = new ArrayList<>();
             if (StringUtil.isNotBlank(repairerOpenId)) {
-                orderStatusChangeNotice(repairerOpenId, code, orderStatus, operatorName, time);
+                openIds.add(repairerOpenId);
+                orderStatusChangeNotice(openIds, code, orderStatus, operatorName, time);
             }
         }
 
@@ -848,8 +901,10 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             String orderStatus = "委外维修中";
             String operatorName = operateRecordDO.getUserNickName() + "将当前工单进行了委外维修";
             String time = operateRecordDO.getCreateTime().format(formatter);
+            List<String> openIds = new ArrayList<>();
             if (StringUtil.isNotBlank(repairerOpenId)) {
-                orderStatusChangeNotice(repairerOpenId, code, orderStatus, operatorName, time);
+                openIds.add(repairerOpenId);
+                orderStatusChangeNotice(openIds, code, orderStatus, operatorName, time);
             }
         }
 
@@ -883,8 +938,10 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             String orderStatus = "处理中";
             String operatorName = "委外结束" + operateRecordDO.getUserNickName() + "将继续处理工单";
             String time = operateRecordDO.getCreateTime().format(formatter);
+            List<String> openIds = new ArrayList<>();
             if (StringUtil.isNotBlank(repairerOpenId)) {
-                orderStatusChangeNotice(repairerOpenId, code, orderStatus, operatorName, time);
+                openIds.add(repairerOpenId);
+                orderStatusChangeNotice(openIds, code, orderStatus, operatorName, time);
             }
         }
 
@@ -919,8 +976,10 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             String orderStatus = "处理中";
             String operatorName = operateRecordDO.getUserNickName() + "重启了工单进度";
             String time = operateRecordDO.getCreateTime().format(formatter);
+            List<String> openIds = new ArrayList<>();
             if (StringUtil.isNotBlank(repairerOpenId)) {
-                orderStatusChangeNotice(repairerOpenId, code, orderStatus, operatorName, time);
+                openIds.add(repairerOpenId);
+                orderStatusChangeNotice(openIds, code, orderStatus, operatorName, time);
             }
         }
 
@@ -981,8 +1040,10 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             String orderStatus = "已完成";
             String operatorName = operateRecordDO.getUserNickName() + "对工单提报完工";
             String time = operateRecordDO.getCreateTime().format(formatter);
+            List<String> openIds = new ArrayList<>();
             if (StringUtil.isNotBlank(repairerOpenId)) {
-                orderStatusChangeNotice(repairerOpenId, code, orderStatus, operatorName, time);
+                openIds.add(repairerOpenId);
+                orderStatusChangeNotice(openIds, code, orderStatus, operatorName, time);
             }
 
         }
@@ -1039,23 +1100,30 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             String orderStatus = "已撤销";
             String operatorName = operateRecordDO.getUserNickName() + "撤销了工单";
             String time = operateRecordDO.getCreateTime().format(formatter);
+
+            List<String> openIds = new ArrayList<>();
             if (StringUtil.isNotBlank(repairerOpenId)) {
-                orderStatusChangeNotice(repairerOpenId, code, orderStatus, operatorName, time);
+                openIds.add(repairerOpenId);
+                if (StringUtil.isNotBlank(dealerOpenId)) {
+                    openIds.add(dealerOpenId);
+                }
+                orderStatusChangeNotice(openIds, code, orderStatus, operatorName, time);
             }
-            if (StringUtil.isNotBlank(dealerOpenId)) {
-                orderStatusChangeNotice(dealerOpenId, code, orderStatus, operatorName, time);
-            }
+
             //发送和订单处理消息
             sendOrderStatusChangeMsg();
         }
     }
 
-    private void orderStatusChangeNotice(String repairerOpenId, String code, String orderStatus, String operatorName, String time) {
+    private void orderStatusChangeNotice(List<String> openIds, String code, String orderStatus, String operatorName, String time) {
         OperationOrderDO operationOrderDO = operationOrderMapper.selectOne(new QueryWrapper<OperationOrderDO>().lambda().eq(OperationOrderDO::getCode, code));
 
         try {
-            List<String> openIdList = new ArrayList<>();
-            openIdList.add(repairerOpenId);
+            List<String> openIdList = openIds.stream()
+                    .distinct()
+                    .collect(Collectors.toList());
+//            List<String> openIdList = new ArrayList<>();
+//            openIdList.add(repairerOpenId);
 //            WechatNoticeVO wechatNoticeVO = new WechatNoticeVO();
             String templateId = "hGGuKzP2XQpO57rVcwQwYWn9V36keth4agPcuvLfyCo";  //工单状态变更消息模板
 //            wechatNoticeVO.setTemplate_id(templateId); //模板Id,templateId
