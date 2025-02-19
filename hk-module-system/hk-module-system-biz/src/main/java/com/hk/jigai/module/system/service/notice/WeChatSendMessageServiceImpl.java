@@ -53,7 +53,7 @@ public class WeChatSendMessageServiceImpl implements WeChatSendMessageService {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
 
-            for (String openId : openIdList) {
+            for (String openId : openidSet) {
                 wechatNoticeVO.put("touser", openId);
                 HttpEntity<HashMap> requestEntity = new HttpEntity(wechatNoticeVO, headers);
                 //调用请求
