@@ -23,6 +23,7 @@ import com.hk.jigai.module.system.service.scenecode.SceneCodeService;
 import com.hk.jigai.module.system.service.user.AdminUserService;
 import com.hk.jigai.module.system.util.operate.OperateConstant;
 import jodd.util.StringUtil;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -33,10 +34,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.hk.jigai.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -204,18 +202,28 @@ public class OperationOrderServiceImpl implements OperationOrderService {
                 appIdMap.put("appid", appId);
                 appIdMap.put("pagepath", path + operationOrder.getId());
                 wechatNoticeVO.put("miniprogram", appIdMap);
-
-                try {
-                    weChatSendMessageService.sendModelMessage(openIdList, wechatNoticeVO);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                //异步发送消息
+                printStarsAsync(openIdList, wechatNoticeVO);
+//                try {
+//                    weChatSendMessageService.sendModelMessage(openIdList, wechatNoticeVO);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
             }
         }
         //新增时发送新订单消息
         sendOrderStatusChangeMsg();
         // 返回
         return operationOrder.getId();
+    }
+
+    @Async
+    public void printStarsAsync(List<String> openIdList, Map wechatNoticeVO) {
+        try {
+            weChatSendMessageService.sendModelMessage(openIdList, wechatNoticeVO);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -1117,7 +1125,8 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         }
     }
 
-    private void orderStatusChangeNotice(List<String> openIds, String code, String orderStatus, String operatorName, String time) {
+    @Async
+    public void orderStatusChangeNotice(List<String> openIds, String code, String orderStatus, String operatorName, String time) {
         OperationOrderDO operationOrderDO = operationOrderMapper.selectOne(new QueryWrapper<OperationOrderDO>().lambda().eq(OperationOrderDO::getCode, code));
 
         try {
