@@ -83,6 +83,7 @@ public class ReasonableSuggestionDO extends BaseDO {
     /**
      * 附件地址
      */
+    @TableField( updateStrategy = FieldStrategy.IGNORED)
     private String filePath;
 
     @TableField(exist = false)

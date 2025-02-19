@@ -10,6 +10,7 @@ import com.hk.jigai.module.system.dal.mysql.dept.DeptMapper;
 import com.hk.jigai.module.system.dal.mysql.reasonablesuggestion.ReasonableSuggestionMapper;
 import jodd.util.CollectionUtil;
 import jodd.util.StringUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -73,6 +74,8 @@ public class ReasonableSuggestionServiceImpl implements ReasonableSuggestionServ
             List<String> urls = fileList.stream().map(p -> p.getUrl()).collect(Collectors.toList());
             String filePath = String.join(";", urls);
             updateObj.setFilePath(filePath);
+        } else {
+            updateObj.setFilePath(null);
         }
         DeptDO deptDO = deptMapper.selectById(updateObj.getDeptId());
         updateObj.setDeptName(deptDO.getName());

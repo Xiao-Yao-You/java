@@ -24,7 +24,14 @@ public interface OperationOrderService {
      * @param createReqVO 创建信息
      * @return 编号
      */
-    Long createOperationOrder(@Valid OperationOrderSaveReqVO createReqVO);
+    CreateVO createOperationOrder(@Valid OperationOrderSaveReqVO createReqVO);
+
+    /**
+     * 发送创建工单消息
+     * @param openIdList
+     * @param wechatNoticeVO
+     */
+    void sendCreateMsg(List<String> openIdList, Map wechatNoticeVO);
 
     /**
      * 更新工单

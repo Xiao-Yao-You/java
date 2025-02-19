@@ -23,6 +23,7 @@ import com.hk.jigai.module.system.service.scenecode.SceneCodeService;
 import com.hk.jigai.module.system.service.user.AdminUserService;
 import com.hk.jigai.module.system.util.operate.OperateConstant;
 import jodd.util.StringUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +36,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import static com.hk.jigai.framework.common.exception.util.ServiceExceptionUtil.exception;
@@ -85,6 +88,9 @@ public class OperationOrderServiceImpl implements OperationOrderService {
     @Resource
     private OperationDeviceMapper operationDeviceMapper;
 
+    // 定义线程池（可选）
+    private final Executor asyncExecutor = Executors.newFixedThreadPool(2);
+
     /**
      * 新建工单消息模板
      */
@@ -96,7 +102,7 @@ public class OperationOrderServiceImpl implements OperationOrderService {
 
     @Override
     @Transactional
-    public Long createOperationOrder(OperationOrderSaveReqVO createReqVO) {
+    public CreateVO createOperationOrder(OperationOrderSaveReqVO createReqVO) {
 
         LocalTime currentTime = LocalTime.now();
         LocalTime startTime = LocalTime.of(8, 0);
@@ -133,7 +139,7 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         operationOrderOperateRecordMapper.insert(operationOrderOperateRecordDO);
 
         List<String> openIdList = new ArrayList<>();
-
+        CreateVO createVO = new CreateVO();
         List<OperationNoticeObjectDO> allUsers = operationNoticeObjectService.getAllUsers();
         if (CollectionUtil.isNotEmpty(allUsers)) {
             List<Long> collect = allUsers.stream().map(p -> p.getUserId()).collect(Collectors.toList());
@@ -167,58 +173,51 @@ public class OperationOrderServiceImpl implements OperationOrderService {
 //            wechatNoticeVO.setData(dataMap);
 //            wechatNoticeVO.setMiniprogram(wechatNoticeVO.createMiniProgram(appId, path + operationOrder.getId()));
 
-            LocalTime now = LocalTime.now();
 
-            LocalTime start = LocalTime.of(8, 0);
-
-            LocalTime end = LocalTime.of(17, 0);
-
-            boolean isBetween = !now.isBefore(start) && !now.isAfter(end);
-
-            //上午八点-下午五点，发送新工单通知
-            if (isBetween) {
-
-                Map wechatNoticeVO = new HashMap();
-                wechatNoticeVO.put("template_id", templateId);
-                Map dataMap = new HashMap<>();
-                Map cs = new HashMap<>();
-                cs.put("value", operationOrder.getCode());
-                dataMap.put("character_string2", cs);    //工单编号
-                Map t5 = new HashMap<>();
-                t5.put("value", operationOrder.getSubmitUserNickName());
-                dataMap.put("thing5", t5);    //报修人员
-                Map t3 = new HashMap<>();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                t3.put("value", operationOrder.getCreateTime().format(formatter));
-                dataMap.put("time3", t3);//报修时间
-                Map p13 = new HashMap<>();
-                p13.put("value", operationOrder.getSubmitUserMobile());
-                dataMap.put("phone_number13", p13);//联系电话
-                Map t6 = new HashMap<>();
-                t6.put("value", operationOrder.getDescription());
-                dataMap.put("thing6", t6);//故障描述
-                wechatNoticeVO.put("data", dataMap);
-                Map appIdMap = new HashMap<>();
-                appIdMap.put("appid", appId);
-                appIdMap.put("pagepath", path + operationOrder.getId());
-                wechatNoticeVO.put("miniprogram", appIdMap);
-                //异步发送消息
-                printStarsAsync(openIdList, wechatNoticeVO);
+            Map wechatNoticeVO = new HashMap();
+            wechatNoticeVO.put("template_id", templateId);
+            Map dataMap = new HashMap<>();
+            Map cs = new HashMap<>();
+            cs.put("value", operationOrder.getCode());
+            dataMap.put("character_string2", cs);    //工单编号
+            Map t5 = new HashMap<>();
+            t5.put("value", operationOrder.getSubmitUserNickName());
+            dataMap.put("thing5", t5);    //报修人员
+            Map t3 = new HashMap<>();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            t3.put("value", operationOrder.getCreateTime().format(formatter));
+            dataMap.put("time3", t3);//报修时间
+            Map p13 = new HashMap<>();
+            p13.put("value", operationOrder.getSubmitUserMobile());
+            dataMap.put("phone_number13", p13);//联系电话
+            Map t6 = new HashMap<>();
+            t6.put("value", operationOrder.getDescription());
+            dataMap.put("thing6", t6);//故障描述
+            wechatNoticeVO.put("data", dataMap);
+            Map appIdMap = new HashMap<>();
+            appIdMap.put("appid", appId);
+            appIdMap.put("pagepath", path + operationOrder.getId());
+            wechatNoticeVO.put("miniprogram", appIdMap);
+            //异步发送消息
+//                printStarsAsync(openIdList, wechatNoticeVO);
 //                try {
 //                    weChatSendMessageService.sendModelMessage(openIdList, wechatNoticeVO);
 //                } catch (Exception e) {
 //                    e.printStackTrace();
 //                }
-            }
+            createVO.setOpenIdList(openIdList);
+            createVO.setMap(wechatNoticeVO);
         }
+        createVO.setId(operationOrder.getId());
+
         //新增时发送新订单消息
         sendOrderStatusChangeMsg();
         // 返回
-        return operationOrder.getId();
+        return createVO;
     }
 
-    @Async
-    public void printStarsAsync(List<String> openIdList, Map wechatNoticeVO) {
+    @Override
+    public void sendCreateMsg(List<String> openIdList, Map wechatNoticeVO) {
         try {
             weChatSendMessageService.sendModelMessage(openIdList, wechatNoticeVO);
         } catch (Exception e) {
@@ -624,14 +623,15 @@ public class OperationOrderServiceImpl implements OperationOrderService {
                     }
                 }
             }
-
             String code = operationOrderDO.getCode();
             String orderStatus = "待处理";
             String operatorName = "工单由" + operateRecordDO.getOperateUserNickName() + "指派给" + operateRecordDO.getUserNickName();
             String time = operateRecordDO.getCreateTime().format(formatter);
             if (StringUtil.isNotBlank(repairerOpenId)) {
                 openIds.add(repairerOpenId);
-                orderStatusChangeNotice(openIds, code, orderStatus, operatorName, time);
+                asyncExecutor.execute(() -> {
+                    orderStatusChangeNotice(openIds, code, orderStatus, operatorName, time);
+                });
             }
             //发送和订单处理消息
             sendOrderStatusChangeMsg();
@@ -692,7 +692,9 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             }
             if (StringUtil.isNotBlank(repairerOpenId)) {
                 openIds.add(repairerOpenId);
-                orderStatusChangeNotice(openIds, code, orderStatus, operatorName, time);
+                asyncExecutor.execute(() -> {
+                    orderStatusChangeNotice(openIds, code, orderStatus, operatorName, time);
+                });
             }
             //发送和订单处理消息
             sendOrderStatusChangeMsg();
@@ -1128,8 +1130,8 @@ public class OperationOrderServiceImpl implements OperationOrderService {
     @Async
     public void orderStatusChangeNotice(List<String> openIds, String code, String orderStatus, String operatorName, String time) {
         OperationOrderDO operationOrderDO = operationOrderMapper.selectOne(new QueryWrapper<OperationOrderDO>().lambda().eq(OperationOrderDO::getCode, code));
-
         try {
+            Thread.sleep(500);
             List<String> openIdList = openIds.stream()
                     .distinct()
                     .collect(Collectors.toList());

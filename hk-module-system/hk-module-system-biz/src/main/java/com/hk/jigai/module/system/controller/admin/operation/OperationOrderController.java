@@ -1,6 +1,8 @@
 package com.hk.jigai.module.system.controller.admin.operation;
 
 import com.hk.jigai.module.system.dal.dataobject.operation.OperationOrderOperateRecordDO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -14,8 +16,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import javax.validation.constraints.*;
 import javax.validation.*;
 import javax.servlet.http.*;
+import java.time.LocalTime;
 import java.util.*;
 import java.io.IOException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import com.hk.jigai.framework.common.pojo.PageParam;
 import com.hk.jigai.framework.common.pojo.PageResult;
@@ -40,14 +45,48 @@ import com.hk.jigai.module.system.service.operation.OperationOrderService;
 @Validated
 public class OperationOrderController {
 
+//    @Autowired
+//    private OperationOrderController self;
+
     @Resource
     private OperationOrderService operationOrderService;
+
+    private final Executor asyncExecutor = Executors.newFixedThreadPool(2);
 
     @PostMapping("/create")
     @Operation(summary = "创建工单")
 //    @PreAuthorize("@ss.hasPermission('hk:operation-order:create')")
     public CommonResult<Long> createOperationOrder(@Valid @RequestBody OperationOrderSaveReqVO createReqVO) {
-        return success(operationOrderService.createOperationOrder(createReqVO));
+
+        CreateVO createVO = creatOrder(createReqVO);
+        LocalTime now = LocalTime.now();
+        LocalTime start = LocalTime.of(8, 0);
+        LocalTime end = LocalTime.of(17, 0);
+        boolean isBetween = !now.isBefore(start) && !now.isAfter(end);
+
+        //上午八点-下午五点，发送新工单通知
+        if (isBetween && createVO.getOpenIdList().size() > 0) {
+            asyncExecutor.execute(() -> {
+                sendCreateMsg(createVO);
+            });
+        }
+        return success(createVO.getId());
+    }
+
+    public CreateVO creatOrder(OperationOrderSaveReqVO createReqVO) {
+        CreateVO createVO = operationOrderService.createOperationOrder(createReqVO);
+        return createVO;
+    }
+
+    @Async
+    public void sendCreateMsg(CreateVO createVO) {
+        // 模拟耗时操作
+        try {
+            Thread.sleep(500);
+            operationOrderService.sendCreateMsg(createVO.getOpenIdList(), createVO.getMap());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @PutMapping("/update")
@@ -124,10 +163,9 @@ public class OperationOrderController {
 
     @GetMapping("/getUnDealOrderCount")
     @Operation(summary = "查询未处理的工单数量")
-    public CommonResult<Integer> getUnDealOrderCount(){
+    public CommonResult<Integer> getUnDealOrderCount() {
         return operationOrderService.getUnDealOrderCount();
     }
 
 
-    
 }
