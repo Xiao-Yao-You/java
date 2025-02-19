@@ -21,6 +21,7 @@ import com.hk.jigai.module.system.dal.mysql.dept.DeptMapper;
 import com.hk.jigai.module.system.dal.mysql.operation.*;
 import com.hk.jigai.module.system.dal.mysql.operationdeviceaccessoryhistory.OperationDeviceAccessoryHistoryMapper;
 import com.hk.jigai.module.system.dal.mysql.operationdevicehistory.OperationDeviceHistoryMapper;
+import com.hk.jigai.module.system.dal.mysql.operationdevicemodel.OperationDeviceModelMapper;
 import com.hk.jigai.module.system.dal.mysql.operationdevicepicturehistory.OperationDevicePictureHistoryMapper;
 import com.hk.jigai.module.system.dal.mysql.user.AdminUserMapper;
 import com.hk.jigai.module.system.service.dept.DeptService;
@@ -101,6 +102,9 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
     @Resource
     private DeptMapper deptMapper;
 
+    @Resource
+    private OperationDeviceModelMapper operationDeviceModelMapper;
+
     @Override
     @Transactional
     public Long createOperationDevice(OperationDeviceSaveReqVO createReqVO) {
@@ -135,6 +139,10 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
         operationDeviceTypeMapper.updateById(operationLabelDO);
         //4.设备表插入
         OperationDeviceDO operationDevice = BeanUtils.toBean(createReqVO, OperationDeviceDO.class);
+        OperationDeviceModelDO operationDeviceModelDO = operationDeviceModelMapper.selectOne(new QueryWrapper<OperationDeviceModelDO>().lambda().eq(OperationDeviceModelDO::getId, operationDevice.getModel()));
+        if (operationDeviceModelDO != null) {
+            operationDevice.setModelName(operationDeviceModelDO.getModel());
+        }
 //        OperationAddressDO operationAddressDO = operationAddressMapper.selectById(operationDevice.getAddressId());
 //        operationDevice.setAddress(operationAddressDO == null ? "" : operationAddressDO.getAddressName());
         operationDeviceMapper.insert(operationDevice);
@@ -170,6 +178,11 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
         updateObj.setUserNickName(last.getUserNickName());
         updateObj.setAddressId(last.getAddressId());
         updateObj.setAddress(last.getAddress());
+
+        OperationDeviceModelDO operationDeviceModelDO = operationDeviceModelMapper.selectOne(new QueryWrapper<OperationDeviceModelDO>().lambda().eq(OperationDeviceModelDO::getId, updateObj.getModel()));
+        if (operationDeviceModelDO != null) {
+            updateObj.setModelName(operationDeviceModelDO.getModel());
+        }
         operationDeviceMapper.updateById(updateObj);
         //5.图片
         operationDevicePictureMapper.delete(new QueryWrapper<OperationDevicePictureDO>().lambda()

@@ -13,6 +13,7 @@ import com.hk.jigai.module.system.dal.dataobject.operationdevicemodel.OperationD
 import com.hk.jigai.module.system.service.dict.DictDataService;
 import com.hk.jigai.module.system.service.operation.*;
 import com.hk.jigai.module.system.service.operationdevicemodel.OperationDeviceModelService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
