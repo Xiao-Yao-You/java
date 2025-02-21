@@ -95,6 +95,14 @@ public class ReasonableSuggestionController {
         return success(BeanUtils.toBean(pageResult, ReasonableSuggestionRespVO.class));
     }
 
+    @GetMapping("/pageForApp")
+    @Operation(summary = "获得合理化建议分页")
+    @PreAuthorize("@ss.hasPermission('reasonableSuggestion::query')")
+    public CommonResult<PageResult<ReasonableSuggestionRespVO>> pageForApp(@Valid ReasonableSuggestionPageReqVO pageReqVO) {
+        PageResult<ReasonableSuggestionDO> pageResult = reasonableSuggestionService.getPageForApp(pageReqVO);
+        return success(BeanUtils.toBean(pageResult, ReasonableSuggestionRespVO.class));
+    }
+
     @GetMapping("/export-excel")
     @Operation(summary = "导出合理化建议 Excel")
     @PreAuthorize("@ss.hasPermission('reasonableSuggestion::export')")

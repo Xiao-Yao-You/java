@@ -39,4 +39,6 @@ public class ReasonableSuggestionPageReqVO extends PageParam {
     @Schema(description = "附件地址")
     private List<OperationDevicePictureSaveReqVO> fileList;
 
+    private Long userId;
+
 }

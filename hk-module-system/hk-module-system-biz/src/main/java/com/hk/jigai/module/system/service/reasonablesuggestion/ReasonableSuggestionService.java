@@ -53,6 +53,14 @@ public interface ReasonableSuggestionService {
     PageResult<ReasonableSuggestionDO> getPage(ReasonableSuggestionPageReqVO pageReqVO);
 
     /**
+     * 获得合理化建议分页
+     *
+     * @param pageReqVO 分页查询
+     * @return 合理化建议分页
+     */
+    PageResult<ReasonableSuggestionDO> getPageForApp(ReasonableSuggestionPageReqVO pageReqVO);
+
+    /**
      * 审核合理化建议
      *
      * @param id

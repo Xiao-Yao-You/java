@@ -21,6 +21,7 @@ public interface ReasonableSuggestionMapper extends BaseMapperX<ReasonableSugges
         return selectPage(reqVO, new LambdaQueryWrapperX<ReasonableSuggestionDO>()
                 .eqIfPresent(ReasonableSuggestionDO::getTitle, reqVO.getTitle())
                 .eqIfPresent(ReasonableSuggestionDO::getSuggestionType, reqVO.getSuggestionType())
+                .eqIfPresent(ReasonableSuggestionDO::getUserId, reqVO.getUserId())
                 .likeIfPresent(ReasonableSuggestionDO::getNickname, reqVO.getNickname())
                 .likeIfPresent(ReasonableSuggestionDO::getDeptName, reqVO.getDeptName())
                 .eqIfPresent(ReasonableSuggestionDO::getStatus, reqVO.getStatus())

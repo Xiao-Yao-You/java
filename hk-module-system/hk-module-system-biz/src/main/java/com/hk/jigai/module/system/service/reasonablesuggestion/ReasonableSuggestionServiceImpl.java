@@ -1,6 +1,7 @@
 package com.hk.jigai.module.system.service.reasonablesuggestion;
 
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.hk.jigai.framework.security.core.util.SecurityFrameworkUtils;
 import com.hk.jigai.module.system.controller.admin.operation.vo.OperationDevicePictureSaveReqVO;
 import com.hk.jigai.module.system.controller.admin.reasonablesuggestion.vo.ReasonableSuggestionPageReqVO;
 import com.hk.jigai.module.system.controller.admin.reasonablesuggestion.vo.ReasonableSuggestionSaveReqVO;
@@ -126,6 +127,13 @@ public class ReasonableSuggestionServiceImpl implements ReasonableSuggestionServ
 
     @Override
     public PageResult<ReasonableSuggestionDO> getPage(ReasonableSuggestionPageReqVO pageReqVO) {
+        return reasonableSuggestionMapper.selectPage(pageReqVO);
+    }
+
+
+    @Override
+    public PageResult<ReasonableSuggestionDO> getPageForApp(ReasonableSuggestionPageReqVO pageReqVO) {
+        pageReqVO.setUserId(SecurityFrameworkUtils.getLoginUserId());
         return reasonableSuggestionMapper.selectPage(pageReqVO);
     }
 
