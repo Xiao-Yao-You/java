@@ -1,16 +1,12 @@
 package com.hk.jigai.module.system.controller.admin.reasonablesuggestion.vo;
 
-import com.alibaba.excel.annotation.ExcelIgnore;
-import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.excel.annotation.write.style.*;
 import com.alibaba.excel.enums.poi.BorderStyleEnum;
 import com.alibaba.excel.enums.poi.FillPatternTypeEnum;
 import com.alibaba.excel.enums.poi.HorizontalAlignmentEnum;
-import com.alibaba.excel.metadata.data.WriteCellData;
 import com.hk.jigai.framework.excel.core.annotations.DictFormat;
 import com.hk.jigai.framework.excel.core.convert.DictConvert;
-import com.hk.jigai.module.system.controller.admin.operation.vo.OperationDevicePictureSaveReqVO;
 import com.hk.jigai.module.system.controller.admin.reasonablesuggestion.export.ImageUrlConverter;
 import com.hk.jigai.module.system.enums.DictTypeConstants;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -21,7 +17,6 @@ import lombok.NoArgsConstructor;
 
 import java.net.URL;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
