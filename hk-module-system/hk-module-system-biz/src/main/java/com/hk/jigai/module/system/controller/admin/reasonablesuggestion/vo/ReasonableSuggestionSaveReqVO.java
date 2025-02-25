@@ -57,4 +57,7 @@ public class ReasonableSuggestionSaveReqVO {
 
     @Schema(description = "附件地址")
     private List<OperationDevicePictureSaveReqVO> fileList;
+
+    @Schema(description = "审核备注")
+    private String remark;
 }

@@ -1,12 +1,18 @@
 package com.hk.jigai.module.system.controller.admin.reasonablesuggestion.vo;
 
+import com.hk.jigai.framework.excel.core.annotations.DictFormat;
 import com.hk.jigai.module.system.controller.admin.operation.vo.OperationDevicePictureSaveReqVO;
+import com.hk.jigai.module.system.enums.DictTypeConstants;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+
 import java.util.*;
 import java.util.*;
+
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDateTime;
+
 import com.alibaba.excel.annotation.*;
 
 @Schema(description = "管理后台 - 合理化建议 Response VO")
@@ -24,6 +30,7 @@ public class ReasonableSuggestionRespVO {
 
     @Schema(description = "建议类型", example = "1")
     @ExcelProperty("建议类型")
+    @DictFormat(DictTypeConstants.SUGGESTION_TYPE)
     private Integer suggestionType;
 
     @Schema(description = "申报人id", example = "31928")
@@ -64,6 +71,7 @@ public class ReasonableSuggestionRespVO {
 
     @Schema(description = "建议状态", example = "2")
     @ExcelProperty("建议状态")
+    @DictFormat(DictTypeConstants.SUGGESTION_STATUS)
     private Integer status;
 
     @Schema(description = "是否匿名")
@@ -80,5 +88,9 @@ public class ReasonableSuggestionRespVO {
 
     @Schema(description = "附件地址")
     private List<OperationDevicePictureSaveReqVO> fileList;
+
+    @Schema(description = "审核备注")
+    private String remark;
+
 
 }

@@ -9,6 +9,9 @@ public interface DictTypeConstants {
 
     String USER_TYPE = "user_type"; // 用户类型
     String COMMON_STATUS = "common_status"; // 系统状态
+    String SUGGESTION_STATUS = "adoption_status"; // 合理化建议状态
+    String SUGGESTION_TYPE = "suggestion_type"; // 合理化建议类型
+    String ANONYMOUS = "anonymous"; // 合理化建议类型
 
     // ========== SYSTEM 模块 ==========
 
@@ -23,5 +26,6 @@ public interface DictTypeConstants {
     String SMS_TEMPLATE_TYPE = "system_sms_template_type"; // 短信模板类型
     String SMS_SEND_STATUS = "system_sms_send_status"; // 短信发送状态
     String SMS_RECEIVE_STATUS = "system_sms_receive_status"; // 短信接收状态
+
 
 }

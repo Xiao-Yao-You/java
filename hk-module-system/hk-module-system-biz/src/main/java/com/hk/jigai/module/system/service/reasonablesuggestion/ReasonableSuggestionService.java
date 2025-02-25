@@ -5,7 +5,10 @@ import com.hk.jigai.module.system.controller.admin.reasonablesuggestion.vo.Reaso
 import com.hk.jigai.module.system.controller.admin.reasonablesuggestion.vo.ReasonableSuggestionSaveReqVO;
 import com.hk.jigai.module.system.dal.dataobject.reasonablesuggestion.ReasonableSuggestionDO;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.net.MalformedURLException;
+import java.util.List;
 
 /**
  * 合理化建议 Service 接口
@@ -66,5 +69,31 @@ public interface ReasonableSuggestionService {
      * @param id
      * @param examineType
      */
-    void examine(Long id, Integer examineType);
+    void examine(Long id, Integer examineType,String remark);
+
+    /**
+     * 设置单条已读
+     *
+     * @param id
+     */
+    void read(Long id);
+
+    /**
+     * 一键已读
+     */
+    void allRead();
+
+    /**
+     * 获取所有未审核的合理化建议
+     *
+     * @return
+     */
+    List<ReasonableSuggestionDO> getAllSuggestion();
+
+    /**
+     * 导出数据
+     *
+     * @param list
+     */
+    void exportData(List<ReasonableSuggestionDO> list, HttpServletResponse response) throws MalformedURLException;
 }

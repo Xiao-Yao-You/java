@@ -1,5 +1,6 @@
 package com.hk.jigai.module.system.controller.admin.reasonablesuggestion;
 
+import com.hk.jigai.module.system.controller.admin.reasonablesuggestion.vo.ReasonableSuggestionExportReqVO;
 import com.hk.jigai.module.system.controller.admin.reasonablesuggestion.vo.ReasonableSuggestionPageReqVO;
 import com.hk.jigai.module.system.controller.admin.reasonablesuggestion.vo.ReasonableSuggestionRespVO;
 import com.hk.jigai.module.system.controller.admin.reasonablesuggestion.vo.ReasonableSuggestionSaveReqVO;
@@ -73,8 +74,8 @@ public class ReasonableSuggestionController {
     @PostMapping("/examine")
     @Operation(summary = "审核合理化建议")
     @PreAuthorize("@ss.hasPermission('reasonableSuggestion::examine')")
-    public CommonResult<Boolean> examine(@RequestParam("id") Long id,@RequestParam("examineType") Integer examineType) {
-        reasonableSuggestionService.examine(id,examineType);
+    public CommonResult<Boolean> examine(@RequestParam("id") Long id, @RequestParam("examineType") Integer examineType, @RequestParam("remark") String remark) {
+        reasonableSuggestionService.examine(id, examineType, remark);
         return success(true);
     }
 
@@ -110,10 +111,30 @@ public class ReasonableSuggestionController {
     public void exportExcel(@Valid ReasonableSuggestionPageReqVO pageReqVO,
                             HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<ReasonableSuggestionDO> list = reasonableSuggestionService.getPage(pageReqVO).getList();
+        List<ReasonableSuggestionDO> list = reasonableSuggestionService.getAllSuggestion();
         // 导出 Excel
-        ExcelUtils.write(response, "合理化建议.xls", "数据", ReasonableSuggestionRespVO.class,
-                BeanUtils.toBean(list, ReasonableSuggestionRespVO.class));
+        reasonableSuggestionService.exportData(list, response);
+//        ExcelUtils.write(response, "合理化建议.xls", "数据", ReasonableSuggestionExportReqVO.class,
+//                BeanUtils.toBean(list, ReasonableSuggestionExportReqVO.class));
     }
+
+    @PostMapping("/read")
+    @Operation(summary = "单条已读合理化建议")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('reasonableSuggestion::read')")
+    public CommonResult<Boolean> read(@RequestParam("id") Long id) {
+        reasonableSuggestionService.read(id);
+        return success(true);
+    }
+
+    @PostMapping("/allRead")
+    @Operation(summary = "一键已读合理化建议")
+    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @PreAuthorize("@ss.hasPermission('reasonableSuggestion::allRead')")
+    public CommonResult<Boolean> allRead() {
+        reasonableSuggestionService.allRead();
+        return success(true);
+    }
+
 
 }

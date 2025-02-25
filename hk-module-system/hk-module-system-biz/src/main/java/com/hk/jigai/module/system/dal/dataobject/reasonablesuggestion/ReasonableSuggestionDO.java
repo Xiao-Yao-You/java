@@ -2,9 +2,11 @@ package com.hk.jigai.module.system.dal.dataobject.reasonablesuggestion;
 
 import com.hk.jigai.module.system.controller.admin.operation.vo.OperationDevicePictureSaveReqVO;
 import lombok.*;
+
 import java.util.*;
 import java.time.LocalDateTime;
 import java.time.LocalDateTime;
+
 import com.baomidou.mybatisplus.annotation.*;
 import com.hk.jigai.framework.mybatis.core.dataobject.BaseDO;
 
@@ -83,10 +85,15 @@ public class ReasonableSuggestionDO extends BaseDO {
     /**
      * 附件地址
      */
-    @TableField( updateStrategy = FieldStrategy.IGNORED)
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String filePath;
 
     @TableField(exist = false)
     private List<OperationDevicePictureSaveReqVO> fileList;
+
+    /**
+     * 审核备注
+     */
+    private String remark;
 
 }
