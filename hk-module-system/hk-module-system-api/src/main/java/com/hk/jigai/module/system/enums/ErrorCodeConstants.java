@@ -218,6 +218,8 @@ public interface ErrorCodeConstants {
     ErrorCode INSPECTION_PROJECT_NOT_EXISTS = new ErrorCode(1_002_033_018, "巡检项目指标不存在");
     ErrorCode INSPECTION_RECORD_NOT_EXISTS = new ErrorCode(1_002_033_019, "设备巡检记录不存在");
     ErrorCode INSPECTION_RECORD_DETAIL_NOT_EXISTS = new ErrorCode(1_002_033_020, "巡检记录详情不存在");
+    ErrorCode OPERATION_GROUP_NOT_EXISTS = new ErrorCode(1_002_033_021, "运维小组不存在");
+    ErrorCode OPERATION_GROUP_EXISTS = new ErrorCode(1_002_033_022, "已存在相同请求类型的分组");
 
     //抽奖
     ErrorCode PRIZE_DRAW_ACTIVITY_NOT_EXISTS = new ErrorCode(1_002_034_001, "抽奖活动已失效或不存在");
