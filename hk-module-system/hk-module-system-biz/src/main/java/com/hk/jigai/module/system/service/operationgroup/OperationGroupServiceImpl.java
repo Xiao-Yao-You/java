@@ -43,7 +43,7 @@ public class OperationGroupServiceImpl implements OperationGroupService {
     @Override
     public Long createOperationGroup(OperationGroupSaveReqVO createReqVO) {
 
-        List<OperationGroupDO> operationGroupDOS = operationGroupMapper.selectList(new QueryWrapper<OperationGroupDO>().lambda().eq(OperationGroupDO::getGroup, createReqVO.getGroup()));
+        List<OperationGroupDO> operationGroupDOS = operationGroupMapper.selectList(new QueryWrapper<OperationGroupDO>().lambda().eq(OperationGroupDO::getGroupId, createReqVO.getGroupId()));
         if (CollectionUtil.isNotEmpty(operationGroupDOS)) {
             throw exception(OPERATION_GROUP_EXISTS);
         }
@@ -60,7 +60,7 @@ public class OperationGroupServiceImpl implements OperationGroupService {
         validateOperationGroupExists(updateReqVO.getId());
 
         List<OperationGroupDO> operationGroupDOS = operationGroupMapper.selectList(new QueryWrapper<OperationGroupDO>().lambda()
-                .eq(OperationGroupDO::getGroup, updateReqVO.getGroup())
+                .eq(OperationGroupDO::getGroupId, updateReqVO.getGroupId())
                 .ne(OperationGroupDO::getId, updateReqVO.getId()));
         //存在不是本条数据的相同请求类型的分组
         if (CollectionUtil.isNotEmpty(operationGroupDOS)) {
@@ -87,7 +87,8 @@ public class OperationGroupServiceImpl implements OperationGroupService {
 
     @Override
     public OperationGroupDO getOperationGroup(Long id) {
-        return operationGroupMapper.selectById(id);
+        OperationGroupDO operationGroupDO = operationGroupMapper.selectById(id);
+        return operationGroupDO;
     }
 
     @Override
@@ -102,7 +103,7 @@ public class OperationGroupServiceImpl implements OperationGroupService {
 
     @Override
     public List<AdminUserDO> getGroupUsers(Long groupId) {
-        OperationGroupDO operationGroupDO = operationGroupMapper.selectOne(new QueryWrapper<OperationGroupDO>().lambda().eq(OperationGroupDO::getGroup, groupId));
+        OperationGroupDO operationGroupDO = operationGroupMapper.selectOne(new QueryWrapper<OperationGroupDO>().lambda().eq(OperationGroupDO::getGroupId, groupId));
         Set<Long> userIds = operationGroupDO.getUserIds();
         List<AdminUserDO> adminUserDOS = new ArrayList<>();
         if (CollectionUtil.isNotEmpty(userIds)) {

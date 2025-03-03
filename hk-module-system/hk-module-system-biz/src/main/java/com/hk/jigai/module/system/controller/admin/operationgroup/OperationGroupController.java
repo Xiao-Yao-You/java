@@ -38,7 +38,7 @@ import static com.hk.jigai.framework.apilog.core.enums.OperateTypeEnum.*;
 
 @Tag(name = "管理后台 - 运维小组")
 @RestController
-@RequestMapping("/hk/operation-group")
+@RequestMapping("/operation-group")
 @Validated
 public class OperationGroupController {
 

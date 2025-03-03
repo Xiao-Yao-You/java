@@ -27,7 +27,7 @@ public class OperationGroupRespVO {
 
     @Schema(description = "分组")
     @ExcelProperty("分组")
-    private String group;
+    private String groupId;
 
     @Schema(description = "创建时间", requiredMode = Schema.RequiredMode.REQUIRED)
     @ExcelProperty("创建时间")

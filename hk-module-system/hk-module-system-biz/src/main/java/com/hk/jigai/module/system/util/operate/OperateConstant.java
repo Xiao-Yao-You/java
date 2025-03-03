@@ -18,6 +18,7 @@ public class OperateConstant {
         public static final Integer KAISHI_TYPE = 7;//开始
         public static final Integer OUTSOURCING_TYPE = 8;//委外维修
         public static final Integer OUTSOURCING_RESTART_TYPE = 9;//委外维修,重启操作
+        public static final Integer CLOSE_ORDER_TYPE = 10;//直接关单
 
 
     //状态,00 待分配,01 待处理,02 进行中,03 挂起中,04 已处理,05 已完成,0501:无需处理,0502:无法排除故障,06 已撤销
@@ -33,6 +34,7 @@ public class OperateConstant {
     public static final String COMPLETE_NO_NEED_DEAL_STATUS = "0601";//无需处理
     public static final String COMPLETE_CAN_NOT_DEAL_STATUS = "0602";//无法排除故障
     public static final String ROLLBACK_STATUS = "07";//撤销
+    public static final String CLOSE_ORDER_STATUS = "08";//直接关单
 
 
     //操作类型方法名
@@ -47,5 +49,6 @@ public class OperateConstant {
     public static final String KAISHI = "restart";//再次开始
     public static final String OUTSOURCING = "outsourcing";//委外维修中
     public static final String WEIWAICHONGQI = "outsourcingRestart";//委外维修后重启
+    public static final String CLOSEORDER = "closeOrder";//委外维修后重启
 
 }

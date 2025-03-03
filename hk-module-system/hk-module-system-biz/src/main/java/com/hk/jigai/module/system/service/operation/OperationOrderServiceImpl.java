@@ -1012,6 +1012,7 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             if (!OperateConstant.IN_GOING_STATUS.equals(operationOrderDO.getStatus())) {
                 throw exception(OPERATION_ORDER_OPERATE_ERROR);
             }
+
             //处理完成的工单无法继续进行状态操作
             //处理不同的完工状态
             switch (operationOrderDO.getCompleteResult()) {
@@ -1051,6 +1052,55 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             String code = operationOrderDO.getCode();
             String orderStatus = "已完成";
             String operatorName = operateRecordDO.getUserNickName() + "对工单提报完工";
+            String time = operateRecordDO.getCreateTime().format(formatter);
+            List<String> openIds = new ArrayList<>();
+            if (StringUtil.isNotBlank(repairerOpenId)) {
+                openIds.add(repairerOpenId);
+                orderStatusChangeNotice(openIds, code, orderStatus, operatorName, time);
+            }
+
+        }
+
+        /**
+         * 直接关单
+         */
+        @Transactional
+        public void closeOrder(OperationOrderDO operationOrderDO, OperationOrderOperateRecordDO operateRecordDO,
+                             OperationOrderOperateRecordDO lastOperateRecordDO) {
+
+            //只有非完成状态的工单才能直接关单
+            if (OperateConstant.COMPLETE_STATUS.equals(operationOrderDO.getStatus())||OperateConstant.WAIT_ALLOCATION_STATUS.equals(operationOrderDO.getStatus())) {
+                throw exception(OPERATION_ORDER_OPERATE_ERROR);
+            }
+
+            operationOrderDO.setStatus(OperateConstant.CLOSE_ORDER_STATUS);
+            operateRecordDO.setOperateType(OperateConstant.CLOSE_ORDER_TYPE);
+            operationOrderOperateRecordMapper.insert(operateRecordDO);
+            //处理完成时间
+            operationOrderDO.setDealTime(LocalDateTime.now());
+            List<OperationOrderOperateRecordDO> dealOperateRecordDOS = operationOrderOperateRecordMapper.selectList(new QueryWrapper<OperationOrderOperateRecordDO>().lambda()
+                    .eq(OperationOrderOperateRecordDO::getUserId, operationOrderDO.getDealUserId())
+                    .eq(OperationOrderOperateRecordDO::getOperateType, OperateConstant.XIANCHNAGQUEREN_TYPE)
+                    .eq(OperationOrderOperateRecordDO::getOrderId, operationOrderDO.getId()));
+            if (CollectionUtil.isNotEmpty(dealOperateRecordDOS)) {
+                Long sumSpend = dealOperateRecordDOS.stream().mapToLong(p -> p.getSpendTime().intValue()).sum();
+                operationOrderDO.setDealConsume(sumSpend);
+            } else {
+                operationOrderDO.setDealConsume(0L);
+            }
+            operationOrderDO.setCompleteTime(LocalDateTime.now());
+            //计算完成总耗时
+            operationOrderDO.setCompleteConsume(Duration.between(operationOrderDO.getCreateTime(), LocalDateTime.now()).toMillis());
+            operationOrderMapper.updateById(operationOrderDO);
+
+            //发送微信公众号消息--信息部内部消息
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            //给报修人的状态反馈
+            AdminUserDO repairer = adminUserService.getUser(Long.valueOf(operationOrderDO.getCreator()));
+            String repairerOpenId = repairer.getOpenid();
+            String code = operationOrderDO.getCode();
+            String orderStatus = "直接关单";
+            String operatorName = operateRecordDO.getUserNickName() + "关闭了工单";
             String time = operateRecordDO.getCreateTime().format(formatter);
             List<String> openIds = new ArrayList<>();
             if (StringUtil.isNotBlank(repairerOpenId)) {

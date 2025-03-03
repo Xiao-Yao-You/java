@@ -21,7 +21,8 @@ public enum OrderOperateEnum {
     CHEXIAO("revoke"),//撤销
     KAISHI("restart"),//重新开始
     WEIWAI("outsourcing"),//委外维修
-    WEIWAICHONGQI("outsourcingRestart");//委外维修结束后重启
+    WEIWAICHONGQI("outsourcingRestart"),//委外维修结束后重启
+    CLOSEORDER("closeOrder");//直接关单
     private final String value;
 
 }

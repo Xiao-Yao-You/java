@@ -16,6 +16,6 @@ public class OperationGroupSaveReqVO {
     private Set<Long> userIds;
 
     @Schema(description = "分组")
-    private String group;
+    private String groupId;
 
 }
