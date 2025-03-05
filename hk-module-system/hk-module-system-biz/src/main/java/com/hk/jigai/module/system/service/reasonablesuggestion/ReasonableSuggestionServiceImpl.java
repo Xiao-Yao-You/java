@@ -217,7 +217,7 @@ public class ReasonableSuggestionServiceImpl implements ReasonableSuggestionServ
 
     @Override
     public PageResult<ReasonableSuggestionDO> getPageForApp(ReasonableSuggestionPageReqVO pageReqVO) {
-        pageReqVO.setUserId(SecurityFrameworkUtils.getLoginUserId());
+        pageReqVO.setCreator(SecurityFrameworkUtils.getLoginUserId());
         return reasonableSuggestionMapper.selectPage(pageReqVO);
     }
 

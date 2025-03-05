@@ -28,6 +28,7 @@ public interface ReasonableSuggestionMapper extends BaseMapperX<ReasonableSugges
                 .eqIfPresent(ReasonableSuggestionDO::getStatus, reqVO.getStatus())
                 .eqIfPresent(ReasonableSuggestionDO::getFilePath, reqVO.getFilePath())
                 .betweenIfPresent(ReasonableSuggestionDO::getCreateTime, reqVO.getCreateTime())
+                .eqIfPresent(ReasonableSuggestionDO::getCreator, reqVO.getCreator())
                 .orderByDesc(ReasonableSuggestionDO::getId));
     }
 
