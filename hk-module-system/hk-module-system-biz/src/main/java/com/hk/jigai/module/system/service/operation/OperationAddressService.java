@@ -72,4 +72,6 @@ public interface OperationAddressService {
     AddressImportRespVO importAddressList(List<AddressImportExcelVO> list, Boolean updateSupport);
 
     OperationAddressDO getAddressByAddress(String address);
+
+    List<OperationAddressDO> getAllAddressForPage(OperationAddressRespVO reqVO);
 }

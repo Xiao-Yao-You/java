@@ -230,4 +230,9 @@ public class OperationAddressServiceImpl implements OperationAddressService {
         return operationAddressMapper.selectOne(new QueryWrapper<OperationAddressDO>().lambda().eq(OperationAddressDO::getAddressName, address));
     }
 
+    @Override
+    public List<OperationAddressDO> getAllAddressForPage(OperationAddressRespVO reqVO) {
+        return operationAddressMapper.selectList(reqVO);
+    }
+
 }

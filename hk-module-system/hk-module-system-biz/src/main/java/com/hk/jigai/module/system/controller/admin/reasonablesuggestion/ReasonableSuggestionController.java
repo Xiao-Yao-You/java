@@ -111,7 +111,7 @@ public class ReasonableSuggestionController {
     public void exportExcel(@Valid ReasonableSuggestionPageReqVO pageReqVO,
                             HttpServletResponse response) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
-        List<ReasonableSuggestionDO> list = reasonableSuggestionService.getAllSuggestion();
+        List<ReasonableSuggestionDO> list = reasonableSuggestionService.getAllSuggestion(pageReqVO);
         // 导出 Excel
         reasonableSuggestionService.exportData(list, response);
 //        ExcelUtils.write(response, "合理化建议.xls", "数据", ReasonableSuggestionExportReqVO.class,

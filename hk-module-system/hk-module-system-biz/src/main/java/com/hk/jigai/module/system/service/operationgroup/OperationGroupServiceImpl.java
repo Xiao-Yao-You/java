@@ -16,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.common.pojo.PageParam;
@@ -110,6 +111,17 @@ public class OperationGroupServiceImpl implements OperationGroupService {
             adminUserDOS = adminUserMapper.selectList(new QueryWrapper<AdminUserDO>().lambda().in(AdminUserDO::getId, userIds));
         }
         return adminUserDOS;
+    }
+
+    @Override
+    public List<OperationGroupDO> getGroupByUserId(Long userId) {
+        //所有分组
+        List<OperationGroupDO> operationGroupDOS = operationGroupMapper.selectList();
+        List<OperationGroupDO> collect = new ArrayList<>();
+        if (CollectionUtil.isNotEmpty(operationGroupDOS)) {
+            collect = operationGroupDOS.stream().filter(p -> p.getUserIds().contains(userId)).collect(Collectors.toList());
+        }
+        return collect;
     }
 
 }

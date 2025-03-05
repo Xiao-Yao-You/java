@@ -88,7 +88,7 @@ public interface ReasonableSuggestionService {
      *
      * @return
      */
-    List<ReasonableSuggestionDO> getAllSuggestion();
+    List<ReasonableSuggestionDO> getAllSuggestion(ReasonableSuggestionPageReqVO pageReqVO);
 
     /**
      * 导出数据

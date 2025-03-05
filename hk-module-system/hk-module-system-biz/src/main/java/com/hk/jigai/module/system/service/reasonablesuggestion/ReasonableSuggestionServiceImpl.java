@@ -60,8 +60,8 @@ public class ReasonableSuggestionServiceImpl implements ReasonableSuggestionServ
             String filePath = String.join(";", urls);
             reasonableSuggestionDO.setFilePath(filePath);
         }
-        DeptDO deptDO = deptMapper.selectById(createReqVO.getDeptId());
-        reasonableSuggestionDO.setDeptName(deptDO.getName());
+//        DeptDO deptDO = deptMapper.selectById(createReqVO.getDeptId());
+//        reasonableSuggestionDO.setDeptName(deptDO.getName());
         reasonableSuggestionMapper.insert(reasonableSuggestionDO);
         // 返回
         return reasonableSuggestionDO.getId();
@@ -81,8 +81,8 @@ public class ReasonableSuggestionServiceImpl implements ReasonableSuggestionServ
         } else {
             updateObj.setFilePath(null);
         }
-        DeptDO deptDO = deptMapper.selectById(updateObj.getDeptId());
-        updateObj.setDeptName(deptDO.getName());
+//        DeptDO deptDO = deptMapper.selectById(updateObj.getDeptId());
+//        updateObj.setDeptName(deptDO.getName());
         reasonableSuggestionMapper.updateById(updateObj);
     }
 
@@ -133,11 +133,14 @@ public class ReasonableSuggestionServiceImpl implements ReasonableSuggestionServ
     }
 
     @Override
-    public List<ReasonableSuggestionDO> getAllSuggestion() {
+    public List<ReasonableSuggestionDO> getAllSuggestion(ReasonableSuggestionPageReqVO pageReqVO) {
         //查询所有未审核的合理化,4:已读
-        List<ReasonableSuggestionDO> reasonableSuggestionDOS = reasonableSuggestionMapper.selectList(new QueryWrapper<ReasonableSuggestionDO>().lambda()
-                .eq(ReasonableSuggestionDO::getStatus, 4));
-
+        pageReqVO.setPageSize(10000);
+        pageReqVO.setPageNo(1);
+//        List<ReasonableSuggestionDO> reasonableSuggestionDOS = reasonableSuggestionMapper.selectList(new QueryWrapper<ReasonableSuggestionDO>().lambda()
+//                .eq(ReasonableSuggestionDO::getStatus, 4));
+        PageResult<ReasonableSuggestionDO> reasonableSuggestionDOPageResult = reasonableSuggestionMapper.selectPage(pageReqVO);
+        List<ReasonableSuggestionDO> reasonableSuggestionDOS = reasonableSuggestionDOPageResult.getList();
         reasonableSuggestionDOS.forEach(r -> {
             if ("1".equals(r.getAnonymous())) {
                 r.setNickname("— —");

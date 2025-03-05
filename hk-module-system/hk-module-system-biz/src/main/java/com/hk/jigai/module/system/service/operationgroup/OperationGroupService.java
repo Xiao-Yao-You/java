@@ -2,6 +2,7 @@ package com.hk.jigai.module.system.service.operationgroup;
 
 import java.util.*;
 import javax.validation.*;
+
 import com.hk.jigai.framework.common.pojo.PageResult;
 import com.hk.jigai.framework.common.pojo.PageParam;
 import com.hk.jigai.module.system.controller.admin.operationgroup.vo.OperationGroupPageReqVO;
@@ -56,14 +57,24 @@ public interface OperationGroupService {
 
     /**
      * 获取所有分组
+     *
      * @return
      */
     List<OperationGroupDO> getAllGroup();
 
     /**
      * 获取小组成员
+     *
      * @param groupId
      * @return
      */
     List<AdminUserDO> getGroupUsers(Long groupId);
+
+    /**
+     * 根据用户id获取所在分组
+     *
+     * @param userId
+     * @return
+     */
+    List<OperationGroupDO> getGroupByUserId(Long userId);
 }

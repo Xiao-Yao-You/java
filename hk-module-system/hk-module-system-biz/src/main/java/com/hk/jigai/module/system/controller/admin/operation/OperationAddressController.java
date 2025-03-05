@@ -92,6 +92,15 @@ public class OperationAddressController {
         return success(BeanUtils.toBean(list, OperationAddressRespVO.class));
     }
 
+
+    @GetMapping("/getAllAddress")
+    @Operation(summary = "获得运维地点List")
+//    @PreAuthorize("@ss.hasPermission('hk:operation-address:query')")
+    public CommonResult<List<OperationAddressRespVO>> getAllAddress(OperationAddressRespVO reqVO) {
+        List<OperationAddressDO> list = operationAddressService.getAllAddressForPage(reqVO);
+        return success(BeanUtils.toBean(list, OperationAddressRespVO.class));
+    }
+
     @GetMapping("/export-excel")
     @Operation(summary = "导出运维地点 Excel")
 //    @PreAuthorize("@ss.hasPermission('hk:operation-address:export')")

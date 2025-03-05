@@ -13,6 +13,13 @@ public interface DictTypeConstants {
     String SUGGESTION_TYPE = "suggestion_type"; // 合理化建议类型
     String ANONYMOUS = "anonymous"; // 合理化建议类型
 
+    //=======================工单=======================
+    String REPAIR_ORDER_STATUS = "repair_order_status"; // 工单处理状态
+    String REPAIR_ORDER_TYPE = "repair_request_type"; // 请求类型
+    String HK_LEVEL = "hk_level"; // 紧急程度
+    String SOURCE_TYPE = "source_type"; // 工单来源
+    String ORDER_TYPE = "order_type"; // 工单类型
+
     // ========== SYSTEM 模块 ==========
 
     String USER_SEX = "system_user_sex"; // 用户性别

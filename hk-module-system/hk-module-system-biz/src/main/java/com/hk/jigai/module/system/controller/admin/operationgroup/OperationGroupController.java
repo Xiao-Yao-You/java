@@ -113,4 +113,12 @@ public class OperationGroupController {
         return success(list);
     }
 
+    @GetMapping("/getGroupByUserId")
+    @Operation(summary = "根据用户id获取所在分组")
+    public CommonResult<List<OperationGroupRespVO>> getGroupByUserId(@RequestParam("userId") Long userId) {
+        List<OperationGroupDO> list = operationGroupService.getGroupByUserId(userId);
+        return success(BeanUtils.toBean(list, OperationGroupRespVO.class));
+    }
+
+
 }
