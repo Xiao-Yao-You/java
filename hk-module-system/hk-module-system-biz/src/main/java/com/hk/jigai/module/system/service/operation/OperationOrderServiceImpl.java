@@ -191,7 +191,7 @@ public class OperationOrderServiceImpl implements OperationOrderService {
             p13.put("value", operationOrder.getSubmitUserMobile());
             dataMap.put("phone_number13", p13);//联系电话
             Map t6 = new HashMap<>();
-            t6.put("value", operationOrder.getDescription());
+            t6.put("value", truncate(operationOrder.getDescription()));
             dataMap.put("thing6", t6);//故障描述
             wechatNoticeVO.put("data", dataMap);
             Map appIdMap = new HashMap<>();
@@ -215,6 +215,13 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         // 返回
         return createVO;
     }
+
+    public static String truncate(String input) {
+        if (input == null) return null;
+        // 超过10字符时，截取前7字符 + "..."
+        return input.length() > 20 ? input.substring(0, 17) + "..." : input;
+    }
+
 
     @Override
     public void sendCreateMsg(List<String> openIdList, Map wechatNoticeVO) {
@@ -1066,10 +1073,10 @@ public class OperationOrderServiceImpl implements OperationOrderService {
          */
         @Transactional
         public void closeOrder(OperationOrderDO operationOrderDO, OperationOrderOperateRecordDO operateRecordDO,
-                             OperationOrderOperateRecordDO lastOperateRecordDO) {
+                               OperationOrderOperateRecordDO lastOperateRecordDO) {
 
             //只有非完成状态的工单才能直接关单
-            if (OperateConstant.COMPLETE_STATUS.equals(operationOrderDO.getStatus())||OperateConstant.WAIT_ALLOCATION_STATUS.equals(operationOrderDO.getStatus())) {
+            if (OperateConstant.COMPLETE_STATUS.equals(operationOrderDO.getStatus()) || OperateConstant.WAIT_ALLOCATION_STATUS.equals(operationOrderDO.getStatus())) {
                 throw exception(OPERATION_ORDER_OPERATE_ERROR);
             }
 

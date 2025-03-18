@@ -82,7 +82,7 @@ public class OperationOrderController {
     public void sendCreateMsg(CreateVO createVO) {
         // 模拟耗时操作
         try {
-            Thread.sleep(500);
+            Thread.sleep(1000);
             operationOrderService.sendCreateMsg(createVO.getOpenIdList(), createVO.getMap());
         } catch (InterruptedException e) {
             e.printStackTrace();

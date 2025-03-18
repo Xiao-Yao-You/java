@@ -221,6 +221,14 @@ public interface ErrorCodeConstants {
     ErrorCode OPERATION_GROUP_NOT_EXISTS = new ErrorCode(1_002_033_021, "运维小组不存在");
     ErrorCode OPERATION_GROUP_EXISTS = new ErrorCode(1_002_033_022, "已存在相同请求类型的分组");
 
+    // ========== 个人工单处理月报 ==========
+    ErrorCode REPORT_PERSON_ORDER_NOT_EXISTS = new ErrorCode(1_002_033_023, "个人工单处理月报不存在");
+    ErrorCode REPORT_PERSON_ORDER_HAD_EXISTS = new ErrorCode(1_002_033_026, "已经生成过该月的报表");
+    // ========== 小组工单处理月报 ==========
+    ErrorCode REPORT_GROUP_ORDER_NOT_EXISTS = new ErrorCode(1_002_033_024, "小组工单处理月报不存在");
+    // ========== 各设备型号故障月报 ==========
+    ErrorCode REPORT_MODEL_ORDER_NOT_EXISTS = new ErrorCode(1_002_033_025, "各设备型号故障月报不存在");
+
     //抽奖
     ErrorCode PRIZE_DRAW_ACTIVITY_NOT_EXISTS = new ErrorCode(1_002_034_001, "抽奖活动已失效或不存在");
     ErrorCode PRIZE_DRAW_USER_NOT_EXISTS = new ErrorCode(1_002_034_002, "抽奖用户不存在");
@@ -231,7 +239,7 @@ public interface ErrorCodeConstants {
     ErrorCode PRIZE_DRAW_NOT_INFO = new ErrorCode(1_002_034_008, "信息获取失败");
     ErrorCode PRIZE_NOT_EXISTS = new ErrorCode(1_002_034_003, "奖品信息不存在");
     ErrorCode PRIZE_DRAW_OUT_USER_NOT_EXISTS = new ErrorCode(1_002_034_004, "场外参与人员不存在");
-    ErrorCode  PRIZE_DRAW_CHECK = new ErrorCode(1_002_034_009, "获取微信回调失败");
+    ErrorCode PRIZE_DRAW_CHECK = new ErrorCode(1_002_034_009, "获取微信回调失败");
     //合理化建议
     ErrorCode REASONABLE_SUGGESTION_NOT_EXISTS = new ErrorCode(1_002_035_001, "合理化建议不存在");
 
