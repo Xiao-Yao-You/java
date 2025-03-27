@@ -108,4 +108,8 @@ public interface DictDataService {
     List<DictDataDO> getDictDataListByDictType(String dictType);
 
     List<DictDataDO> getPrizeLevel();
+
+    List<DictDataDO> getGroupList();
+
+    List<DictDataDO> getCompany();
 }

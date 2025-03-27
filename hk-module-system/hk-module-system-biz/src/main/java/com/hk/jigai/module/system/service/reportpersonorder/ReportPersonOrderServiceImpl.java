@@ -9,15 +9,18 @@ import com.hk.jigai.module.system.controller.admin.reportpersonorder.vo.ReportPe
 import com.hk.jigai.module.system.controller.admin.reportpersonorder.vo.ReportPersonOrderSaveReqVO;
 import com.hk.jigai.module.system.dal.dataobject.operation.OperationOrderDO;
 import com.hk.jigai.module.system.dal.dataobject.operationgroup.OperationGroupDO;
+import com.hk.jigai.module.system.dal.dataobject.reportlist.ReportListDO;
 import com.hk.jigai.module.system.dal.dataobject.reportpersonorder.ReportPersonOrderDO;
 import com.hk.jigai.module.system.dal.dataobject.user.AdminUserDO;
 import com.hk.jigai.module.system.dal.mysql.operation.OperationOrderMapper;
 import com.hk.jigai.module.system.dal.mysql.operationgroup.OperationGroupMapper;
+import com.hk.jigai.module.system.dal.mysql.reportlist.ReportListMapper;
 import com.hk.jigai.module.system.dal.mysql.reportpersonorder.ReportPersonOrderMapper;
 import com.hk.jigai.module.system.dal.mysql.user.AdminUserMapper;
 import com.hk.jigai.module.system.util.operate.OperateConstant;
 import jodd.util.StringUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -30,8 +33,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.hk.jigai.framework.common.exception.util.ServiceExceptionUtil.exception;
-import static com.hk.jigai.module.system.enums.ErrorCodeConstants.REPORT_PERSON_ORDER_HAD_EXISTS;
-import static com.hk.jigai.module.system.enums.ErrorCodeConstants.REPORT_PERSON_ORDER_NOT_EXISTS;
+import static com.hk.jigai.module.system.enums.ErrorCodeConstants.*;
 
 /**
  * 个人工单处理月报 Service 实现类
@@ -53,6 +55,9 @@ public class ReportPersonOrderServiceImpl implements ReportPersonOrderService {
 
     @Resource
     private AdminUserMapper adminUserMapper;
+
+    @Resource
+    private ReportListMapper reportListMapper;
 
     @Override
     public Long createReportPersonOrder(ReportPersonOrderSaveReqVO createReqVO) {
@@ -97,6 +102,7 @@ public class ReportPersonOrderServiceImpl implements ReportPersonOrderService {
     }
 
     @Override
+    @Transactional
     public List<ReportPersonOrderDO> generateReport(String month) {
 
         Long reportCount = reportPersonOrderMapper.selectCount(new QueryWrapper<ReportPersonOrderDO>()
@@ -112,12 +118,12 @@ public class ReportPersonOrderServiceImpl implements ReportPersonOrderService {
         //month -->格式>>yyyy-MM
         //保存用日期格式
         SimpleDateFormat monthFormatter = new SimpleDateFormat("yyyy-MM");
-        //保存用日期格式
+        //查询用日期格式
         DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         Date queryStartDate = new Date();
         Date queryEndDate = new Date();
         try {
-            Date startOfMonth = startOfMonth = monthFormatter.parse(month);
+            Date startOfMonth = monthFormatter.parse(month);
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(startOfMonth);
             calendar.set(Calendar.DAY_OF_MONTH, 1);
@@ -167,13 +173,13 @@ public class ReportPersonOrderServiceImpl implements ReportPersonOrderService {
                     //个人总工单数量不为空的情况
                     if (CollectionUtils.isNotEmpty(personOrders)) {
                         //已完成的工单数量
-                        long completeCount = personOrders.stream().filter(o -> o.getStatus() == OperateConstant.COMPLETE_STATUS).count();
+                        long completeCount = personOrders.stream().filter(o -> OperateConstant.COMPLETE_STATUS.equals(o.getStatus())).count();
                         reportPersonOrderDO.setCompleteOrderCount((int) completeCount);
                         //待处理or进行中的工单数量
-                        long processingCount = personOrders.stream().filter(o -> o.getStatus() == OperateConstant.WAIT_DEAL_STATUS || o.getStatus() == OperateConstant.IN_GOING_STATUS).count();
+                        long processingCount = personOrders.stream().filter(o -> OperateConstant.WAIT_DEAL_STATUS.equals(o.getStatus()) || OperateConstant.IN_GOING_STATUS.equals(o.getStatus())).count();
                         reportPersonOrderDO.setProcessingOrderCount((int) processingCount);
                         //挂起的工单数量
-                        long pendingCount = personOrders.stream().filter(o -> o.getStatus() == OperateConstant.HANG_UP_STATUS).count();
+                        long pendingCount = personOrders.stream().filter(o -> OperateConstant.HANG_UP_STATUS.equals(o.getStatus())).count();
                         reportPersonOrderDO.setPendingOrderCount((int) pendingCount);
                         //处置总时长
                         long totalHandleTime = personOrders.stream().mapToLong(time -> time.getDealConsume() == null ? 0L : time.getDealConsume()).sum();
@@ -209,7 +215,7 @@ public class ReportPersonOrderServiceImpl implements ReportPersonOrderService {
                         }
                         //按时完成率
                         //按时完成数量，即个人处置时长在1h以内，1*60*60*1000
-                        long otCount = personOrders.stream().filter(o -> o.getStatus() == OperateConstant.COMPLETE_STATUS && o.getDealConsume() <= 3600000).count();
+                        long otCount = personOrders.stream().filter(o -> OperateConstant.COMPLETE_STATUS.equals(o.getStatus()) && o.getDealConsume() <= 3600000).count();
                         BigDecimal completeDecimal = BigDecimal.valueOf(completeCount);
                         BigDecimal otDecimal = BigDecimal.valueOf(otCount);
                         // 执行除法并保留两位小数（四舍五入）
@@ -278,7 +284,14 @@ public class ReportPersonOrderServiceImpl implements ReportPersonOrderService {
         }
         if (!reportPersonOrderDOList.isEmpty()) {
             reportPersonOrderMapper.insertBatch(reportPersonOrderDOList);
+        } else {
+            throw exception(REPORT_PERSON_ORDER_NO_DATA);
         }
+        //新增报表标题列表
+        ReportListDO reportListDO = new ReportListDO();
+        reportListDO.setReportTitle(month + "运维人员工单处理月度报表");
+        reportListDO.setReportMonth(month);
+        reportListMapper.insert(reportListDO);
         //F、返回整合好的数据
         return reportPersonOrderDOList;
     }

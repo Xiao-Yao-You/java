@@ -229,6 +229,13 @@ public interface ErrorCodeConstants {
     // ========== 各设备型号故障月报 ==========
     ErrorCode REPORT_MODEL_ORDER_NOT_EXISTS = new ErrorCode(1_002_033_025, "各设备型号故障月报不存在");
 
+    ErrorCode REPORT_LIST_NOT_EXISTS = new ErrorCode(1_002_033_027, "月报表列不存在");
+    ErrorCode REPORT_PERSON_ORDER_NO_DATA = new ErrorCode(1_002_033_028, "未找到当月工单数据");
+
+    ErrorCode REPORT_GROUP_ORDER_DETAIL_NOT_EXISTS = new ErrorCode(1_002_033_029, "小组工单处理月报详情不存在");
+
+    ErrorCode REPORT_DEVICE_NOT_EXISTS = new ErrorCode(1_002_033_030, "设备资产报不存在");
+
     //抽奖
     ErrorCode PRIZE_DRAW_ACTIVITY_NOT_EXISTS = new ErrorCode(1_002_034_001, "抽奖活动已失效或不存在");
     ErrorCode PRIZE_DRAW_USER_NOT_EXISTS = new ErrorCode(1_002_034_002, "抽奖用户不存在");

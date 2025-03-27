@@ -182,4 +182,14 @@ public class DictDataServiceImpl implements DictDataService {
         return dictDataMapper.selectList(new QueryWrapper<DictDataDO>().lambda().eq(DictDataDO::getDictType, "prize_level"));
     }
 
+    @Override
+    public List<DictDataDO> getGroupList() {
+        return dictDataMapper.selectList(new QueryWrapper<DictDataDO>().lambda().eq(DictDataDO::getDictType, "repair_request_type"));
+    }
+
+    @Override
+    public List<DictDataDO> getCompany() {
+        return dictDataMapper.selectList(new QueryWrapper<DictDataDO>().lambda().eq(DictDataDO::getDictType, "assets_company"));
+    }
+
 }
