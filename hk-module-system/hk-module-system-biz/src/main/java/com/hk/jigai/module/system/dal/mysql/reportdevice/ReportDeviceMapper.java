@@ -16,7 +16,7 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface ReportDeviceMapper extends BaseMapperX<ReportDeviceDO> {
-
+    
     default PageResult<ReportDeviceDO> selectPage(ReportDevicePageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<ReportDeviceDO>()
                 .eqIfPresent(ReportDeviceDO::getReportMonth, reqVO.getReportMonth())
