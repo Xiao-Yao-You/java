@@ -1,5 +1,6 @@
 package com.hk.jigai.module.system.dal.dataobject.reportgrouporder;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.util.*;
@@ -101,5 +102,9 @@ public class ReportGroupOrderDO extends BaseDO {
      * 环比增长率
      */
     private BigDecimal monthOnMonthGrowthRate;
+
+    private Integer handleTimeoutTimes;
+
+    private BigDecimal handleTimeoutRate;
 
 }

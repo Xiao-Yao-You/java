@@ -70,4 +70,10 @@ public class ReportPersonOrderSaveReqVO {
     @Schema(description = "环比增长率")
     private BigDecimal monthOnMonthGrowthRate;
 
+    @Schema(description = "处置超时次数")
+    private Integer handleTimeoutTimes;
+
+    @Schema(description = "处置超时率")
+    private BigDecimal handleTimeoutRate;
+
 }

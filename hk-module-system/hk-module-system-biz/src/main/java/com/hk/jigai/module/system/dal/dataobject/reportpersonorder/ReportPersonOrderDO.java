@@ -108,4 +108,14 @@ public class ReportPersonOrderDO extends BaseDO {
      */
     private BigDecimal monthOnMonthGrowthRate;
 
+    /**
+     * 处置超时次数
+     */
+    private Integer handleTimeoutTimes;
+
+    /**
+     * 处置超时率
+     */
+    private BigDecimal handleTimeoutRate;
+
 }

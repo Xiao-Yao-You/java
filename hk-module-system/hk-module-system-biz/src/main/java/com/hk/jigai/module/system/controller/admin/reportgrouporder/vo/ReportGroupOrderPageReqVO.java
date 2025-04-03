@@ -1,5 +1,6 @@
 package com.hk.jigai.module.system.controller.admin.reportgrouporder.vo;
 
+import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.*;
 import java.util.*;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -59,5 +60,11 @@ public class ReportGroupOrderPageReqVO extends PageParam {
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
+
+    @Schema(description = "处置超时次数")
+    private Integer handleTimeoutTimes;
+
+    @Schema(description = "处置超时率")
+    private BigDecimal handleTimeoutRate;
 
 }

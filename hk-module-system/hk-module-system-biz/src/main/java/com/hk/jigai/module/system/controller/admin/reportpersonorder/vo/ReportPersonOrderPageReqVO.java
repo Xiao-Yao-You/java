@@ -1,11 +1,13 @@
 package com.hk.jigai.module.system.controller.admin.reportpersonorder.vo;
 
-import lombok.*;
-import java.util.*;
-import io.swagger.v3.oas.annotations.media.Schema;
 import com.hk.jigai.framework.common.pojo.PageParam;
-import java.math.BigDecimal;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static com.hk.jigai.framework.common.util.date.DateUtils.FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND;
@@ -78,5 +80,11 @@ public class ReportPersonOrderPageReqVO extends PageParam {
     @Schema(description = "创建时间")
     @DateTimeFormat(pattern = FORMAT_YEAR_MONTH_DAY_HOUR_MINUTE_SECOND)
     private LocalDateTime[] createTime;
+
+    @Schema(description = "处置超时次数")
+    private Integer handleTimeoutTimes;
+
+    @Schema(description = "处置超时率")
+    private BigDecimal handleTimeoutRate;
 
 }

@@ -74,4 +74,12 @@ public class ReportGroupOrderRespVO {
     @ExcelProperty("创建时间")
     private LocalDateTime createTime;
 
+    @Schema(description = "处置超时次数")
+    @ExcelProperty("处置超时次数")
+    private Integer handleTimeoutTimes;
+
+    @Schema(description = "处置超时率")
+    @ExcelProperty("处置超时率")
+    private BigDecimal handleTimeoutRate;
+
 }
