@@ -16,6 +16,7 @@ import com.hk.jigai.module.system.dal.dataobject.operation.*;
 import com.hk.jigai.module.system.dal.dataobject.operationnoticeobject.OperationNoticeObjectDO;
 import com.hk.jigai.module.system.dal.dataobject.user.AdminUserDO;
 import com.hk.jigai.module.system.dal.mysql.operation.*;
+import com.hk.jigai.module.system.dal.mysql.user.AdminUserMapper;
 import com.hk.jigai.module.system.enums.OrderOperateEnum;
 import com.hk.jigai.module.system.service.notice.WeChatSendMessageService;
 import com.hk.jigai.module.system.service.operationnoticeobject.OperationNoticeObjectService;
@@ -87,6 +88,9 @@ public class OperationOrderServiceImpl implements OperationOrderService {
 
     @Resource
     private OperationDeviceMapper operationDeviceMapper;
+
+    @Resource
+    private AdminUserMapper adminUserMapper;
 
     // 定义线程池（可选）
     private final Executor asyncExecutor = Executors.newFixedThreadPool(2);
@@ -268,6 +272,13 @@ public class OperationOrderServiceImpl implements OperationOrderService {
         if (operationOrderDO == null) {
             throw exception(OPERATION_ORDER_NOT_EXISTS);
         }
+
+        // 关联查询处理人电话
+        AdminUserDO adminUserDO = adminUserMapper.selectById(operationOrderDO.getDealUserId());
+        if (adminUserDO != null) {
+            operationOrderDO.setDealUserMobile(adminUserDO.getMobile());
+        }
+
         OperationQuestionTypeDO operationQuestionTypeDO = operationQuestionTypeMapper.selectById(operationOrderDO.getQuestionType());
         if (operationQuestionTypeDO != null) {
             operationOrderDO.setQuestionTypeStr(operationQuestionTypeDO.getName());

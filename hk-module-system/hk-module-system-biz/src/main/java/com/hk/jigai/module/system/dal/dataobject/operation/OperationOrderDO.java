@@ -184,5 +184,6 @@ public class OperationOrderDO extends BaseDO {
     @TableField(exist = false)
     private String picture;
 
-
+    @TableField(exist = false)
+    private String dealUserMobile;
 }

@@ -100,6 +100,10 @@ public class OperationOrderRespVO {
     @ExcelProperty("处理人名称")
     private String dealUserNickName;
 
+    @Schema(description = "处理人手机号")
+    @ExcelProperty("处理人手机号")
+    private String dealUserMobile;
+
     @Schema(description = "分配人员id", example = "22442")
     @ExcelProperty("分配人员id")
     private Long allocationUserId;
