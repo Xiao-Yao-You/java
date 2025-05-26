@@ -20,7 +20,6 @@ import com.hk.jigai.module.system.dal.mysql.reportgrouporder.ReportGroupOrderMap
 import com.hk.jigai.module.system.dal.mysql.reportgrouporderdetail.ReportGroupOrderDetailMapper;
 import com.hk.jigai.module.system.service.dict.DictDataService;
 import com.hk.jigai.module.system.util.operate.OperateConstant;
-import com.sun.org.apache.regexp.internal.RE;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -118,8 +117,8 @@ public class ReportGroupOrderServiceImpl implements ReportGroupOrderService {
         List<ReportGroupOrderDO> groupOrderDOList = new ArrayList<>();
         List<ReportGroupOrderDetailDO> groupOrderDetailDOList = new ArrayList<>();
 
-        //查询所有问题类型，放在循环外面处理，减少复杂度
-        //先获取根节点问题类型
+        // 查询所有问题类型，放在循环外面处理，减少复杂度
+        // 先获取根节点问题类型
         Map<String, List<Long>> questionMap = new HashMap<>();
         List<OperationQuestionTypeDO> questionTypeDOS = operationQuestionTypeMapper.selectList(new QueryWrapper<OperationQuestionTypeDO>().lambda().eq(OperationQuestionTypeDO::getParentId, 0));
         for (OperationQuestionTypeDO questionTypeDO : questionTypeDOS) {
@@ -130,10 +129,10 @@ public class ReportGroupOrderServiceImpl implements ReportGroupOrderService {
             questionMap.put(questionTypeDO.getName(), questionIds);
         }
 
-        //获取分组名称
+        // 获取分组名称
         List<DictDataDO> groupDict = dictDataService.getGroupList();
-        //1、根据设备所在地获取在指定公司的运维工单
-        //保存用日期格式
+        // 1、根据设备所在地获取在指定公司的运维工单
+        // 保存用日期格式
         SimpleDateFormat monthFormatter = new SimpleDateFormat("yyyy-MM");
         Date queryStartDate = new Date();
         Date queryEndDate = new Date();
@@ -149,16 +148,16 @@ public class ReportGroupOrderServiceImpl implements ReportGroupOrderService {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        //2.1、查询所有分组
+        // 2.1、查询所有分组
         List<OperationGroupDO> groupList = operationGroupMapper.selectList();
         for (OperationGroupDO group : groupList) {
-            //2.2、查询所有当月符合条件和组员信息的订单数据
-            //获取同一组的数据
+            // 2.2、查询所有当月符合条件和组员信息的订单数据
+            // 获取同一组的数据
             List<OperationOrderDO> groupOrderList = operationOrderMapper.selectList(new QueryWrapper<OperationOrderDO>()
                     .lambda()
                     .in(OperationOrderDO::getDealUserId, group.getUserIds() == null ? Collections.emptyList() : group.getUserIds())
                     .between(BaseDO::getCreateTime, queryStartDate, queryEndDate));
-            //新建一个小组总数据
+            // 新建一个小组总数据
             ReportGroupOrderDO reportGroupOrderDO = new ReportGroupOrderDO();
             ReportGroupOrderDetailDO reportGroupOrderDetailDO = new ReportGroupOrderDetailDO();
             String groupName = "";
@@ -166,28 +165,28 @@ public class ReportGroupOrderServiceImpl implements ReportGroupOrderService {
                 List<DictDataDO> gs = groupDict.stream().filter(g -> g.getValue().equals(group.getGroupId())).collect(Collectors.toList());
                 if (CollectionUtil.isNotEmpty(gs)) {
                     groupName = gs.get(0).getLabel();
-                    //小组Id
+                    // 小组Id
                     reportGroupOrderDO.setGroupId(Long.valueOf(group.getGroupId()));
-                    //小组名称
+                    // 小组名称
                     reportGroupOrderDO.setGroupName(groupName);
                 }
             }
-            //设置月份
+            // 设置月份
             reportGroupOrderDO.setReportMonth(month);
             reportGroupOrderDetailDO.setReportMonth(month);
-            //工单数量
+            // 工单数量
             int totalCount = groupOrderList.size();
             reportGroupOrderDO.setOrderCount(totalCount);
             if (CollectionUtil.isNotEmpty(groupOrderList)) {
-                //处理数据
+                // 处理数据
                 List<ReportGroupOrderDO> groupOrderDOs = handleGroupData(reportGroupOrderDO, groupOrderList, queryStartDate, monthFormatter, group);
                 groupOrderDOList.addAll(groupOrderDOs);
-                //处理数据详情
+                // 处理数据详情
                 List<ReportGroupOrderDetailDO> groupOrderDetailDOs = handleGroupDetailData(groupOrderList, queryStartDate, monthFormatter, group, questionMap, month, groupName);
                 groupOrderDetailDOList.addAll(groupOrderDetailDOs);
             }
         }
-        //数据存储
+        // 数据存储
         if (CollectionUtil.isNotEmpty(groupOrderDOList)) {
             reportGroupOrderMapper.insertBatch(groupOrderDOList);
         }
@@ -203,7 +202,7 @@ public class ReportGroupOrderServiceImpl implements ReportGroupOrderService {
         return groupOrderDOList;
     }
 
-    //分组数据详情
+    // 分组数据详情
     public List<ReportGroupOrderDetailDO> handleGroupDetailData(List<OperationOrderDO> groupOrderList,
                                                                 Date queryStartDate, SimpleDateFormat monthFormatter, OperationGroupDO group,
                                                                 Map<String, List<Long>> questionMap, String month, String groupName) {
@@ -215,10 +214,10 @@ public class ReportGroupOrderServiceImpl implements ReportGroupOrderService {
             reportGroupOrderDetailDO.setGroupName(groupName);
             reportGroupOrderDetailDO.setReportMonth(month);
             Map.Entry<String, List<Long>> entry = it.next();
-            //设置问题类型Name
+            // 设置问题类型Name
             reportGroupOrderDetailDO.setQuestionTypeName(entry.getKey());
             List<Long> childQuestionIds = entry.getValue();
-            //筛选符合问题类型的工单
+            // 筛选符合问题类型的工单
             List<OperationOrderDO> questionOrderList = new ArrayList<>();
             for (OperationOrderDO operationOrderDO : groupOrderList) {
                 if (childQuestionIds.contains(operationOrderDO.getQuestionType())) {
@@ -228,38 +227,38 @@ public class ReportGroupOrderServiceImpl implements ReportGroupOrderService {
             }
             if (CollectionUtil.isNotEmpty(questionOrderList)) {
                 reportGroupOrderDetailDO.setOrderCount(questionOrderList.size());
-                //已完成的工单数量
+                // 已完成的工单数量
                 long completeCount = questionOrderList.stream().filter(o -> OperateConstant.COMPLETE_STATUS.equals(o.getStatus())).count();
                 reportGroupOrderDetailDO.setCompleteOrderCount((int) completeCount);
-                //待处理or进行中的工单数量
+                // 待处理or进行中的工单数量
                 long processingCount = questionOrderList.stream().filter(o -> OperateConstant.WAIT_DEAL_STATUS.equals(o.getStatus()) || OperateConstant.IN_GOING_STATUS.equals(o.getStatus())).count();
                 reportGroupOrderDetailDO.setProcessingOrderCount((int) processingCount);
-                //挂起的工单数量
+                // 挂起的工单数量
                 long pendingCount = questionOrderList.stream().filter(o -> OperateConstant.HANG_UP_STATUS.equals(o.getStatus())).count();
                 reportGroupOrderDetailDO.setPendingOrderCount((int) pendingCount);
-                //处置总时长
+                // 处置总时长
                 long totalHandleTime = questionOrderList.stream().mapToLong(time -> time.getDealConsume() == null ? 0L : time.getDealConsume()).sum();
                 reportGroupOrderDetailDO.setTotalHandleTime(totalHandleTime);
-                //平均处置时长
+                // 平均处置时长
                 long aht = completeCount > 0 ? totalHandleTime / completeCount : 0L;
                 reportGroupOrderDetailDO.setAht(aht);
-                //挂起总时长
+                // 挂起总时长
                 long totalPendingTime = questionOrderList.stream().mapToLong(time -> time.getHangUpConsume() == null ? 0L : time.getHangUpConsume()).sum();
                 reportGroupOrderDetailDO.setPendingTotalTime(totalPendingTime);
-                //平均挂起时长
+                // 平均挂起时长
                 long apt = pendingCount > 0 ? totalPendingTime / pendingCount : 0L;
                 reportGroupOrderDetailDO.setApt(apt);
-                //紧急程度工单数量分布
+                // 紧急程度工单数量分布
                 long lowCount = questionOrderList.stream().filter(o -> "0".equals(o.getLevel())).count();
                 long midCount = questionOrderList.stream().filter(o -> "1".equals(o.getLevel())).count();
                 long higCount = questionOrderList.stream().filter(o -> "2".equals(o.getLevel())).count();
                 reportGroupOrderDetailDO.setUrgencyLevelDistribution("低:" + lowCount + "，中:" + midCount + "，高:" + higCount);
-                //工单接单类型数量分布
+                // 工单接单类型数量分布
                 long disCount = questionOrderList.stream().filter(o -> 0 == o.getType()).count();
                 long actCount = questionOrderList.stream().filter(o -> 1 == o.getType()).count();
                 long pasCount = questionOrderList.stream().filter(o -> 2 == o.getType()).count();
                 reportGroupOrderDetailDO.setOrderTypeDistribution("派:" + disCount + "，抢:" + actCount + "，转:" + pasCount);
-                //主动接单率
+                // 主动接单率
                 BigDecimal totalDecimal = BigDecimal.valueOf(questionOrderList.size());
                 BigDecimal actDecimal = BigDecimal.valueOf(actCount);
                 // 执行除法并保留两位小数（四舍五入）
@@ -269,8 +268,8 @@ public class ReportGroupOrderServiceImpl implements ReportGroupOrderService {
                 } else {
                     reportGroupOrderDetailDO.setOrderAcceptedProportion(BigDecimal.ZERO);
                 }
-                //按时完成率
-                //按时完成数量，即个人处置时长在1h以内，1*60*60*1000
+                // 按时完成率
+                // 按时完成数量，即个人处置时长在1h以内，1*60*60*1000
                 long otCount = questionOrderList.stream().filter(o -> OperateConstant.COMPLETE_STATUS.equals(o.getStatus()) && o.getDealConsume() <= 3600000).count();
                 BigDecimal completeDecimal = BigDecimal.valueOf(completeCount);
                 BigDecimal otDecimal = BigDecimal.valueOf(otCount);
@@ -281,8 +280,8 @@ public class ReportGroupOrderServiceImpl implements ReportGroupOrderService {
                 } else {
                     reportGroupOrderDetailDO.setOnTimeCompletionRate(BigDecimal.ZERO);
                 }
-                //环比增长量
-                //获取上个月
+                // 环比增长量
+                // 获取上个月
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(queryStartDate);
                 // 减去一个月（注意月份从0开始，但此处直接操作无需手动调整）
@@ -291,10 +290,10 @@ public class ReportGroupOrderServiceImpl implements ReportGroupOrderService {
                 String lastDateStr = monthFormatter.format(lastDate);
                 ReportGroupOrderDetailDO lastMonthReport = reportGroupOrderDetailMapper.selectOne(new QueryWrapper<ReportGroupOrderDetailDO>().lambda().eq(ReportGroupOrderDetailDO::getGroupId, group.getGroupId()).eq(ReportGroupOrderDetailDO::getReportMonth, lastDateStr));
                 if (lastMonthReport != null) {
-                    //环比增长量
+                    // 环比增长量
                     long growth = completeCount - lastMonthReport.getCompleteOrderCount();
                     reportGroupOrderDetailDO.setMonthOnMonthGrowth((int) growth);
-                    //环比增长率
+                    // 环比增长率
                     if (lastMonthReport.getCompleteOrderCount() != 0) {
                         BigDecimal growthDecimal = BigDecimal.valueOf(growth);
                         BigDecimal lastDecimal = BigDecimal.valueOf(completeCount);
@@ -309,7 +308,7 @@ public class ReportGroupOrderServiceImpl implements ReportGroupOrderService {
                         reportGroupOrderDetailDO.setMonthOnMonthGrowthRate(BigDecimal.ZERO);
                     }
                 } else {
-                    //没有上个月数据的时候增长量即为全部完成量
+                    // 没有上个月数据的时候增长量即为全部完成量
                     long growth = completeCount;
                     reportGroupOrderDetailDO.setMonthOnMonthGrowth((int) growth);
                     reportGroupOrderDetailDO.setMonthOnMonthGrowthRate(BigDecimal.ZERO);
@@ -330,44 +329,44 @@ public class ReportGroupOrderServiceImpl implements ReportGroupOrderService {
         return reportGroupOrderDetailDOS;
     }
 
-    //分组数据
+    // 分组数据
     public List<ReportGroupOrderDO> handleGroupData(ReportGroupOrderDO reportGroupOrderDO, List<OperationOrderDO> groupOrderList,
                                                     Date queryStartDate, SimpleDateFormat monthFormatter, OperationGroupDO group) {
 
         List<ReportGroupOrderDO> groupOrderDOList = new ArrayList<>();
 
-        //已完成的工单数量
+        // 已完成的工单数量
         long completeCount = groupOrderList.stream().filter(o -> OperateConstant.COMPLETE_STATUS.equals(o.getStatus())).count();
         reportGroupOrderDO.setCompleteOrderCount((int) completeCount);
-        //待处理or进行中的工单数量
+        // 待处理or进行中的工单数量
         long processingCount = groupOrderList.stream().filter(o -> OperateConstant.WAIT_DEAL_STATUS.equals(o.getStatus()) || OperateConstant.IN_GOING_STATUS.equals(o.getStatus())).count();
         reportGroupOrderDO.setProcessingOrderCount((int) processingCount);
-        //挂起的工单数量
+        // 挂起的工单数量
         long pendingCount = groupOrderList.stream().filter(o -> OperateConstant.HANG_UP_STATUS.equals(o.getStatus())).count();
         reportGroupOrderDO.setPendingOrderCount((int) pendingCount);
-        //处置总时长
+        // 处置总时长
         long totalHandleTime = groupOrderList.stream().mapToLong(time -> time.getDealConsume() == null ? 0L : time.getDealConsume()).sum();
         reportGroupOrderDO.setTotalHandleTime(totalHandleTime);
-        //平均处置时长
+        // 平均处置时长
         long aht = completeCount > 0 ? totalHandleTime / completeCount : 0L;
         reportGroupOrderDO.setAht(aht);
-        //挂起总时长
+        // 挂起总时长
         long totalPendingTime = groupOrderList.stream().mapToLong(time -> time.getHangUpConsume() == null ? 0L : time.getHangUpConsume()).sum();
         reportGroupOrderDO.setPendingTotalTime(totalPendingTime);
-        //平均挂起时长
+        // 平均挂起时长
         long apt = pendingCount > 0 ? totalPendingTime / pendingCount : 0L;
         reportGroupOrderDO.setApt(apt);
-        //紧急程度工单数量分布
+        // 紧急程度工单数量分布
         long lowCount = groupOrderList.stream().filter(o -> "0".equals(o.getLevel())).count();
         long midCount = groupOrderList.stream().filter(o -> "1".equals(o.getLevel())).count();
         long higCount = groupOrderList.stream().filter(o -> "2".equals(o.getLevel())).count();
         reportGroupOrderDO.setUrgencyLevelDistribution("低:" + lowCount + "，中:" + midCount + "，高:" + higCount);
-        //工单接单类型数量分布
+        // 工单接单类型数量分布
         long disCount = groupOrderList.stream().filter(o -> 0 == o.getType()).count();
         long actCount = groupOrderList.stream().filter(o -> 1 == o.getType()).count();
         long pasCount = groupOrderList.stream().filter(o -> 2 == o.getType()).count();
         reportGroupOrderDO.setOrderTypeDistribution("派:" + disCount + "，抢:" + actCount + "，转:" + pasCount);
-        //主动接单率
+        // 主动接单率
         BigDecimal totalDecimal = BigDecimal.valueOf(groupOrderList.size());
         BigDecimal actDecimal = BigDecimal.valueOf(actCount);
         // 执行除法并保留两位小数（四舍五入）
@@ -377,8 +376,8 @@ public class ReportGroupOrderServiceImpl implements ReportGroupOrderService {
         } else {
             reportGroupOrderDO.setOrderAcceptedProportion(BigDecimal.ZERO);
         }
-        //按时完成率
-        //按时完成数量，即个人处置时长在1h以内，1*60*60*1000
+        // 按时完成率
+        // 按时完成数量，即个人处置时长在1h以内，1*60*60*1000
         long otCount = groupOrderList.stream().filter(o -> OperateConstant.COMPLETE_STATUS.equals(o.getStatus()) && o.getDealConsume() <= 3600000).count();
         BigDecimal completeDecimal = BigDecimal.valueOf(completeCount);
         BigDecimal otDecimal = BigDecimal.valueOf(otCount);
@@ -389,8 +388,8 @@ public class ReportGroupOrderServiceImpl implements ReportGroupOrderService {
         } else {
             reportGroupOrderDO.setOnTimeCompletionRate(BigDecimal.ZERO);
         }
-        //环比增长量
-        //获取上个月
+        // 环比增长量
+        // 获取上个月
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(queryStartDate);
         // 减去一个月（注意月份从0开始，但此处直接操作无需手动调整）
@@ -399,10 +398,10 @@ public class ReportGroupOrderServiceImpl implements ReportGroupOrderService {
         String lastDateStr = monthFormatter.format(lastDate);
         ReportGroupOrderDO lastMonthReport = reportGroupOrderMapper.selectOne(new QueryWrapper<ReportGroupOrderDO>().lambda().eq(ReportGroupOrderDO::getGroupId, group.getGroupId()).eq(ReportGroupOrderDO::getReportMonth, lastDateStr));
         if (lastMonthReport != null) {
-            //环比增长量
+            // 环比增长量
             long growth = completeCount - lastMonthReport.getCompleteOrderCount();
             reportGroupOrderDO.setMonthOnMonthGrowth((int) growth);
-            //环比增长率
+            // 环比增长率
             if (lastMonthReport.getCompleteOrderCount() != 0) {
                 BigDecimal growthDecimal = BigDecimal.valueOf(growth);
                 BigDecimal lastDecimal = BigDecimal.valueOf(completeCount);
@@ -417,7 +416,7 @@ public class ReportGroupOrderServiceImpl implements ReportGroupOrderService {
                 reportGroupOrderDO.setMonthOnMonthGrowthRate(BigDecimal.ZERO);
             }
         } else {
-            //没有上个月数据的时候增长量即为全部完成量
+            // 没有上个月数据的时候增长量即为全部完成量
             long growth = completeCount;
             reportGroupOrderDO.setMonthOnMonthGrowth((int) growth);
             reportGroupOrderDO.setMonthOnMonthGrowthRate(BigDecimal.ZERO);
