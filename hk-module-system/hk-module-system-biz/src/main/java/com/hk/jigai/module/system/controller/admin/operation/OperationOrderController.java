@@ -64,7 +64,7 @@ public class OperationOrderController {
         LocalTime end = LocalTime.of(17, 0);
         boolean isBetween = !now.isBefore(start) && !now.isAfter(end);
 
-        //上午八点-下午五点，发送新工单通知
+        // 上午八点-下午五点，发送新工单通知
         if (isBetween && createVO.getOpenIdList().size() > 0) {
             asyncExecutor.execute(() -> {
                 sendCreateMsg(createVO);
@@ -134,13 +134,20 @@ public class OperationOrderController {
     @GetMapping("/export-excel")
     @Operation(summary = "导出工单 Excel")
     @ApiAccessLog(operateType = EXPORT)
-    public void exportOperationOrderExcel(@Valid OperationOrderPageReqVO pageReqVO,
-                                          HttpServletResponse response) throws IOException {
+    public void exportOperationOrderExcel(
+            @Valid OperationOrderPageReqVO pageReqVO,
+            HttpServletResponse response
+    ) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<OperationOrderDO> list = operationOrderService.getOperationOrderPage(pageReqVO).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "工单.xls", "数据", OperationOrderRespExportVO.class,
-                BeanUtils.toBean(list, OperationOrderRespExportVO.class));
+        ExcelUtils.write(
+                response,
+                "工单.xls",
+                "数据",
+                OperationOrderRespExportVO.class,
+                BeanUtils.toBean(list, OperationOrderRespExportVO.class)
+        );
     }
 
     @PutMapping("/operateOrder")

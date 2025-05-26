@@ -13,7 +13,6 @@ import com.hk.jigai.module.system.dal.dataobject.operationdevicemodel.OperationD
 import com.hk.jigai.module.system.service.dict.DictDataService;
 import com.hk.jigai.module.system.service.operation.*;
 import com.hk.jigai.module.system.service.operationdevicemodel.OperationDeviceModelService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -24,7 +23,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
 
-import javax.validation.constraints.*;
 import javax.validation.*;
 import javax.servlet.http.*;
 import java.util.*;
@@ -152,13 +150,20 @@ public class OperationDeviceController {
     @Operation(summary = "导出运维设备 Excel")
 //    @PreAuthorize("@ss.hasPermission('hk:operation-device:export')")
     @ApiAccessLog(operateType = EXPORT)
-    public void exportOperationDeviceExcel(@Valid OperationDevicePageReqVO pageReqVO,
-                                           HttpServletResponse response) throws IOException {
+    public void exportOperationDeviceExcel(
+            @Valid OperationDevicePageReqVO pageReqVO,
+            HttpServletResponse response
+    ) throws IOException {
         pageReqVO.setPageSize(PageParam.PAGE_SIZE_NONE);
         List<OperationDeviceDO> list = operationDeviceService.getOperationDevicePage(pageReqVO).getList();
         // 导出 Excel
-        ExcelUtils.write(response, "运维设备.xls", "数据", OperationDeviceRespVO.class,
-                BeanUtils.toBean(list, OperationDeviceRespVO.class));
+        ExcelUtils.write(
+                response,
+                "运维设备.xls",
+                "数据",
+                OperationDeviceRespVO.class,
+                BeanUtils.toBean(list, OperationDeviceRespVO.class)
+        );
     }
 
     @PutMapping("/register")
@@ -194,18 +199,18 @@ public class OperationDeviceController {
     @PreAuthorize("@ss.hasPermission('hk:operation-device:sync')")
 //    public CommonResult<List<OperationDeviceDO>> syncOldDevice() {
     public CommonResult<Boolean> syncOldDevice() {
-        //基础数据
-        //获取公司集合
+        // 基础数据
+        // 获取公司集合
         DictDataPageReqVO dictDataPageReqVO = new DictDataPageReqVO();
         dictDataPageReqVO.setDictType("assets_company");
         dictDataPageReqVO.setPageNo(1);
         dictDataPageReqVO.setPageSize(100);
         List<DictDataDO> dictDataList = dictDataService.getDictDataPage(dictDataPageReqVO).getList();
-        //获取型号集合
+        // 获取型号集合
         List<OperationDeviceModelDO> modelList = operationDeviceModelService.getAllModel();
-        //获取类型集合
+        // 获取类型集合
         List<OperationDeviceTypeDO> typeList = operationDeviceTypeService.getAll();
-        //获取地点数据
+        // 获取地点数据
         List<OperationAddressDO> addressList = operationAddressService.getAllAddress();
 
         OldOperationDevicePageReqVO oldOperationDevicePageReqVO = new OldOperationDevicePageReqVO();
@@ -213,13 +218,13 @@ public class OperationDeviceController {
         Integer pageSize = 20;
 
         Boolean flag = true;
-        //设备数据
+        // 设备数据
         while (flag) {
             oldOperationDevicePageReqVO.setPageNo(pageNo);
             oldOperationDevicePageReqVO.setPageSize(pageSize);
             List<OperationDeviceDO> operationDeviceDOS = operationDeviceService.syncOldDevice(oldOperationDevicePageReqVO);
             if (CollectionUtil.isNotEmpty(operationDeviceDOS)) {
-                //处理数据
+                // 处理数据
                 operationDeviceService.handleData(operationDeviceDOS, dictDataList, modelList, typeList, addressList);
                 pageNo++;
             } else {
