@@ -178,6 +178,9 @@ public class OperationDeviceRespVO {
     @Schema(description = "问题类型明文")
     private String questionTypeStr;
 
+    @Schema(description = "是否安装杀毒软件，0:是 1:否")
+    private Integer antivirusInstalled;
+
     //1:新，2：旧
     private Integer flag;
 }

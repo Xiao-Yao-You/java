@@ -133,4 +133,6 @@ public class OperationDevicePageReqVO extends PageParam {
 
     private String modelName;
 
+    @Schema(description = "是否安装杀毒软件，0:是 1:否")
+    private Integer antivirusInstalled;
 }

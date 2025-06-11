@@ -16,7 +16,6 @@ import com.hk.jigai.module.system.controller.admin.operation.vo.*;
  */
 @Mapper
 public interface OperationDeviceMapper extends BaseMapperX<OperationDeviceDO> {
-
     default PageResult<OperationDeviceDO> selectPage(OperationDevicePageReqVO reqVO) {
         return selectPage(reqVO, new LambdaQueryWrapperX<OperationDeviceDO>()
                 .likeIfPresent(OperationDeviceDO::getName, reqVO.getName())
@@ -28,6 +27,7 @@ public interface OperationDeviceMapper extends BaseMapperX<OperationDeviceDO> {
                 .likeIfPresent(OperationDeviceDO::getLabelCode, reqVO.getLabelCode())
                 .eqIfPresent(OperationDeviceDO::getStatus, reqVO.getStatus())
                 .eqIfPresent(OperationDeviceDO::getCompany, reqVO.getCompany())
+                .eqIfPresent(OperationDeviceDO::getAntivirusInstalled, reqVO.getAntivirusInstalled())
                 .eqIfPresent(OperationDeviceDO::getSerialNumber, reqVO.getSerialNumber())
                 .eqIfPresent(OperationDeviceDO::getEffectLevel, reqVO.getEffectLevel())
                 .eqIfPresent(OperationDeviceDO::getNumberName, reqVO.getNumberName())

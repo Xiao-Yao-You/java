@@ -51,6 +51,9 @@ public class OperationDeviceSaveReqVO {
 //    @NotNull(message = "所属单位 0:恒科,1:轩达,2:其他不能为空")
     private Integer company;
 
+    @Schema(description = "是否安装杀毒软件，0:是 1:否", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Integer antivirusInstalled;
+
     @Schema(description = "序列号", requiredMode = Schema.RequiredMode.REQUIRED)
 //    @NotEmpty(message = "序列号不能为空")
     private String serialNumber;
@@ -98,7 +101,6 @@ public class OperationDeviceSaveReqVO {
     @Schema(description = "使用地点", example = "32586")
     private List<Long> addressId;
     private String address;
-
 
     @Schema(description = "设备位置")
     private String location;

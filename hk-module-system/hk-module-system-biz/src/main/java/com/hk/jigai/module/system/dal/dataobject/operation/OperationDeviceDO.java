@@ -208,4 +208,10 @@ public class OperationDeviceDO extends BaseDO {
     @TableField(exist = false)
     private String usePersonName;
 
+    /**
+     * 是否安转杀毒软件
+     */
+    @TableField(exist = false)
+    private Integer antivirusInstalled;
+
 }
