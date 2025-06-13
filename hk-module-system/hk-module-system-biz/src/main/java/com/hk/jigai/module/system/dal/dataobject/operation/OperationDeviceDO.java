@@ -211,7 +211,7 @@ public class OperationDeviceDO extends BaseDO {
     /**
      * 是否安转杀毒软件
      */
-    @TableField(exist = false)
+    // @TableField(exist = false)
     private Integer antivirusInstalled;
 
 }

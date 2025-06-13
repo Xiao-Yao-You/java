@@ -75,6 +75,10 @@ public class OperationDeviceRespVO {
     // @ExcelProperty("是否需要巡检，0:是 1:否")
     private Integer needCheckFlag;
 
+    @Schema(description = "是否安装杀毒软件，0:是 1:否")
+    @ExcelProperty("是否安装杀毒软件，0:是 1:否")
+    private Integer antivirusInstalled;
+
     @Schema(description = "设备部门", example = "27960")
     // @ExcelProperty("设备部门")
     private Long deptId;
@@ -177,9 +181,6 @@ public class OperationDeviceRespVO {
 
     @Schema(description = "问题类型明文")
     private String questionTypeStr;
-
-    @Schema(description = "是否安装杀毒软件，0:是 1:否")
-    private Integer antivirusInstalled;
 
     //1:新，2：旧
     private Integer flag;
