@@ -60,4 +60,6 @@ public interface ReportPersonOrderService {
      * @return
      */
     List<ReportPersonOrderDO> generateReport(String month);
+
+    void deleteReport(String month);
 }

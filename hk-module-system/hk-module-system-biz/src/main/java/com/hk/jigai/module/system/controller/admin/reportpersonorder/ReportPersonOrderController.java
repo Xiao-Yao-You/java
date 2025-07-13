@@ -51,6 +51,13 @@ public class ReportPersonOrderController {
         return success(personOrderDOS);
     }
 
+    @PostMapping("/deleteReport")
+    @Operation(summary = "删除报表")
+    public CommonResult<Boolean> deleteReport(@RequestParam("month") String month) {
+        reportPersonOrderService.deleteReport(month);
+        return success(true);
+    }
+
     @PostMapping("/create")
     @Operation(summary = "创建个人工单处理月报")
     @PreAuthorize("@ss.hasPermission('hk:report-person-order:create')")
