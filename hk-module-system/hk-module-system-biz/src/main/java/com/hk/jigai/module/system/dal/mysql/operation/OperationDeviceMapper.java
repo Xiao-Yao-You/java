@@ -27,6 +27,7 @@ public interface OperationDeviceMapper extends BaseMapperX<OperationDeviceDO> {
                 .likeIfPresent(OperationDeviceDO::getLabelCode, reqVO.getLabelCode())
                 .eqIfPresent(OperationDeviceDO::getStatus, reqVO.getStatus())
                 .eqIfPresent(OperationDeviceDO::getCompany, reqVO.getCompany())
+                .eqIfPresent(OperationDeviceDO::getDeptId, reqVO.getDeptId())
                 .eqIfPresent(OperationDeviceDO::getAntivirusInstalled, reqVO.getAntivirusInstalled())
                 .eqIfPresent(OperationDeviceDO::getSerialNumber, reqVO.getSerialNumber())
                 .eqIfPresent(OperationDeviceDO::getEffectLevel, reqVO.getEffectLevel())
