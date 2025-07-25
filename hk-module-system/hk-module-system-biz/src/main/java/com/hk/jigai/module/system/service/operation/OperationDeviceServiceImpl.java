@@ -109,7 +109,7 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
     @Transactional
     public Long createOperationDevice(OperationDeviceSaveReqVO createReqVO) {
         createReqVO.setStatus(1);
-        //1.先查询设备类型，设备编码
+        // 1.先查询设备类型，设备编码
         OperationDeviceTypeDO operationLabelDO = operationDeviceTypeMapper.selectById(createReqVO.getDeviceType());
         if (operationLabelDO == null) {
             throw exception(OPERATION_DEVICE_TYPE_NOT_EXISTS);
@@ -121,7 +121,7 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
         createReqVO.setCode(sceneCodeService.increment(sceneCodeDO.getKeyCode()));
         operationLabelDO.setCurrentCode(createReqVO.getCode());
 
-        //2.标签编码
+        // 2.标签编码
         if (StringUtils.isEmpty(createReqVO.getLabelCode())) {
             SceneCodeDO labelSceneCodeDO = sceneCodeService.getSceneCode(operationLabelDO.getLabelSceneCodeId().intValue());
             if (labelSceneCodeDO == null) {
@@ -130,14 +130,14 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
             createReqVO.setLabelCode(sceneCodeService.increment(labelSceneCodeDO.getKeyCode()));
             operationLabelDO.setLabelCurrentCode(createReqVO.getLabelCode());
         } else {
-            //绑定了设备，更新设备标签状态为已使用
+            // 绑定了设备，更新设备标签状态为已使用
             OperationLabelCodeDO operationLabelCodeDO = operationLabelCodeMapper.selectOne(new QueryWrapper<OperationLabelCodeDO>().lambda().eq(OperationLabelCodeDO::getCode, createReqVO.getLabelCode()));
             operationLabelCodeDO.setStatus(1);
             operationLabelCodeMapper.updateById(operationLabelCodeDO);
         }
-        //3.更新设备类型表
+        // 3.更新设备类型表
         operationDeviceTypeMapper.updateById(operationLabelDO);
-        //4.设备表插入
+        // 4.设备表插入
         OperationDeviceDO operationDevice = BeanUtils.toBean(createReqVO, OperationDeviceDO.class);
         OperationDeviceModelDO operationDeviceModelDO = operationDeviceModelMapper.selectOne(new QueryWrapper<OperationDeviceModelDO>().lambda().eq(OperationDeviceModelDO::getId, operationDevice.getModel()));
         if (operationDeviceModelDO != null) {
@@ -146,15 +146,15 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
 //        OperationAddressDO operationAddressDO = operationAddressMapper.selectById(operationDevice.getAddressId());
 //        operationDevice.setAddress(operationAddressDO == null ? "" : operationAddressDO.getAddressName());
         operationDeviceMapper.insert(operationDevice);
-        //5.图片
+        // 5.图片
         List<OperationDevicePictureDO> operationDevicePictureList = BeanUtils.toBean(createReqVO.getPictureList(), OperationDevicePictureDO.class);
         operationDevicePictureList.forEach((a) -> a.setDeviceId(operationDevice.getId()));
         operationDevicePictureMapper.insertBatch(operationDevicePictureList);
-        //6.配置
+        // 6.配置
         List<OperationDeviceAccessoryDO> operationDeviceAccessoryList = BeanUtils.toBean(createReqVO.getAccessoryList(), OperationDeviceAccessoryDO.class);
         operationDeviceAccessoryList.forEach((a) -> a.setDeviceId(operationDevice.getId()));
         operationDeviceAccessoryMapper.insertBatch(operationDeviceAccessoryList);
-        //7.返回
+        // 7.返回
         return operationDevice.getId();
     }
 
@@ -163,9 +163,9 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
     public void updateOperationDevice(OperationDeviceSaveReqVO updateReqVO) {
         // 校验存在
         validateOperationDeviceExists(updateReqVO.getId());
-        //获取原数据
+        // 获取原数据
         Long deviceId = updateReqVO.getId();
-        //创建快照
+        // 创建快照
         createDeviceSnapshot(deviceId);
 
         OperationDeviceDO last = operationDeviceMapper.selectById(updateReqVO.getId());
@@ -184,7 +184,7 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
             updateObj.setModelName(operationDeviceModelDO.getModel());
         }
         operationDeviceMapper.updateById(updateObj);
-        //5.图片
+        // 5.图片
         operationDevicePictureMapper.delete(new QueryWrapper<OperationDevicePictureDO>().lambda()
                 .eq(OperationDevicePictureDO::getDeviceId, updateReqVO.getId())
                 .eq(OperationDevicePictureDO::getType, "0"));
@@ -195,7 +195,7 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
         });
 
         operationDevicePictureMapper.insertBatch(operationDevicePictureList);
-        //6.配置
+        // 6.配置
         operationDeviceAccessoryMapper.delete(new QueryWrapper<OperationDeviceAccessoryDO>().lambda().in(OperationDeviceAccessoryDO::getDeviceId, updateReqVO.getId()));
         List<OperationDeviceAccessoryDO> operationDeviceAccessoryList = BeanUtils.toBean(updateReqVO.getAccessoryList(), OperationDeviceAccessoryDO.class);
         operationDeviceAccessoryList.forEach((a) -> {
@@ -205,18 +205,18 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
         operationDeviceAccessoryMapper.insertBatch(operationDeviceAccessoryList);
     }
 
-    //创建设备快照
+    // 创建设备快照
     @Transactional
     public void createDeviceSnapshot(Long deviceId) {
-        //原设备基础信息
+        // 原设备基础信息
         OperationDeviceDO oldDevice = operationDeviceMapper.selectById(deviceId);
-        //获取原图片
+        // 获取原图片
         List<OperationDevicePictureDO> oldDevicePictureDOS = operationDevicePictureMapper.selectList(new QueryWrapper<OperationDevicePictureDO>().lambda()
                 .eq(OperationDevicePictureDO::getDeviceId, deviceId));
-        //获取原分配记录
+        // 获取原分配记录
         List<OperationDeviceAccessoryDO> oldDeviceAccessoryDOS = operationDeviceAccessoryMapper.selectList(new QueryWrapper<OperationDeviceAccessoryDO>().lambda().eq(OperationDeviceAccessoryDO::getDeviceId, deviceId));
 
-        //数据转换
+        // 数据转换
         OperationDeviceHistoryDO operationDeviceHistoryDO = BeanUtils.toBean(oldDevice, OperationDeviceHistoryDO.class);
         operationDeviceHistoryDO.setId(null);
         operationDeviceHistoryDO.setCreateTime(null);
@@ -291,7 +291,7 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
                     .eq(OperationDeviceAccessoryDO::getDeviceId, operationDeviceDO.getId())));
             List<OperationDeviceAccessorySaveReqVO> accessoryList = BeanUtils.toBean(operationDeviceAccessoryDOS, OperationDeviceAccessorySaveReqVO.class);
             resp.setAccessoryList(accessoryList);
-            //编码名称
+            // 编码名称
             if (operationDeviceDO.getNumberName() != null) {
                 SceneCodeDO sceneCode = sceneCodeService.getSceneCode(operationDeviceDO.getNumberName().intValue());
                 if (sceneCode != null) {
@@ -306,7 +306,7 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
     @Override
     public OperationDeviceRespVO getOperationDeviceByLabelCode(String labelCode) {
         OperationDeviceDO operationDeviceDO = operationDeviceMapper.selectOne(new QueryWrapper<OperationDeviceDO>().lambda().eq(OperationDeviceDO::getLabelCode, labelCode));
-        //先从新系统获取数据
+        // 先从新系统获取数据
         OperationDeviceRespVO resp = new OperationDeviceRespVO();
         if (operationDeviceDO != null) {
             resp = BeanUtils.toBean(operationDeviceDO, OperationDeviceRespVO.class);
@@ -329,7 +329,7 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
     @Override
     @Slave
     public OperationDeviceRespVO getOldOperationDeviceByLabelCode(String labelCode) {
-        //先从新系统获取数据
+        // 先从新系统获取数据
         OperationDeviceRespVO resp = new OperationDeviceRespVO();
         OldOperationDeviceDO oldOperationDeviceDO = oldOperationDeviceMapper.selectOne(new QueryWrapper<OldOperationDeviceDO>().lambda().eq(OldOperationDeviceDO::getBarcode, labelCode));
         if (oldOperationDeviceDO != null) {
@@ -369,6 +369,16 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
 
     @Override
     public PageResult<OperationDeviceDO> getOperationDevicePage(OperationDevicePageReqVO pageReqVO) {
+        // // 取出 deviceList
+        // PageResult<OperationDeviceDO> operationDeviceDOPageResult = operationDeviceMapper.selectPage(pageReqVO);
+        // List<OperationDeviceDO> deviceList = operationDeviceDOPageResult.getList();
+        //
+        // // 处理 deviceList
+        //
+        // // 返回 deviceList
+        // operationDeviceDOPageResult.setList(deviceList);
+        // return operationDeviceDOPageResult;
+
         return operationDeviceMapper.selectPage(pageReqVO);
     }
 
@@ -376,14 +386,14 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
     @Transactional
     public void register(OperationDeviceRegisterReqVO registerReqVO) {
 
-        //创建快照
+        // 创建快照
         createDeviceSnapshot(registerReqVO.getId());
-        //查询设备信息
+        // 查询设备信息
         OperationDeviceDO operationDeviceDO = operationDeviceMapper.selectById(registerReqVO.getId());
         if (operationDeviceDO == null) {
             throw exception(OPERATION_DEVICE_NOT_EXISTS);
         }
-        //状态更新
+        // 状态更新
         operationDeviceDO.setStatus(0);
         operationDeviceDO.setDeptId(registerReqVO.getDeptId());
         operationDeviceDO.setDeptName(registerReqVO.getDeptName());
@@ -409,9 +419,9 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
         } else {
             operationDeviceDO.setStatus(1);
         }
-        //更新
+        // 更新
         operationDeviceMapper.updateById(operationDeviceDO);
-        //picture表
+        // picture表
         operationDevicePictureMapper.delete(new QueryWrapper<OperationDevicePictureDO>().lambda()
                 .eq(OperationDevicePictureDO::getDeviceId, operationDeviceDO.getId())
                 .eq(OperationDevicePictureDO::getType, "1"));
@@ -423,12 +433,12 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
     @Override
     @Transactional
     public void scrap(OperationDeviceScrapReqVO scrapReqVO) {
-        //查询设备信息
+        // 查询设备信息
         OperationDeviceDO operationDeviceDO = operationDeviceMapper.selectById(scrapReqVO.getId());
         if (operationDeviceDO == null) {
             throw exception(OPERATION_DEVICE_NOT_EXISTS);
         }
-        //状态更新
+        // 状态更新
         operationDeviceDO.setStatus(2);
         operationDeviceDO.setScrapDate(scrapReqVO.getScrapDate());
         operationDeviceDO.setScrapType(scrapReqVO.getScrapType());
@@ -439,9 +449,9 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
         operationDeviceDO.setScrapDealType(scrapReqVO.getScrapDealType());
         operationDeviceDO.setScrapRemark(scrapReqVO.getScrapRemark());
 
-        //更新
+        // 更新
         operationDeviceMapper.updateById(operationDeviceDO);
-        //picture表
+        // picture表
         List<OperationDevicePictureDO> operationDevicePictureList = BeanUtils.toBean(scrapReqVO.getPictureList(), OperationDevicePictureDO.class);
         operationDevicePictureList.forEach((a) -> a.setDeviceId(operationDeviceDO.getId()));
         operationDevicePictureMapper.insertBatch(operationDevicePictureList);
@@ -473,14 +483,14 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
     public List<OperationDeviceDO> handleData(List<OperationDeviceDO> operationDeviceDOS, List<DictDataDO> companyList, List<OperationDeviceModelDO> modelList, List<OperationDeviceTypeDO> typeList, List<OperationAddressDO> addressList) {
         List<OperationDevicePictureDO> operationDevicePictureDOS = new ArrayList<>();
         for (OperationDeviceDO device : operationDeviceDOS) {
-            //处理公司数据
+            // 处理公司数据
             if (StringUtils.isNotBlank(device.getCompanyName())) {
                 List<DictDataDO> collect = companyList.stream().filter(p -> device.getCompanyName().equals(p.getLabel())).collect(Collectors.toList());
                 if (CollectionUtil.isNotEmpty(collect)) {
                     device.setCompany(Integer.parseInt(collect.get(0).getValue()));
                 }
             }
-            //处理类型数据
+            // 处理类型数据
             if (StringUtils.isNotBlank(device.getTypeName())) {
                 List<OperationDeviceTypeDO> collect = typeList.stream().filter(p -> device.getTypeName().equals(p.getName())).collect(Collectors.toList());
                 if (CollectionUtil.isNotEmpty(collect)) {
@@ -490,7 +500,7 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
                 }
 
             }
-            //处理型号数据
+            // 处理型号数据
             if (StringUtils.isNotBlank(device.getModelName())) {
                 List<OperationDeviceModelDO> collect = modelList.stream().filter(p -> device.getModelName().equals(p.getModel())).collect(Collectors.toList());
                 if (CollectionUtil.isNotEmpty(collect)) {
@@ -498,7 +508,7 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
                     device.setModelName(collect.get(0).getModel());
                 }
             }
-            //处理地点数据
+            // 处理地点数据
             if (StringUtils.isNotBlank(device.getAddress())) {
                 List<OperationAddressDO> collect = addressList.stream().filter(p -> device.getAddress().equals(p.getAddressName())).collect(Collectors.toList());
                 if (CollectionUtil.isNotEmpty(collect)) {
@@ -506,13 +516,13 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
                     device.setAddress(collect.get(0).getAddressName());
                 }
             }
-            //获取部门
+            // 获取部门
             List<DeptDO> deptDOS = deptMapper.selectList(new QueryWrapper<DeptDO>().lambda().eq(DeptDO::getName, device.getDepartmentName()));
             if (CollectionUtil.isNotEmpty(deptDOS)) {
                 device.setDeptId(deptDOS.get(0).getId());
                 device.setDeptName(deptDOS.get(0).getName());
             }
-            //使用人
+            // 使用人
             if (StringUtils.isNotBlank(device.getUsePersonName()) && StringUtils.isNotBlank(device.getDeptId() + "")) {
                 AdminUserDO user = adminUserService.getUserByNickNameAndDept(device.getUsePersonName(), device.getDeptId());
                 if (user != null) {
@@ -523,7 +533,7 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
                 }
 
             }
-            //登记人
+            // 登记人
             if (StringUtils.isNotBlank(device.getRegisterUserName())) {
                 AdminUserDO userByNickName = adminUserService.getUserByNickName(device.getRegisterUserName());
                 device.setRegisterUserId(userByNickName.getId());
@@ -534,7 +544,7 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
 
             }
 
-            //处理状态值
+            // 处理状态值
             switch (device.getStatus()) {
                 case 1:
                     device.setStatus(4);
@@ -558,7 +568,7 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
                     device.setStatus(1);
                     break;
             }
-            //处理影响程度
+            // 处理影响程度
             switch (device.getEffectLevel()) {
                 case "1":
                     device.setEffectLevel("0");
@@ -573,7 +583,7 @@ public class OperationDeviceServiceImpl implements OperationDeviceService {
                     device.setEffectLevel("0");
                     break;
             }
-            //处理图片
+            // 处理图片
             String picPath = "https://szh.jshkxcl.cn/hkjg-oldpic/";
             String displayPhoto = device.getDisplayPhoto();
             String productPhoto = device.getProductPhoto(); // 0

@@ -161,8 +161,8 @@ public class OperationDeviceController {
                 response,
                 "运维设备.xls",
                 "数据",
-                OperationDeviceRespVO.class,
-                BeanUtils.toBean(list, OperationDeviceRespVO.class)
+                OperationDeviceRespExportVO.class,
+                BeanUtils.toBean(list, OperationDeviceRespExportVO.class)
         );
     }
 

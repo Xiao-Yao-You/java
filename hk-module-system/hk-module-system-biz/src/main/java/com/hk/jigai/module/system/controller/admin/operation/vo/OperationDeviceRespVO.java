@@ -46,11 +46,11 @@ public class OperationDeviceRespVO {
     private String labelCode;
 
     @Schema(description = "状态 0:在用,1:闲置,2:报废", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    // @ExcelProperty("状态 0:在用,1:闲置,2:报废")
+    @ExcelProperty("设备状态")
     private Integer status;
 
-    @Schema(description = "所属单位 0:恒科,1:轩达,2:其他", requiredMode = Schema.RequiredMode.REQUIRED)
-    // @ExcelProperty("所属单位 0:恒科,1:轩达,2:其他")
+    @Schema(description = "所属公司 0:恒科,1:轩达,2:其他", requiredMode = Schema.RequiredMode.REQUIRED)
+    @ExcelProperty("所属公司")
     private Integer company;
 
     @Schema(description = "序列号", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -76,7 +76,7 @@ public class OperationDeviceRespVO {
     private Integer needCheckFlag;
 
     @Schema(description = "是否安装杀毒软件，0:是 1:否")
-    @ExcelProperty("是否安装杀毒软件，0:是 1:否")
+    @ExcelProperty("是否安装杀毒软件")
     private Integer antivirusInstalled;
 
     @Schema(description = "设备部门", example = "27960")
